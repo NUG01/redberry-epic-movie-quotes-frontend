@@ -1,5 +1,5 @@
 <template>
-   <Form @submit="onSubmit" class="w-[36rem] mb-[3.2rem]">
+   <Form @submit="onSubmit" class="w-[36rem] mb-[3.2rem]" mode="aggresive">
       <base-input rules="required|min:2" name="name" type="text" placeholder="At least 3 & max.15 lower case characters" label="Name"/>
       <base-input rules="required|min:2" name="email" type="email" placeholder="Enter your email" label="Email"/>
       <base-input rules="required|min:2" name="password" type="password" placeholder="At least 8 & max.15 lower case characters" label="Password"/>
@@ -20,8 +20,12 @@ import { Form } from 'vee-validate';
 export default {
   components:{BaseInput,BaseButton, GoogleSymbol,Form},
    setup(){
+
+
+   
+
     function onSubmit(){
-      console.log('submitted')
+      
     }
     
     
