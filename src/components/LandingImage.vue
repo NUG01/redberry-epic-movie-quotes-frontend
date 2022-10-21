@@ -1,3 +1,22 @@
+<script>
+export default {
+props:['margintop','image','gradient'],
+setup(props){
+  const margintop=props.margintop;
+  const image=props.image;
+  const gradient=props.gradient;
+
+  return {
+    margintop,
+    image,
+    gradient
+     }
+  }
+}
+
+</script>
+
+
 <template>
   <div class="w-[100%] h-[100vh] relative"><img class="w-[100%] h-[100%]" :src="image" /><div class="absolute top-0 left-0 h-[100%] w-[100%] z-10" :class="gradient">
    <div class="h-[auto] w-[60%] custom-grid ml-[5%] gap-[1.6rem]" :class="margintop">
@@ -11,23 +30,6 @@
   </div>
 </template>
 
-<script>
-export default {
-props:['margintop','image','gradient'],
-setup(props){
-  const margintop=props.margintop;
-  const image=props.image;
-  const gradient=props.gradient;
-
-return {
-margintop,
-image,
-gradient
-     }
-  }
-}
-
-</script>
 
 
 
@@ -38,8 +40,8 @@ gradient
 .gradient-four{
  background: linear-gradient(360deg, rgba(17, 16, 26, 0.95) 0%, rgba(8, 8, 13, 0.13) 50%, rgba(0, 0, 0, 0) 100%);
 }
-.gradient-five{
-background: linear-gradient(187.16deg, #181623 0.07%, #191725 51.65%, #0D0B14 98.75%);
+.gradient-two{
+  background: linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 55.21%, rgba(0, 0, 0, 0) 100%);
 }
 .custom-grid{
   display: grid;

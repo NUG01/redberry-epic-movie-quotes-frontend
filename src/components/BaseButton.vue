@@ -1,3 +1,32 @@
+<script>
+export default {
+  props:['type','paddings','rounded','text','width'],
+  setup(props,context){
+    const type=props.type;
+    const paddings=props.paddings;
+    const rounded=props.rounded;
+    const text=props.text;
+    const width=props.width;
+
+     function emitBase(){
+      context.emit('emit-base')
+    };
+
+
+   return{
+    type,
+    paddings,
+    rounded,
+    text,
+    width,
+    emitBase
+    }
+  }
+}
+</script>
+
+
+
 <template>
     <button @click="emitBase"
     :type="type" :class="[rounded, width]"
@@ -19,33 +48,6 @@
     focus:shadow-base-shadow">
     <p :class="[paddings, text, width]"><slot></slot></p></button>
 </template>
-
-<script>
-export default {
-  props:['type','paddings','rounded','text','width'],
-  setup(props,context){
-    const type=props.type;
-    const paddings=props.paddings;
-    const rounded=props.rounded;
-    const text=props.text;
-    const width=props.width;
-
-     function emitBase(){
-          context.emit('emit-base')
-        };
-
-
-    return{
-      type,
-      paddings,
-      rounded,
-      text,
-      width,
-      emitBase
-      }
-  }
-}
-</script>
 
 
 <style scoped>
