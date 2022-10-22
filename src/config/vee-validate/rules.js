@@ -18,9 +18,9 @@ if (value && !regexName.test(value) || regexNum.test(value) || regexLetter.test(
 }
  });
 
-const regexEnail=/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+const regexEmail=/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 defineRule('email_valid', value => {
-if (value && !regexEnail.test(value)) {
+if (value && !regexEmail.test(value)) {
   return 'Please use correct email address';
 }else{
   return true;

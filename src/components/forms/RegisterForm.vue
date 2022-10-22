@@ -1,7 +1,7 @@
 <template>
    <Form @submit="onSubmit" class="w-[36rem] mb-[3.2rem]">
       <base-input rules='required|min:3|max:15|lower_case' name="name" type="text" placeholder="At least 3 & max.15 lower case characters" label="Name"/>
-      <base-input rules='required|email' name="email" type="email" placeholder="Enter your email" label="Email"/>
+      <base-input rules='required|email|email_valid' name="email" type="email" placeholder="Enter your email" label="Email"/>
       <base-input rules='required|min:8|max:15|lower_case' name="password" type="password" placeholder="At least 8 & max.15 lower case characters" label="Password"/>
       <base-input rules='required|confirmed:@password' name="confirm_password" type="password" placeholder="Confirm password" label="Confirm password"/>
       <base-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] mt-[2.4rem]" width="w-[100%]">Get started</base-button>
@@ -16,10 +16,10 @@ import BaseInput from "@/components/BaseInput.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import GoogleSymbol from "@/components/icons/GoogleSymbol.vue";
 import { Form } from 'vee-validate';
-import { ref } from 'vue';
 export default {
   components:{BaseInput,BaseButton, GoogleSymbol,Form},
    setup(){
+      
       function onSubmit(values){
       console.log(values)
     }
