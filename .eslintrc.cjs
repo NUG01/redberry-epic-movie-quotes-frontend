@@ -9,7 +9,7 @@ module.exports = {
     "@vue/eslint-config-prettier",
     "eslint:recommended",
     "plugin:vue/vue3-recommended",
-     "prettier"
+    "prettier",
   ],
   overrides: [
     {
