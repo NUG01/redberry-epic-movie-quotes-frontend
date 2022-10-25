@@ -23,7 +23,7 @@
       <p class="text-[3.2rem] text-[#ffffff] font-medium">Thank you!</p>
       <p class="text-[1.6rem] text-[#ffffff]">Please check your email and follow the instructions to activate your account.</p>
       </div>
-      <a href="https://mail.google.com/" style="width:100%"><base-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Go to my email</base-button></a>
+      <a href="https://mail.google.com/" style="width:100%"><basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Go to my email</basic-button></a>
 </div>
   </div>
 </div>
@@ -33,14 +33,14 @@
 import FormHeader from "@/components/FormHeader.vue";
 import RegisterForm from "@/components/forms/RegisterForm.vue";
 import VerifyEmail from "@/components/icons/VerifyEmail.vue";
-import BaseButton from "@/components/BaseButton.vue";
+import BasicButton from "@/components/BasicButton.vue";
 import { useRouter } from "vue-router";
 import { ref, computed } from "vue";
 import { useRegisterStore } from '@/stores/RegisterStore.js';
 export default {
   name:"registration",
   emits:['showSuccess'],
-  components:{FormHeader,RegisterForm,VerifyEmail,BaseButton},
+  components:{FormHeader,RegisterForm,VerifyEmail,BasicButton},
   setup(){
     const router=useRouter();
      const register = useRegisterStore();
@@ -57,7 +57,7 @@ export default {
     }, "3600")
 
     function modalHide(){
-     return router.push('/landing');
+     return router.push({name:'landing'});
     }
 
     

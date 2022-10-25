@@ -24,7 +24,7 @@ export default {
     const router=useRouter();
 
     function modalHide(){
-     return router.push('/landing');
+     return router.push({name:'landing'});
     }
     
     return {

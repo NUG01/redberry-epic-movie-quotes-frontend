@@ -1,3 +1,5 @@
+// import axios from "@/config/axios/index.js";
+
 export const getJwtToken = () => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`jwt_token=`);

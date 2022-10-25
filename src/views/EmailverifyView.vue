@@ -14,17 +14,10 @@
 </template>
 
 <script>
-import { useRouter } from "vue-router";
-import { onMounted } from "vue";
-import { getJwtToken } from "@/helpers/jwt/index.js";
 export default {
   name: 'verification', 
-  components:['EmailverifyView'],
 
   setup(){
-    const router=useRouter();
-
-    return {}
   }
   
 }
