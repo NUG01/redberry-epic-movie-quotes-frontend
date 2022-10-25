@@ -15,13 +15,18 @@
 import BaseInput from "@/components/BaseInput.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import GoogleSymbol from "@/components/icons/GoogleSymbol.vue";
-import { Form } from 'vee-validate';
+import { Form } from 'vee-validate';                 
+import { useRouter } from 'vue-router';
+import { getJwtToken } from "@/helpers/jwt/index.js";
+import { useRegisterStore } from '@/stores/RegisterStore.js';
 export default {
   components:{BaseInput,BaseButton, GoogleSymbol,Form},
    setup(){
+    const router=useRouter();
+    const register = useRegisterStore();
       
       function onSubmit(values){
-      console.log(values)
+        register.fetchApi(values);
     }
     return {
     onSubmit,
