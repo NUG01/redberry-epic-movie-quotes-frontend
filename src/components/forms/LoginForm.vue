@@ -1,6 +1,6 @@
 <template>
    <Form @submit="onSubmit" class="w-[36rem] mb-[3.2rem]">
-      <basic-input rules='required|min:3' name="email" type="email" placeholder="Enter your email" label="Email"/>
+      <basic-input rules='required|min:3' name="name" type="text" placeholder="Enter your email" label="Email"/>
       <basic-input rules='required' name="password" type="password" placeholder="At least 8 & max.15 lower case characters" label="Password"/>      
       <div class="flex mb-[1.6rem] mt-[1.6rem] justify-between">
         <remember-me></remember-me>
@@ -20,12 +20,20 @@ import BasicButton from "@/components/BasicButton.vue";
 import RememberMe from "@/components/RememberMe.vue";
 import GoogleSymbol from "@/components/icons/GoogleSymbol.vue";
 import { Form } from 'vee-validate';
+import { getJwtToken } from "@/helpers/jwt/index.js";
+import { useLoginStore } from '@/stores/LoginStore.js';
+import { useRouter } from 'vue-router';
 export default {
   components:{BasicInput,BasicButton, GoogleSymbol,Form,RememberMe},
    setup(){
+    const login = useLoginStore();
+    const router = useRouter();
 
     function onSubmit(values){
-    }
+     const loginPromise=new Promise((resolve,_)=>{resolve(login.sendLoginData(values))});
+      loginPromise.then(router.push({name:'verification'}));
+       }
+
     
     return {
     onSubmit
