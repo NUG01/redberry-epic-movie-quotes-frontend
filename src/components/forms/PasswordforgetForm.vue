@@ -18,17 +18,17 @@ import BasicInput from "@/components/BasicInput.vue";
 import BasicButton from "@/components/BasicButton.vue";
 import BackArrow from "@/components/icons/BackArrow.vue";
 import { Form } from 'vee-validate';
-import { ref } from 'vue';
+import { useForgotPasswordStore } from '@/stores/ForgotPasswordStore.js';
 export default {
   components:{BasicInput,BasicButton,Form,BackArrow},
-   setup(){
-
-
-    function onSubmit(values){
+    setup(){
+    const forgotPassword = useForgotPasswordStore();
+      
+      function onSubmit(values){
+        forgotPassword.sendForgotPasswordData(values);
     }
-    
     return {
-    onSubmit
+    onSubmit,
    }
   }
   }
