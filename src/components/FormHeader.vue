@@ -4,3 +4,4 @@
       <p class="text-[1.6rem] text-[#6C757D]"><slot name="secondaryText"></slot></p>
       </div>
 </template>
+

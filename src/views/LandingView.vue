@@ -1,11 +1,11 @@
 <script>
-import BaseButton from "@/components/BaseButton.vue";
+import BasicButton from "@/components/BasicButton.vue";
 import LandingImage from "@/components/LandingImage.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
 export default{
   name:"landing",
-  components:{BaseButton, LandingImage, DropdownArrow, LandingFooter,}
+  components:{BasicButton, LandingImage, DropdownArrow, LandingFooter,}
 
 }
 
@@ -23,7 +23,7 @@ export default{
         <p class="text-[1.6rem] text-[white]">Eng</p>
       <dropdown-arrow></dropdown-arrow>
       </div>
-      <router-link to="/landing/register"><base-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</base-button></router-link>
+      <router-link to="/landing/register"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</basic-button></router-link>
       <router-link to="/landing/login"><button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px]">Log in</button></router-link>
     </div>
   </header>
@@ -32,7 +32,7 @@ export default{
 <div class="w-[100%] h-[80vh] gradient-one flex items-center justify-center">
   <div class="flex flex-col gap-[3rem] items-center text-[6rem] font-bold text-[#DDCCAA] text-center">
     <p>Find any quote in<br>millions of movie lines</p>
-    <base-button type="button" rounded="rounded-[4.8px]" text="text-[2rem]"><router-link to="/landing/register" class="px-[16px] py-[9px] block focus:shadow-base-shadow rounded-[4.8px] text-[2rem] z-30 border border-solid transition-all disabled:opacity-[0.65] bg-[#E31221] border-[#E31221] hover:bg-[#CC0E10] hover:border-[#CC0E10] active:bg-[#B80D0F] active:border-[#B80D0F]disabled:bg-[#EC4C57]focus:bg-[#B80D0F]focus:border-[#B80D0F]">Get started</router-link></base-button>
+    <basic-button type="button" rounded="rounded-[4.8px]" text="text-[2rem]"><router-link to="/landing/register" class="px-[16px] py-[9px] block focus:shadow-base-shadow rounded-[4.8px] text-[2rem] z-30 border border-solid transition-all disabled:opacity-[0.65] bg-[#E31221] border-[#E31221] hover:bg-[#CC0E10] hover:border-[#CC0E10] active:bg-[#B80D0F] active:border-[#B80D0F]disabled:bg-[#EC4C57]focus:bg-[#B80D0F]focus:border-[#B80D0F]">Get started</router-link></basic-button>
   </div>
 </div>
   
