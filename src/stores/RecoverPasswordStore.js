@@ -5,11 +5,13 @@ export const useRecoverStore = defineStore("useRecoverStore",{
  state(){
   return{
       isRecovered:true,
+      errors:[],
   }
  },
 
    getters:{
     getIsRecovered: (state) => state.isRecovered,
+    getRecoverPasswordErrors: (state) => state.errors,
  },
 
 
@@ -18,6 +20,9 @@ export const useRecoverStore = defineStore("useRecoverStore",{
     
     changeStatus(){
       this.isRecovered=true;
+    },
+    cleanErrors(){
+      this.errors=[];
     },
 
 
@@ -31,7 +36,9 @@ export const useRecoverStore = defineStore("useRecoverStore",{
         this.isRecovered=false;
       })
       .catch((error)=> {
-        alert(error);
+        this.errors=[],
+        this.errors.push(error.response.data)
+        //redirect from here on forgot password route
       });
     },
 

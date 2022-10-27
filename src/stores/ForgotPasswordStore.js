@@ -5,11 +5,13 @@ export const useForgotPasswordStore = defineStore("useForgotPasswordStore",{
  state(){
   return{
       isReset:true,
+      errors:[],
   }
  },
 
    getters:{
     getIsReset: (state) => state.isReset,
+    getForgotPasswordErrors: (state) => state.errors,
  },
 
 
@@ -18,6 +20,10 @@ export const useForgotPasswordStore = defineStore("useForgotPasswordStore",{
     
     changeStatus(){
       this.isReset=true;
+    },
+
+    cleanErrors(){
+      this.errors=[];
     },
 
 
@@ -29,7 +35,8 @@ export const useForgotPasswordStore = defineStore("useForgotPasswordStore",{
         this.isReset=false;
       })
       .catch((error)=> {
-        alert(error);
+        this.errors=[],
+        this.errors.push(error.response.data.message)
       });
     },
 
