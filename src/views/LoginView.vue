@@ -10,7 +10,7 @@
       </form-header>
      <login-form></login-form>
       <div class="flex items-center justify-center">
-      <p class="text-[#6C757D] text-[1.6rem]">Don't have an account? <router-link to="/landing/register"><button class="text-[#0D6EFD]">Sign up</button></router-link></p>
+      <p class="text-[#6C757D] text-[1.6rem]">Don't have an account? <router-link :to="{name:'registration'}"><button class="text-[#0D6EFD]">Sign up</button></router-link></p>
       </div>
     </div>
   </div>

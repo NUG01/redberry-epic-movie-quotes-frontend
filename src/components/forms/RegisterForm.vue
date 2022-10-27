@@ -10,7 +10,7 @@
       </ul>
       <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] mt-[2rem]" width="w-[100%]">Get started</basic-button>
       <button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] w-[100%] mt-[1.6rem] flex items-center justify-center gap-[0.8rem]">
-      <google-symbol></google-symbol><span>Sign up with Google</span></button>
+      <google-icon></google-icon><span>Sign up with Google</span></button>
       </Form>
 </template>
 
@@ -18,7 +18,7 @@
 <script>
 import BasicInput from "@/components/BasicInput.vue";
 import BasicButton from "@/components/BasicButton.vue";
-import GoogleSymbol from "@/components/icons/GoogleSymbol.vue";
+import GoogleIcon from "@/components/icons/GoogleIcon.vue";
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import { Form } from 'vee-validate';                 
 import { useRouter } from 'vue-router';
@@ -26,7 +26,7 @@ import { ref, computed } from 'vue';
 import { getJwtToken } from "@/helpers/jwt/index.js";
 import { useRegisterStore } from '@/stores/RegisterStore.js';
 export default {
-  components:{BasicInput,BasicButton, GoogleSymbol,Form,InvalidIcon},
+  components:{BasicInput,BasicButton, GoogleIcon,Form,InvalidIcon},
    setup(){
     const router=useRouter();
     const register = useRegisterStore();

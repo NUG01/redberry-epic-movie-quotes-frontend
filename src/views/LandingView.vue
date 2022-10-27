@@ -23,8 +23,8 @@ export default{
         <p class="text-[1.6rem] text-[white]">Eng</p>
       <dropdown-arrow></dropdown-arrow>
       </div>
-      <router-link to="/landing/register"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</basic-button></router-link>
-      <router-link to="/landing/login"><button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px]">Log in</button></router-link>
+      <router-link :to="{name:'registration'}"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</basic-button></router-link>
+      <router-link :to="{name:'login'}"><button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px]">Log in</button></router-link>
     </div>
   </header>
 </div>
