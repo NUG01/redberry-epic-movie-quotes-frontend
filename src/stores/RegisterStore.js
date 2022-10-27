@@ -5,11 +5,13 @@ export const useRegisterStore = defineStore("useRegisterStore",{
  state(){
   return{
       isRegistered:true,
+      errors:[],
   }
  },
 
    getters:{
     getIsRegistered: (state) => state.isRegistered,
+    getIsRegisteredErrors: (state) => state.errors,
  },
 
 
@@ -18,6 +20,9 @@ export const useRegisterStore = defineStore("useRegisterStore",{
     
     changeStatus(){
       this.isRegistered=true;
+    },
+    cleanErrors(){
+      this.errors=[];
     },
 
 
@@ -32,7 +37,9 @@ export const useRegisterStore = defineStore("useRegisterStore",{
         this.isRegistered=false;
       })
       .catch((error)=> {
-        alert(error);
+        this.errors=[];
+        this.errors.push(error.response.data.errors.email[0]);
+        this.errors.push(error.response.data.errors.name[0]);
       });
     },
 
