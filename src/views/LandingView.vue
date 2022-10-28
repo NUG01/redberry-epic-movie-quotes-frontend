@@ -3,10 +3,28 @@ import BasicButton from "@/components/BasicButton.vue";
 import LandingImage from "@/components/LandingImage.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
+import { ref } from "vue";
 export default{
   name:"landing",
-  components:{BasicButton, LandingImage, DropdownArrow, LandingFooter,}
+  components:{BasicButton, LandingImage, DropdownArrow, LandingFooter,},
+     setup(){
 
+      const langActive=ref(false);
+
+      function langDropDown(){
+        langActive.value=!langActive.value;
+        setTimeout(function(){
+          langActive.value=false
+        }, 1800);
+
+      }
+     
+
+      return {
+        langDropDown,
+        active: langActive
+        }
+     }
 }
 
 </script>
@@ -19,9 +37,15 @@ export default{
   <header class="absolute top-0 left-0 w-[100%] h-[auto] py-[3rem] px-[7rem] flex items-center justify-between">
     <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA]">movie quotes</div>
     <div class="flex gap-[1.6rem]">
-      <div class="flex items-center justify-center gap-[1rem] mr-[2.4rem]">
+      <div class="mr-[2.4rem] relative flex items-center justify-center">
+        <div @click="langDropDown" class="flex items-center justify-center gap-[1rem] cursor-pointer">
         <p class="text-[1.6rem] text-[white]">Eng</p>
       <dropdown-arrow></dropdown-arrow>
+        </div>
+      <div class="absolute top-full left-0 bg-none border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
+          <router-link to="#" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600]"><p class="text-[1.4rem] px-[5px] py-[4px]">Eng</p></router-link>
+          <router-link to="#" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600]"><p class="text-[1.4rem] px-[5px] py-[4px]">Ka</p></router-link>
+      </div>
       </div>
       <router-link :to="{name:'registration'}"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</basic-button></router-link>
       <router-link :to="{name:'login'}"><button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px]">Log in</button></router-link>
@@ -61,8 +85,6 @@ export default{
 </section>
 </template>
 
-
-
 <style scoped>
 section{
   font-family:sans-serif;
@@ -73,5 +95,11 @@ section{
 }
 .gradient-two{
   background: linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 55.21%, rgba(0, 0, 0, 0) 100%);
+}
+.lang{
+  color:#cdc9c2;
+  color:#23232b;
+  height: auto !important;
+  display: block !important;
 }
 </style>

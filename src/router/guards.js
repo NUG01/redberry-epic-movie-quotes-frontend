@@ -5,8 +5,9 @@ export function isAuthenticated() {
     return "/landing/login";
   }
 }
+
 export function isLoggedIn() {
-  if (getJwtToken()) {
+  if (getJwtToken() && getJwtToken()!=undefined) {
     return "/news-feed";
   }
 }

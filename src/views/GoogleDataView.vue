@@ -1,7 +1,7 @@
 <template>
-  <div class="spinner w-[100vw] h-[100vh]">
-        <router-link :to="{name : 'landing'}" type="button" class="mb-[9rem] text-[white] text-[1.8rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[31%]"><span class="flex items-center justify-center">Go Back</span></router-link>
-        <div class="lds-roller">
+  <div class="spinner w-[100vw] h-[100vh] flex flex-col">
+    <router-link :to="{name : 'landing'}" type="button" class="mb-[9rem] text-[white] text-[1.8rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[31%]"><span class="flex items-center justify-center">Go Back</span></router-link>
+    <div class="lds-roller">
       <div></div>
       <div></div>
       <div></div>
@@ -15,14 +15,27 @@
 </template>
 
 <script>
+
+import { useRouter } from "vue-router";
+import { onMounted } from "vue";
+import { useLoginStore } from '@/stores/LoginStore.js';
 export default {
-  name: 'verification', 
+  name:'google-login',
 
   setup(){
+    const login = useLoginStore();
+    const router=useRouter();
+
+   onMounted(() => {
+    const loginPromise=new Promise((resolve,_)=>{resolve(login.loginWithGoogle(router.currentRoute.value.params.id, router.currentRoute.value.query.code))});
+      loginPromise.then(router.push({name:'news-feed'}));
+})
+      return{ }
   }
   
 }
 </script>
+
 
 <style scoped>
 .spinner {

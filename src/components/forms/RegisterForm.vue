@@ -9,7 +9,7 @@
         </li>
       </ul>
       <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] mt-[2rem]" width="w-[100%]">Get started</basic-button>
-      <button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] w-[100%] mt-[1.6rem] flex items-center justify-center gap-[0.8rem]">
+      <button @click="googleRegister" type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] w-[100%] mt-[1.6rem] flex items-center justify-center gap-[0.8rem]">
       <google-icon></google-icon><span>Sign up with Google</span></button>
       </Form>
 </template>
@@ -23,7 +23,6 @@ import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import { Form } from 'vee-validate';                 
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import { getJwtToken } from "@/helpers/jwt/index.js";
 import { useRegisterStore } from '@/stores/RegisterStore.js';
 export default {
   components:{BasicInput,BasicButton, GoogleIcon,Form,InvalidIcon},
@@ -41,6 +40,10 @@ export default {
     return register.getIsRegisteredErrors;
 });
 
+function googleRegister(){
+window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
+}
+
 
       
       function onSubmit(values){
@@ -50,7 +53,8 @@ export default {
     return {
     onSubmit,
     errors:errors.value,
-    deleteError
+    deleteError,
+    googleRegister
    }
   }
 
