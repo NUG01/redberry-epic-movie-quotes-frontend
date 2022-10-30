@@ -7,6 +7,8 @@ export const useLoginStore = defineStore("useLoginStore",{
   return{
       isLogged:false,
       userData:null,
+      isGoogleLogged:false,
+      googleData:null,
       isLoggedOut:false,
       errors:[],
   }
@@ -15,6 +17,7 @@ export const useLoginStore = defineStore("useLoginStore",{
    getters:{
     getIsLogged: (state) => state.isLogged,
     getIsLoggedOut: (state) => state.isLoggedOut,
+    getIsGoogleLogged: (state) => state.isLogged,
     getUserData: (state)=>state.userData,
     getIsLoggedErrors: (state) => state.errors,
  },
@@ -42,12 +45,28 @@ export const useLoginStore = defineStore("useLoginStore",{
       .then((response)=>{
         setJwtToken(response.data.access_token, response.data.expires_in);
         this.isLogged=true;
-        this.userData=response.data;
+        this.googleData=response.data;
         //redirect from here to news feed page
       })
       .catch((error)=> {
-        this.errors=[],
-        this.errors.push(error.response.data.error)
+        alert(error);
+      });
+    },
+
+
+    loginWithGoogle(valueId, valueCode){
+      axios.post('auth/google/login', {
+        token: valueId,
+       email: valueCode,
+      })
+      .then((response)=>{
+        setJwtToken(response.data.access_token, response.data.expires_in);
+        this.isGoogleLogged=true;
+        this.userGoogleData=response.data;
+        //redirect from here to news feed page
+      })
+      .catch((error)=> {
+        //redirect on forbidden page
       });
     },
 

@@ -7,6 +7,9 @@ import PasswordForgotView from "@/views/PasswordForgotView.vue";
 import VerifiedView from "@/views/VerifiedView.vue";
 import PasswordRecoverView from "@/views/PasswordRecoverView.vue";
 import NewsFeedView from "@/views/NewsFeedView.vue";
+import ForbiddenView from "@/views/ForbiddenView.vue";
+import NotFoundView from "@/views/NotFoundView.vue";
+import GoogleDataView from "@/views/GoogleDataView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +24,7 @@ const router = createRouter({
       path: "/landing",
       name: "landing",
       component: LandingView,
+      beforeEnter: [isLoggedIn],
       children: [
         {
           path: "register",
@@ -32,6 +36,7 @@ const router = createRouter({
           path: "email-verified",
           name: "verified",
           component: VerifiedView,
+          beforeEnter: [isLoggedIn],
         },
         {
           path: "login",
@@ -65,6 +70,22 @@ const router = createRouter({
       name: 'news-feed', 
       component: NewsFeedView,
       beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/google/login/:id', 
+      name: 'google-login', 
+      component: GoogleDataView,
+      props:true,
+  },
+    { 
+      path: '/403-forbidden', 
+      name: 'forbidden', 
+      component: ForbiddenView,
+  },
+    { 
+      path: '/:notFound(.*)', 
+      name: 'not-found', 
+      component: NotFoundView,
   },
 ]
 });

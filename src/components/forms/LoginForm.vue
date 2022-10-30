@@ -10,8 +10,8 @@
         <li @click="deleteError" class="cursor-pointer bg-[#dcb9bb] text-[#222030] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]" v-for="(error,index) in errors" :key="index"><div class="flex items-center justify-between"><p>{{ error }}</p><invalid-icon/></div>
         </li>
       </ul>
-      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Get started</basic-button>
-      <button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] w-[100%] mt-[1.6rem] flex items-center justify-center gap-[0.8rem]">
+      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Get started</basic-button>      
+      <button @click="googleLogin" type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] w-[100%] mt-[1.6rem] flex items-center justify-center gap-[0.8rem]">
       <google-icon></google-icon><span>Sign in with Google</span>
       </button>
       </Form>
@@ -44,6 +44,11 @@ export default {
     return login.getIsLoggedErrors;
 });
 
+
+function googleLogin(){
+window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
+}
+
     function onSubmit(values){
      const loginPromise=new Promise((resolve,_)=>{resolve(login.sendLoginData(values))});
       loginPromise.then(router.push({name:'news-feed'}));
@@ -54,7 +59,8 @@ export default {
     return {
     onSubmit,
     errors:errors.value,
-    deleteError
+    deleteError,
+    googleLogin
    }
   }
 
