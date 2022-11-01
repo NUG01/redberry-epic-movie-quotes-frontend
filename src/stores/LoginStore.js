@@ -45,28 +45,42 @@ export const useLoginStore = defineStore("useLoginStore",{
       .then((response)=>{
         setJwtToken(response.data.access_token, response.data.expires_in);
         this.isLogged=true;
-        this.googleData=response.data;
-        //redirect from here to news feed page
+        this.userData=response.data;
+        this.router.push({ name: 'news-feed', params: { id: response.data.id } })
       })
       .catch((error)=> {
         alert(error);
       });
     },
 
+    fetchUserData(routeId, data){
+      axios.post('auth-user', {
+        id : routeId
+      })
+      .then((response)=>{
+        this.userData=response.data
+        data.value=this.getUserData
+        localStorage.setItem('id', routeId);
+      })
+      .catch((error)=> {
+        alert(error);
+      });
+    },                
+
 
     loginWithGoogle(valueId, valueCode){
       axios.post('auth/google/login', {
         token: valueId,
-       email: valueCode,
+        email: valueCode,
       })
       .then((response)=>{
         setJwtToken(response.data.access_token, response.data.expires_in);
         this.isGoogleLogged=true;
         this.userGoogleData=response.data;
-        //redirect from here to news feed page
+        this.router.push({ name: 'news-feed', params: { id: response.data.id } })
       })
-      .catch((error)=> {
-        //redirect on forbidden page
+      .catch(()=> {
+        this.router.push({ name: 'forbidden'})
       });
     },
 
@@ -77,6 +91,7 @@ export const useLoginStore = defineStore("useLoginStore",{
       .then(()=>{
         document.cookie = 'jwt_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.isLoggedOut=true;
+        localStorage.removeItem('id');
         location.reload();
       })
       .catch((error)=> {

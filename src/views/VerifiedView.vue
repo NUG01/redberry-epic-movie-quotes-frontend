@@ -7,7 +7,7 @@
       <p class="text-[3.2rem] text-[#ffffff] font-medium">Thank you!</p>
       <p class="text-[1.6rem] text-[#ffffff]">Your account has been activated.</p>
       </div>
-      <a href="login" style="width:100%"><basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Go to my news feed</basic-button></a>
+      <router-link :to="{ name: 'login'}" style="width:100%"><basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Go to my news feed</basic-button></router-link>
 
     </div>
   </div>

@@ -8,7 +8,7 @@
       <p class="font-bold text-[4.7rem]">Whoops!</p>
       <p class="font-medium text-[2.4rem]">We can't see the page you are looking for</p>
     </div>
-    <router-link :to="{name:'landing'}"><basic-button type="button" class="mb-[12rem] text-[white] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]">Return home</basic-button></router-link>
+    <router-link :to="{name:'landing'}"><basic-button type="button" class="text-[white] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]">Return home</basic-button></router-link>
   </div>
 </template>
 

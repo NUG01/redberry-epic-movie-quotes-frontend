@@ -10,6 +10,8 @@ import NewsFeedView from "@/views/NewsFeedView.vue";
 import ForbiddenView from "@/views/ForbiddenView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import GoogleDataView from "@/views/GoogleDataView.vue";
+import ProfileView from "@/views/ProfileView.vue";
+import MovieListView from "@/views/MovieListView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,9 +68,24 @@ const router = createRouter({
       beforeEnter: [isLoggedIn],
   },
     { 
-      path: '/news-feed', 
+      path: '/news-feed/:id', 
       name: 'news-feed', 
       component: NewsFeedView,
+      props:true,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/profile/:id', 
+      name: 'profile', 
+      component: ProfileView,
+      props:true,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/movie-list/:id', 
+      name: 'movie-list', 
+      component: MovieListView,
+      props:true,
       beforeEnter: [isAuthenticated],
   },
     { 

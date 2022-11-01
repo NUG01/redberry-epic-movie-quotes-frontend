@@ -8,6 +8,6 @@ export function isAuthenticated() {
 
 export function isLoggedIn() {
   if (getJwtToken() && getJwtToken()!=undefined) {
-    return "/news-feed";
+    return `/news-feed/${localStorage.getItem('id')}`;
   }
 }

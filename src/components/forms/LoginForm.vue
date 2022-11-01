@@ -50,8 +50,7 @@ window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
 }
 
     function onSubmit(values){
-     const loginPromise=new Promise((resolve,_)=>{resolve(login.sendLoginData(values))});
-      loginPromise.then(router.push({name:'news-feed'}));
+    login.sendLoginData(values);
       login.cleanErrors();
        }
 
