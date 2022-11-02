@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "@/config/axios/index.js";
-import {setJwtToken, getJwtToken} from "@/helpers/jwt/index.js";
+import {setJwtToken} from "@/helpers/jwt/index.js";
 
 export const useLoginStore = defineStore("useLoginStore",{
  state(){
@@ -46,53 +46,32 @@ export const useLoginStore = defineStore("useLoginStore",{
         setJwtToken(response.data.access_token, response.data.expires_in);
         this.isLogged=true;
         this.userData=response.data;
-        this.router.push({ name: 'news-feed', params: { id: response.data.id } })
+        this.router.push({ name: 'news-feed'})
       })
       .catch((error)=> {
-        alert(error);
+        this.errors.push(error.response.data.error);
       });
     },
 
-    fetchUserData(routeId, data){
-      axios.post('auth-user', {
-        id : routeId
-      })
-      .then((response)=>{
-        this.userData=response.data
-        data.value=this.getUserData
-        localStorage.setItem('id', routeId);
-      })
-      .catch((error)=> {
-        alert(error);
-      });
-    },                
+    updateUserData(data){
+        this.userData=data
+    },          
 
-
-    loginWithGoogle(valueId, valueCode){
-      axios.post('auth/google/login', {
-        token: valueId,
-        email: valueCode,
-      })
-      .then((response)=>{
-        setJwtToken(response.data.access_token, response.data.expires_in);
-        this.isGoogleLogged=true;
-        this.userGoogleData=response.data;
-        this.router.push({ name: 'news-feed', params: { id: response.data.id } })
-      })
-      .catch(()=> {
-        this.router.push({ name: 'forbidden'})
-      });
+    loginWithGoogle(token, expires_in){
+      setJwtToken(token, expires_in);
+      this.isGoogleLogged=true;
+      this.router.push({ name: 'news-feed' })
     },
 
     sendLogoutData(){
-      axios.post('logout', {
-        token: getJwtToken(),
-      })
+      axios.post('logout')
       .then(()=>{
         document.cookie = 'jwt_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.isLoggedOut=true;
-        localStorage.removeItem('id');
-        location.reload();
+        this.isGoogleLogged=false;
+        this.userData=null;
+        this.isLogged=false,
+        this.router.push({ name: 'landing' })
       })
       .catch((error)=> {
         alert(error);

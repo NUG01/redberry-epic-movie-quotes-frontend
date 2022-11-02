@@ -37,11 +37,7 @@ export default {
 
 const data=ref({})
     
-
-     onMounted(()=>{
-       login.fetchUserData(router.currentRoute.value.params.id, data)
-      });
-return {data}
+return {}
   }
   
 }

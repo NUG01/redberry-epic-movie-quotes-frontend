@@ -2,16 +2,31 @@
 import  HomeIcon  from "@/components/icons/HomeIcon.vue";
 import  MoviesIcon  from "@/components/icons/MoviesIcon.vue";
 import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed} from "vue";
 import { useRouter } from "vue-router";
+import axios from "@/config/axios/index.js";
+
+
 export default {
   components:{HomeIcon, MoviesIcon},
   props:['feed', 'movies', 'profile'],
 
-  setup(props){
+ setup(props){
 
-     const login = useLoginStore();
+    const login = useLoginStore();
     const router = useRouter();
+
+    
+    
+    const users = ref({});
+  
+     onMounted(async () => {
+       const res = await axios.get("auth-user");
+      login.updateUserData(res.data);
+      users.value =res.data;
+    });
+
+
 
     const feedColor=props.feed;
     const moviesColor=props.movies;
@@ -19,25 +34,19 @@ export default {
 
 
     function redirectToMoviesPage(){
-       router.push({name : 'movie-list', params: {id: router.currentRoute.value.params.id}})
+       router.push({name : 'movie-list'})
     }
     function profilePage(){
-       router.push({name : 'profile', params: {id: router.currentRoute.value.params.id}})
+       router.push({name : 'profile'})
     }
     function redirectToNewsFeed(){
-       router.push({name : 'news-feed', params: {id: router.currentRoute.value.params.id}})
+       router.push({name : 'news-feed'})
 }
 
-
-const data=ref({})
-    
-
-     onMounted(()=>{
-       login.fetchUserData(router.currentRoute.value.params.id, data)
-      });
+   
 
 
-    return{data, 
+    return{users,
     redirectToMoviesPage, 
     redirectToNewsFeed, 
     profilePage,
@@ -56,7 +65,7 @@ const data=ref({})
   <div class="flex items-center gap-[1.3rem]">
     <img src="/src/assets/InterstellarMovie.png" :class="profileColor" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%]"/>
     <div class="flex flex-col ietms-center justify-center">
-      <p class="text-[2.4rem] text-[#fff]">{{ data.name }}</p>
+      <p v-if="!loading" class="text-[2.4rem] text-[#fff]">{{ users.name }}</p>
       <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">Edit your profile</p>
     </div>
   </div>

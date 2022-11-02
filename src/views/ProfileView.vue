@@ -31,17 +31,13 @@ export default {
   
   setup(){
 
-    const login = useLoginStore();
+    // const login = useLoginStore();
     const router = useRouter();
 
 
 const data=ref({})
     
-
-     onMounted(()=>{
-       login.fetchUserData(router.currentRoute.value.params.id, data)
-      });
-return {data}
+return {}
   }
   
 }

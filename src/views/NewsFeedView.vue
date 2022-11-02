@@ -1,11 +1,12 @@
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
   <basic-header></basic-header>
-  <main class="w-[100%] h-[100%]">
+  <main class="w-[100%] h-[93%]">
     <div>
       <basic-navigation feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
+
     </div>
-    <div class="bg-gray overflow-scroll scrollHide">
+    <div class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div class="relative w-[85%]">
       <textarea placeholder="Write new quote" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
@@ -63,7 +64,7 @@
 
 <script>
 import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref } from "vue";
+import { onMounted, ref, Suspense } from "vue";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -82,13 +83,9 @@ export default {
     const router = useRouter();
 
 
-const data=ref({})
     
 
-     onMounted(()=>{
-       login.fetchUserData(router.currentRoute.value.params.id, data)
-      });
-return {data}
+return {}
   }
   
 }

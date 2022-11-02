@@ -15,27 +15,6 @@
   </div>
 </template>
 
-<script>
-
-import { useRouter } from "vue-router";
-import { onMounted } from "vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
-export default {
-  name:'google-login',
-
-  setup(){
-    const login = useLoginStore();
-    const router=useRouter();
-
-   onMounted(() => {
-   login.loginWithGoogle(router.currentRoute.value.params.id, router.currentRoute.value.query.code);
-})
-      return{ }
-  }
-  
-}
-</script>
-
 
 <style scoped>
 .spinner {
