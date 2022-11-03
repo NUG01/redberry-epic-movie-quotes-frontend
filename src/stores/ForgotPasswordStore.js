@@ -28,7 +28,7 @@ export const useForgotPasswordStore = defineStore("useForgotPasswordStore",{
 
 
     sendForgotPasswordData(values){
-      axios.post('forgot-password', {
+      axios.post('ForgotPassword', {
         email: values.email
       })
       .then(()=>{

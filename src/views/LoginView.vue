@@ -1,3 +1,25 @@
+<script>
+import FormHeader from "@/components/FormHeader.vue";
+import LoginForm from "@/components/forms/LoginForm.vue";
+import { useRouter } from "vue-router";
+export default {
+  name:"Login",
+  components:{FormHeader,LoginForm},
+  setup(){
+    const router=useRouter();
+
+    function modalHide(){
+     return router.push({name:'landing'});
+    }
+    
+    return {
+      modalHide
+    }
+  }
+}
+</script>
+
+
 <template>
     <div class="flex items-center justify-center">
     <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="modalHide"></div>
@@ -15,24 +37,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import FormHeader from "@/components/FormHeader.vue";
-import LoginForm from "@/components/forms/LoginForm.vue";
-import { useRouter } from "vue-router";
-export default {
-  name:"login",
-  components:{FormHeader,LoginForm},
-  setup(){
-    const router=useRouter();
-
-    function modalHide(){
-     return router.push({name:'landing'});
-    }
-    
-    return {
-      modalHide
-    }
-  }
-}
-</script>

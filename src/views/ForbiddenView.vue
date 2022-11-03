@@ -1,3 +1,13 @@
+<script>
+import BasicButton from "@/components/BasicButton.vue";
+export default {
+  name:'Forbidden',
+  components:{BasicButton}
+  
+}
+</script>
+
+
 <template>
   <div class="bg-[#181623] w-[100vw] h-[100vh] flex flex-col items-center justify-center">
     <div class="relative inline-block">
@@ -11,12 +21,3 @@
     <router-link :to="{name:'landing'}"><basic-button type="button" class="mb-[15rem] text-[white] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]">Return home</basic-button></router-link>
   </div>
 </template>
-
-<script>
-import BasicButton from "@/components/BasicButton.vue";
-export default {
-  name:'forbidden',
-  components:{BasicButton}
-  
-}
-</script>

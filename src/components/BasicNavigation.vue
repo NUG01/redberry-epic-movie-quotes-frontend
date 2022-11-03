@@ -65,7 +65,7 @@ export default {
   <div class="flex items-center gap-[1.3rem]">
     <img src="/src/assets/InterstellarMovie.png" :class="profileColor" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%]"/>
     <div class="flex flex-col ietms-center justify-center">
-      <p v-if="!loading" class="text-[2.4rem] text-[#fff]">{{ users.name }}</p>
+      <p class="text-[2.4rem] text-[#fff]">{{ users.name }}</p>
       <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">Edit your profile</p>
     </div>
   </div>

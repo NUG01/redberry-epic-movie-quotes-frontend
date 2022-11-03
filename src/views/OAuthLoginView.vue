@@ -1,15 +1,10 @@
-<template>
-<div>
-  <loading-spinner></loading-spinner>
-</div>
-</template>
-
 <script>
 import { useLoginStore } from '@/stores/LoginStore.js';
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
+  name:'OAuth',
   components:{LoadingSpinner},
    setup(){
 
@@ -26,3 +21,10 @@ export default {
 
 }
 </script>
+
+
+<template>
+<div>
+  <loading-spinner></loading-spinner>
+</div>
+</template>

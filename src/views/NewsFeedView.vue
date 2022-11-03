@@ -1,3 +1,33 @@
+<script>
+import { useLoginStore } from '@/stores/LoginStore.js';
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import BasicHeader from "@/components/BasicHeader.vue";
+import BasicNavigation from "@/components/BasicNavigation.vue";
+import CommentsIcon from "@/components/icons/CommentsIcon.vue";
+import LikesIcon from "@/components/icons/LikesIcon.vue";
+import PencilIcon from "@/components/icons/PencilIcon.vue";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
+
+export default {
+  name:'NewsFeed',
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon},
+  
+  setup(){
+
+    const login = useLoginStore();
+    const router = useRouter();
+
+
+    
+
+return {}
+  }
+  
+}
+</script>
+
+
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
   <basic-header></basic-header>
@@ -62,34 +92,6 @@
   </div>
 </template>
 
-<script>
-import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref, Suspense } from "vue";
-import { useRouter } from "vue-router";
-import BasicHeader from "@/components/BasicHeader.vue";
-import BasicNavigation from "@/components/BasicNavigation.vue";
-import CommentsIcon from "@/components/icons/CommentsIcon.vue";
-import LikesIcon from "@/components/icons/LikesIcon.vue";
-import PencilIcon from "@/components/icons/PencilIcon.vue";
-import SearchIcon from "@/components/icons/SearchIcon.vue";
-
-export default {
-  name:'news-feed',
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon},
-  
-  setup(){
-
-    const login = useLoginStore();
-    const router = useRouter();
-
-
-    
-
-return {}
-  }
-  
-}
-</script>
 
 
 <style scoped>

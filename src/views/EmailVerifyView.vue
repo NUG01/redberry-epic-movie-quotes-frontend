@@ -7,6 +7,7 @@
 <script>
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
+  name:'Verification',
   components:{LoadingSpinner},
   
 }

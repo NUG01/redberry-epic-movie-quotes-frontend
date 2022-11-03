@@ -63,18 +63,23 @@ export const useLoginStore = defineStore("useLoginStore",{
       this.router.push({ name: 'news-feed' })
     },
 
-    sendLogoutData(){
-      axios.post('logout')
-      .then(()=>{
-        document.cookie = 'jwt_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    deleteCookie(){
+      document.cookie = 'jwt_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.isLoggedOut=true;
         this.isGoogleLogged=false;
         this.userData=null;
         this.isLogged=false,
         this.router.push({ name: 'landing' })
-      })
-      .catch((error)=> {
-        alert(error);
+    },
+
+    sendLogoutData(){
+      axios.post('logout')
+      .then(()=>{
+         this.deleteCookie()
+        })
+        .catch(()=> {
+        this.deleteCookie()
+        
       });
     },
 

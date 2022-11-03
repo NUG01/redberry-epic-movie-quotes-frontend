@@ -1,3 +1,29 @@
+<script>
+import { useLoginStore } from '@/stores/LoginStore.js';
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import BasicHeader from "@/components/BasicHeader.vue";
+import BasicNavigation from "@/components/BasicNavigation.vue";
+
+export default {
+  name:'Profile',
+  components:{BasicHeader, BasicNavigation},
+  
+  setup(){
+
+    const login = useLoginStore();
+    const router = useRouter();
+
+
+const data=ref({})
+    
+return {}
+  }
+  
+}
+</script>
+
+
 <template>
   <div class="main w-[100vw] h-[100vh]">
   <basic-header></basic-header>
@@ -18,30 +44,6 @@
 
 
 
-<script>
-import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import BasicHeader from "@/components/BasicHeader.vue";
-import BasicNavigation from "@/components/BasicNavigation.vue";
-
-export default {
-  name:'profile',
-  components:{BasicHeader, BasicNavigation},
-  
-  setup(){
-
-    // const login = useLoginStore();
-    const router = useRouter();
-
-
-const data=ref({})
-    
-return {}
-  }
-  
-}
-</script>
 
 
 <style scoped>

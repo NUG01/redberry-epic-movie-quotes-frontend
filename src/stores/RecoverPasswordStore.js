@@ -26,7 +26,7 @@ export const useRecoverStore = defineStore("useRecoverStore",{
     },
 
 
-    sendRecoverData(values, token, email){
+    sendPasswordResetRequest(values, token, email){
       axios.post('reset-password', {
         password: values.password,
         token: token,

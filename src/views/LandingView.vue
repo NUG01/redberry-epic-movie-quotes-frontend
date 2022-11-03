@@ -5,7 +5,7 @@ import LandingFooter from "@/components/LandingFooter.vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
 import { ref } from "vue";
 export default{
-  name:"landing",
+  name:"Landing",
   components:{BasicButton, LandingImage, DropdownArrow, LandingFooter,},
      setup(){
 
