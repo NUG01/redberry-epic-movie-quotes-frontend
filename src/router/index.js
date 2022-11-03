@@ -9,7 +9,9 @@ import PasswordRecoverView from "@/views/PasswordRecoverView.vue";
 import NewsFeedView from "@/views/NewsFeedView.vue";
 import ForbiddenView from "@/views/ForbiddenView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
-import GoogleDataView from "@/views/GoogleDataView.vue";
+import ProfileView from "@/views/ProfileView.vue";
+import MovieListView from "@/views/MovieListView.vue";
+import OAuthLoginView from "@/views/OAuthLoginView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,10 +74,21 @@ const router = createRouter({
       beforeEnter: [isAuthenticated],
   },
     { 
-      path: '/google/login/:id', 
-      name: 'google-login', 
-      component: GoogleDataView,
-      props:true,
+      path: '/oauth', 
+      name: 'oauth', 
+      component: OAuthLoginView,
+  },
+    { 
+      path: '/profile', 
+      name: 'profile', 
+      component: ProfileView,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/movie-list', 
+      name: 'movie-list', 
+      component: MovieListView,
+      beforeEnter: [isAuthenticated],
   },
     { 
       path: '/403-forbidden', 

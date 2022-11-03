@@ -1,3 +1,43 @@
+<script>
+import FormHeader from "@/components/FormHeader.vue";
+import PasswordforgetForm from "@/components/forms/PasswordforgetForm.vue";
+import { useRouter } from "vue-router";
+import { ref, computed } from 'vue';
+import VerifyEmail from "@/components/icons/VerifyEmail.vue";
+import { useForgotPasswordStore } from '@/stores/ForgotPasswordStore.js';
+import BasicButton from "@/components/BasicButton.vue";
+export default {
+  name:"ForgotPassword",
+  components:{FormHeader,PasswordforgetForm, VerifyEmail, BasicButton},
+  setup(){
+    const router=useRouter();
+     const forgetPassword = useForgotPasswordStore();
+
+     const resetModal=ref(true);
+
+     resetModal.value = computed(() => {
+    return forgetPassword.getIsReset;
+})
+
+
+    setTimeout(() => {
+     forgetPassword.changeStatus();
+    }, "3600")
+
+    function modalHide(){
+     return router.push({name:'landing'});
+    }
+    
+    return {
+      modalHide,
+      resetModal:resetModal.value,
+    }
+  }
+}
+</script>
+
+
+
 <template>
 <div>
   <div v-if="resetModal" class="flex items-center justify-center">
@@ -26,41 +66,3 @@
   </div>
 </div>
 </template>
-
-<script>
-import FormHeader from "@/components/FormHeader.vue";
-import PasswordforgetForm from "@/components/forms/PasswordforgetForm.vue";
-import { useRouter } from "vue-router";
-import { ref, computed } from 'vue';
-import VerifyEmail from "@/components/icons/VerifyEmail.vue";
-import { useForgotPasswordStore } from '@/stores/ForgotPasswordStore.js';
-import BasicButton from "@/components/BasicButton.vue";
-export default {
-  name:"forgot-password",
-  components:{FormHeader,PasswordforgetForm, VerifyEmail, BasicButton},
-  setup(){
-    const router=useRouter();
-     const forgetPassword = useForgotPasswordStore();
-
-     const resetModal=ref(true);
-
-     resetModal.value = computed(() => {
-    return forgetPassword.getIsReset;
-})
-
-
-    setTimeout(() => {
-     forgetPassword.changeStatus();
-    }, "3600")
-
-    function modalHide(){
-     return router.push({name:'landing'});
-    }
-    
-    return {
-      modalHide,
-      resetModal:resetModal.value,
-    }
-  }
-}
-</script>

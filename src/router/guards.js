@@ -1,13 +1,13 @@
 import { getJwtToken } from "@/helpers/jwt/index.js";
 
 export function isAuthenticated() {
-  if (!getJwtToken()) {
+  if (!getJwtToken() || getJwtToken()==undefined) {
     return "/landing/login";
   }
 }
 
 export function isLoggedIn() {
-  if (getJwtToken() && getJwtToken()!=undefined) {
-    return "/news-feed";
+  if (getJwtToken()) {
+    return `/news-feed`;
   }
 }

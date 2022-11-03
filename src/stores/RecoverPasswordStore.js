@@ -26,8 +26,8 @@ export const useRecoverStore = defineStore("useRecoverStore",{
     },
 
 
-    sendRecoverData(values, token, email){
-      axios.post('reset-password-form', {
+    sendPasswordResetRequest(values, token, email){
+      axios.post('reset-password', {
         password: values.password,
         token: token,
         email: email
@@ -38,7 +38,6 @@ export const useRecoverStore = defineStore("useRecoverStore",{
       .catch((error)=> {
         this.errors=[],
         this.errors.push(error.response.data)
-        //redirect from here on forgot password route
       });
     },
 

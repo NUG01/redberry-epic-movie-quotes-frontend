@@ -1,3 +1,45 @@
+<script>
+import FormHeader from "@/components/FormHeader.vue";
+import RegisterForm from "@/components/forms/RegisterForm.vue";
+import VerifyEmail from "@/components/icons/VerifyEmail.vue";
+import BasicButton from "@/components/BasicButton.vue";
+import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRegisterStore } from '@/stores/RegisterStore.js';
+export default {
+  name:"Registration",
+  emits:['showSuccess'],
+  components:{FormHeader,RegisterForm,VerifyEmail,BasicButton},
+  setup(){
+    const router=useRouter();
+     const register = useRegisterStore();
+
+     const registrationModal=ref(true);
+
+     registrationModal.value = computed(() => {
+    return register.getIsRegistered;
+})
+
+
+    setTimeout(() => {
+     register.changeStatus();
+    }, "3600")
+
+    function modalHide(){
+     return router.push({name:'landing'});
+    }
+
+    
+    return {
+      modalHide,
+      registrationModal:registrationModal.value,
+    }
+  }
+}
+</script>
+
+
+
 <template>
 <div>
   <div v-if="registrationModal" class="flex items-center justify-center">
@@ -28,43 +70,3 @@
   </div>
 </div>
 </template>
-
-<script>
-import FormHeader from "@/components/FormHeader.vue";
-import RegisterForm from "@/components/forms/RegisterForm.vue";
-import VerifyEmail from "@/components/icons/VerifyEmail.vue";
-import BasicButton from "@/components/BasicButton.vue";
-import { useRouter } from "vue-router";
-import { ref, computed } from "vue";
-import { useRegisterStore } from '@/stores/RegisterStore.js';
-export default {
-  name:"registration",
-  emits:['showSuccess'],
-  components:{FormHeader,RegisterForm,VerifyEmail,BasicButton},
-  setup(){
-    const router=useRouter();
-     const register = useRegisterStore();
-
-     const registrationModal=ref(true);
-
-     registrationModal.value = computed(() => {
-    return register.getIsRegistered;
-})
-
-
-    setTimeout(() => {
-     register.changeStatus();
-    }, "3600")
-
-    function modalHide(){
-     return router.push({name:'landing'});
-    }
-
-    
-    return {
-      modalHide,
-      registrationModal:registrationModal.value,
-    }
-  }
-}
-</script>
