@@ -43,7 +43,10 @@ export default {
   <header class="absolute top-0 left-0 w-[100%] h-[auto] px-[7rem] flex items-center justify-between py-[2rem]">
     <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA]">movie quotes</div>
     <div class="flex gap-[1.6rem]">
-      <div class="flex items-center justify-center">
+      <div class="flex items-center justify-center relative">
+        <div class="cursor-pointer">
+        <div class="bg-[#E33812] w-[25px] h-[25px] rounded-[100%] absolute right-0 top-0 -translate-x-[50%] -translate-y-[9%]"><span class="absolute text-[1.6rem] text-[#fff] font-medium right-1/2 translate-x-1/2">3</span></div>
+        </div>
       <notification-icon class="mr-[2.4rem] hover:cursor-pointer"></notification-icon>
       </div>
       <div class="mr-[2.4rem] relative flex items-center justify-center">

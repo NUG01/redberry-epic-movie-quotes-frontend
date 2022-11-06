@@ -1,9 +1,3 @@
-<template>
-<div>
-  <loading-spinner></loading-spinner>
-</div>
-</template>
-
 <script>
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
@@ -12,3 +6,10 @@ export default {
   
 }
 </script>
+
+
+<template>
+<div>
+  <loading-spinner></loading-spinner>
+</div>
+</template>
