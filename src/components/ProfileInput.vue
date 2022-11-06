@@ -2,12 +2,12 @@
 import { Field, ErrorMessage } from 'vee-validate';
 import { computed, ref,watch} from 'vue';
 import PasswordHidden from "@/components/icons/PasswordHidden.vue";
-import InvalidIcon from "@/components/icons/InvalidIcon.vue";
-import ValidIcon from "@/components/icons/ValidIcon.vue";
+import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
+import ProfilevalidIcon from "@/components/icons/ProfilevalidIcon.vue";
 import InputSuffix from "@/components/icons/InputSuffix.vue";
 export default {
-  props: ['name','type','placeholder','label', 'rules', 'symbol', 'value', 'disabled'],
-  components:{Field, ErrorMessage, PasswordHidden,InvalidIcon,ValidIcon,InputSuffix},
+  props: ['name','type','placeholder','label', 'rules', 'value', 'disabled', 'vModel'],
+  components:{Field, ErrorMessage, PasswordHidden,ProfileinvalidIcon,ProfilevalidIcon,InputSuffix},
   setup(props,context){
 
 
@@ -17,14 +17,12 @@ export default {
   const inputType=props.type;
   const inputText=props.placeholder;
   const validate=props.validate;
-  const symbol=props.symbol;
   const value=props.value;
-  const disabled=props.disabled;
+  const vModel=props.vModel;
 
         
   const noState=ref(false);
   const validState=ref(false);
-
 
   function addErrors(){
       noState.value=true;
@@ -41,6 +39,9 @@ export default {
     document.getElementById('password').type='password'
 
   }
+
+
+
 
   function stateChange(value){
     if(document.getElementById(`${inputName}Error`)){
@@ -75,15 +76,15 @@ export default {
 
 <template>
   <div class="flex flex-col w-[100%] mb-[1.6rem] relative">
-    <label :for="inputName" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">{{ label }}<span class="text-[#DC3545]" :class="symbol"> *</span></label>
+    <label :for="inputName" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">{{ label }}</label>
     <div class="relative">
-    <Field @blur="stateChange" :value="value" :rules="rules" :type="inputType" :name="inputName" :id="inputName" :placeholder="inputText" :disabled="disabled"
-    class="border border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow disabled:bg-[#E9ECEF]"/>
+    <Field @blur="stateChange" v-model="vModel" :rules="rules" :type="inputType" :name="inputName" :id="inputName" :placeholder="inputText"
+    class="border border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow font-medium disabled:bg-[#E9ECEF]"/>
     <password-hidden @mouseenter="showPassword" @mouseleave="hidePassword" v-if="inputType=='password' && (!noState && !validState)" class="absolute top-1/2 right-0 -translate-x-3/4 -translate-y-1/2"></password-hidden>
-    <invalid-icon v-if="noState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></invalid-icon>
-    <valid-icon v-if="validState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></valid-icon>    
+    <profileinvalid-icon v-if="noState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></profileinvalid-icon>
+    <profilevalid-icon v-if="validState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></profilevalid-icon>    
     </div>
-  <ErrorMessage :id="`${inputName}Error`" style="color:#DC3545;font-size:14px;margin-top:4px" :name="inputName"/>
+  <ErrorMessage :id="`${inputName}Error`" style="color:#EC9524;font-size:14px;margin-top:4px;" :name="inputName"/>
   </div>
 </template>
 
@@ -91,10 +92,14 @@ export default {
 
 <style scoped>
 .inpError{
-   border:1.4px solid #E31221;
+   border:1.4px solid #EC9524;
+  background-color: #ec952234;
+  color:#fff;
 }
 .inpValid{
-   border:1.4px solid #198754;
+  color:#fff;
+  border:1.4px solid #198754;
+  background-color: #19875434;
 }
  input::placeholder {
   font-weight: 400;

@@ -12,6 +12,7 @@ import NotFoundView from "@/views/NotFoundView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import MovieListView from "@/views/MovieListView.vue";
 import OAuthLoginView from "@/views/OAuthLoginView.vue";
+import UpdateEmailView from "@/views/UpdateEmailView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -84,6 +85,12 @@ const router = createRouter({
       component: ProfileView,
       beforeEnter: [isAuthenticated],
   },
+  { 
+    path: '/update-email/:id',
+    name: '/update-email', 
+    component: UpdateEmailView,
+    props:true,
+},
     { 
       path: '/movie-list', 
       name: 'movie-list', 
