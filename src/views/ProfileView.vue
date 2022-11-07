@@ -9,6 +9,7 @@ import BasicButton from "@/components/BasicButton.vue";
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import axios from "@/config/axios/index.js";
+import basicAxios from "@/config/axios/BasicAxios.js";
 import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import FormHeader from "@/components/FormHeader.vue";
 
@@ -28,16 +29,18 @@ export default {
     const user=ref({})
     const imageUrl=ref('')
     const imageDisplay=ref('')
+    const selectedFile=ref('')
 
    onMounted(async () => {
       const res = await axios.get("auth-user");
       login.updateUserData(res.data);
       user.value =res.data;
-      imageDisplay.value='http://localhost:8000/'+user.value.thumbnail
+      imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
     });
 
     function handleChange(ev){
       const file=ev.target.files[0]
+      selectedFile.value=ev.target.files[0]
 
       const reader= new FileReader();
       reader.onload= () =>{
@@ -48,10 +51,10 @@ export default {
     }
 
     function onSubmitGoogleProfile(values){
-    axios.patch('update-profile',{
-      name: values.name,
-      thumbnail: imageUrl.value
-    })
+      const form=new FormData();
+      form.append('thumbnail', selectedFile.value);
+      form.append('name', values.name);
+      basicAxios.post('update-profile',form)
     .then((res)=>{
      responseError.value=[];
      requestSuccess.value=true
@@ -63,12 +66,12 @@ export default {
 
   
     function onSubmit(values){
-      axios.patch('update-profile',{
-      name: values.name,
-      email: values.email,
-      password: values.password,
-      thumbnail: imageUrl.value
-    })
+      const form=new FormData();
+      form.append('thumbnail', selectedFile.value);
+      form.append('name', values.name);
+      form.append('email', values.email);
+      form.append('password', values.password);
+      basicAxios.post('update-profile',form)
     .then((res)=>{
       responseError.value=[];
       requestSuccess.value=true
@@ -146,7 +149,7 @@ return {
       </div>
       
       <div v-if="!user.google_id"  class="bg-[#11101A] w-[90rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
-        <Form id="form" @submit="onSubmit" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center">
+        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center">
           <div class="relative flex flex-col items-center justify-center inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">Upload new photo</p>
