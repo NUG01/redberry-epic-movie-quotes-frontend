@@ -48,7 +48,7 @@ export default {
     }
 
     function onSubmitGoogleProfile(values){
-    axios.patch('update-profile/google',{
+    axios.patch('update-profile',{
       name: values.name,
       thumbnail: imageUrl.value
     })
