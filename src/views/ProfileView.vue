@@ -35,7 +35,7 @@ export default {
       const res = await axios.get("auth-user");
       login.updateUserData(res.data);
       user.value =res.data;
-      imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
+      imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail
     });
 
     function handleChange(ev){
