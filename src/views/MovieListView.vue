@@ -35,7 +35,6 @@ export default {
      movies.saveMovies(res.data)
      moviesData.value=movies.getMovies
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
-      console.log(movies.getMovies, moviesData.value[0].id)
     });
 
 
@@ -53,7 +52,7 @@ return {addMoviesModal,handleCloseEmit, moviesData}
 
 
 <template>
-  <div class="main w-[100vw] h-[100vh] relative">
+  <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header></basic-header>
   <main>
     <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" class="absolute"></addmovie-form>
@@ -71,7 +70,7 @@ return {addMoviesModal,handleCloseEmit, moviesData}
       </div>
       <div class="w-[100%] movies-grid h-[90.3%] overflow-scroll scrollHide pb-[1.5rem]">
         <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesData" :key="movie.id">
-          <img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" />
+          <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ movie.name.en }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
             <span class="text-[2rem] font-medium text-[#fff]">10</span>
