@@ -11,8 +11,12 @@ import ForbiddenView from "@/views/ForbiddenView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import MovieListView from "@/views/MovieListView.vue";
+import MovieDescriptionView from "@/views/MovieDescriptionView.vue";
 import OAuthLoginView from "@/views/OAuthLoginView.vue";
 import UpdateEmailView from "@/views/UpdateEmailView.vue";
+import QuoteDetailsView from "@/views/QuoteDetailsView.vue";
+import QuoteEditView from "@/views/QuoteEditView.vue";
+import QuoteAddView from "@/views/QuoteAddView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -95,6 +99,34 @@ const router = createRouter({
       path: '/movie-list', 
       name: 'movie-list', 
       component: MovieListView,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/movie-list/:id', 
+      name: 'movie-description', 
+      component: MovieDescriptionView,
+      props:true,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/quote-details/:id', 
+      name: 'quote-details', 
+      component: QuoteDetailsView,
+      props:true,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/quote-edit/:id', 
+      name: 'quote-edit', 
+      component: QuoteEditView,
+      props:true,
+      beforeEnter: [isAuthenticated],
+  },
+    { 
+      path: '/quote-add/:id', 
+      name: 'quote-add', 
+      component: QuoteAddView,
+      props:true,
       beforeEnter: [isAuthenticated],
   },
     { 

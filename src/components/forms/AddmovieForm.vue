@@ -2,8 +2,8 @@
 import { Form, Field } from 'vee-validate';
 import { ref } from 'vue';
 import BasicButton from "@/components/BasicButton.vue";
-import AddmovieInput from "@/components/AddmovieInput.vue";
-import BasicCheckbox from "@/components/BasicCheckbox.vue";
+import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
+import CheckboxInput from "@/components/inputs/CheckBox.vue";
 import CloseIcon from "@/components/icons/CloseIcon.vue";
 import CameraIcon from "@/components/icons/CameraIcon.vue";
 import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
@@ -11,7 +11,7 @@ import basicAxios from "@/config/axios/BasicAxios.js";
 
 
 export default {
-  components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,BasicCheckbox },
+  components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
    const imageDisplay=ref('')
    const selectedFile=ref('')
@@ -46,7 +46,7 @@ function handleImageChange(ev){
       form.append('director_ka', values.director_ka);
       form.append('description_en', values.description_en);
       form.append('description_ka', values.description_ka);
-      basicAxios.post('add-movie',form)
+      basicAxios.post('movies',form)
     .then((res)=>{
       context.emit('emit-close');
     })
@@ -87,7 +87,7 @@ function handleImageChange(ev){
       <addmovie-input rules="required" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
       
       <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
-      <basic-checkbox rules="required" v-for="genre in genres" :key="genre" :genreValue="genre"></basic-checkbox>
+      <checkbox-input rules="required" v-for="genre in genres" :key="genre" :genreValue="genre"></checkbox-input>
       </div>
       
       <addmovie-input rules="required" inputName="director_en" placeholder="Director" label="Eng" classLabel="top-1/2"></addmovie-input>

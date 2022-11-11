@@ -50,6 +50,9 @@ export const useLoginStore = defineStore("useLoginStore",{
       })
       .catch((error)=> {
         this.errors.push(error.response.data.error);
+      })
+      .finally(()=>{
+        location.reload();
       });
     },
 
@@ -60,7 +63,12 @@ export const useLoginStore = defineStore("useLoginStore",{
     loginWithGoogle(token, expires_in){
       setJwtToken(token, expires_in);
       this.isGoogleLogged=true;
-      this.router.push({ name: 'news-feed' })
+     const promise= new Promise((resolve, reject)=>{
+      resolve(this.router.push({ name: 'news-feed' }))
+  });
+     promise.then(()=>{
+       location.reload()
+   }) 
     },
 
     deleteCookie(){
