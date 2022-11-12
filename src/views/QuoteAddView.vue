@@ -15,14 +15,17 @@ import BasicNavigation from "@/components/BasicNavigation.vue";
 
 export default {
   name:'AddQuote',
-  emits:['emit-close'],
+  props:['id'],
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput, BasicNavigation },
-  setup(){
+  setup(props){
 
    const router=useRouter();
 
    const imageDisplay=ref('')
    const selectedFile=ref('')
+   const currentId=ref('')
+
+   currentId.value=props.id
 
 
     function handleImageChange(ev){
@@ -35,10 +38,34 @@ export default {
       }
       reader.readAsDataURL(file)
     }
+
+     function onSubmit(values){
+      if(!imageDisplay.value){
+        return;
+      }
+      const form=new FormData();
+      form.append('id', currentId.value);
+      form.append('thumbnail', selectedFile.value);
+      form.append('quote_en', values.quote_en);
+      form.append('quote_ka', values.quote_ka);
+      basicAxios.post('quotes',form)
+    .then((res)=>{
+      router.push({ name: 'movie-description', params: { id: currentId.value } })
+    })
+    .catch((err)=>{
+      alert('Something went wrong!')
+    })
+  
+    }
   
 
 
-    return {imageDisplay, handleImageChange, router}
+    return {
+    imageDisplay, 
+    handleImageChange, 
+    router, 
+    onSubmit
+    }
   }
   
 }

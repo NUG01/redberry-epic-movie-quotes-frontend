@@ -52,7 +52,7 @@ export const useLoginStore = defineStore("useLoginStore",{
         this.errors.push(error.response.data.error);
       })
       .finally(()=>{
-        location.reload();
+        this.router.go(0)
       });
     },
 
@@ -67,7 +67,7 @@ export const useLoginStore = defineStore("useLoginStore",{
       resolve(this.router.push({ name: 'news-feed' }))
   });
      promise.then(()=>{
-       location.reload()
+      this.router.go(0)
    }) 
     },
 

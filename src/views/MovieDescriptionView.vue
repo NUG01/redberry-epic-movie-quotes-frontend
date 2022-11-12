@@ -1,7 +1,8 @@
 <script>
 import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import QuoteList from "@/components/QuoteList.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import BasicButton from "@/components/BasicButton.vue";
@@ -12,6 +13,7 @@ import EditPencil from "@/components/icons/EditPencil.vue";
 import ViewQuote from "@/components/icons/ViewQuote.vue";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import DescriptionComment from "@/components/icons/DescriptionComment.vue";
+import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
 import { useMoviesStore } from '@/stores/MoviesStore.js';
 
@@ -21,9 +23,9 @@ export default {
   name:'MovieDescription',
   props:['id'],
   emits:['emit-dots'],
-  components:{BasicHeader, BasicNavigation, BasicButton, AddMovie, HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote },
+  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
   
-  setup(props){
+ async setup(props){
 
     const login = useLoginStore();
     const router = useRouter();
@@ -35,36 +37,54 @@ export default {
     const movieData=ref({})
     const moviesData=ref({})
     const movieName=ref({})
-    const currentId=ref('')
+    const currentId=props.id
+    const quotesLength=ref('')
 
-
-    onMounted(async () => {
-      const res = await axios.get("movies");
-     saveFetchedData(res);
+      
+     const res = await axios.get("movies");
+     const resQuotes = await axios.get(`quotes/${currentId}`);
+     movies.saveMovies(res.data)
+     movies.saveQuotes(resQuotes.data)
+     movieData.value=movies.getMovies.find(x => x.id == props.id);
+     moviesData.value=movies.getMovies
+     movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
+    quotesLength.value=movies.getQuotes.length                        
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
-    });
+ 
       
-
-    watch(router.currentRoute,async () => {
-      const res = await axios.get("movies");
-      saveFetchedData(res);
-     });
-      
-      function saveFetchedData(res){
-        movies.saveMovies(res.data)
-        movieData.value=movies.getMovies.find(x => x.id == props.id);
-        moviesData.value=movies.getMovies
-        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
-      }
 
       function quoteEditModal(id){
         document.getElementById(`movie${id}`).classList.toggle('hidden')
       }
 
-      currentId.value=props.id;
+      function handleCloseEmit(){
+       addMoviesModal.value=false
+      }
+
+
+      function deleteMovie(id){
+        axios.delete(`movies/${id}`)
+        .then((res)=>{
+          router.go(-1)
+        })
+        .catch((err)=>{
+          alert('Something went wrong!')
+        })
+      }
   
     
-return {addMoviesModal, movieData, quoteEditModal, movieName, moviesData, currentId}
+return {
+addMoviesModal, 
+movieData, 
+quoteEditModal, 
+movieName, 
+moviesData, 
+currentId, 
+addMoviesModal, 
+handleCloseEmit,
+deleteMovie,
+quotesLength
+}
   }
   
 }
@@ -75,6 +95,16 @@ return {addMoviesModal, movieData, quoteEditModal, movieName, moviesData, curren
   <div class="main w-[100vw] h-[100vh] relative main overflow-x-hidden">
   <basic-header></basic-header>
   <main>
+  <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" name="Edit Movie" 
+  :name_en="movieData.name.en" 
+  :name_ka="movieData.name.ka" 
+  :director_en="movieData.director.en" 
+  :director_ka="movieData.director.ka" 
+  :description_en="movieData.description.en" 
+  :description_ka="movieData.description.ka" 
+  :id="currentId"
+   ></addmovie-form>
+
     <div>
       <basic-navigation feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
@@ -87,7 +117,7 @@ return {addMoviesModal, movieData, quoteEditModal, movieName, moviesData, curren
           <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>
           <div class="mt-[4rem] flex items-center w-[55%]">
             <div>
-            <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">Quotes (total <span>{{ moviesData.length }}</span>)</p>
+            <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">Quotes (total <span>{{ quotesLength }}</span>)</p>
             </div>
             <div class="w-[1px] h-[2.4rem] bg-[#6C757D]"></div>
             <div class="inline-block ml-[1.6rem]">
@@ -96,41 +126,7 @@ return {addMoviesModal, movieData, quoteEditModal, movieName, moviesData, curren
             </div>
           </div>
           </div>
-          <div class="flex flex-col gap-[4rem] h-[17%]">
-            <div class="px-[3.2rem] py-[2.4rem] w-[100%] bg-[#09090f] rounded-[10px]" v-for="movie in moviesData" :key="movie">
-            <div class="relative">
-              <dots-icon @emit-dots="quoteEditModal(movie.id)" class="absolute top-0 right-0 cursor-pointer z-50"></dots-icon>
-              <div :id="'movie'+movie.id" class="p-[4rem] bg-[#24222F] hidden flex flex-col justify-center gap-[3rem] absolute top-[2rem] right-0 translate-x-[87%] rounded-[10px] z-50">
-                   <div class="flex items-center gap-[1.6rem]">
-                    <view-quote></view-quote>
-                   <router-link :to="{ name: 'quote-details', params: { id: movie.id }}"><p class="text-[1.6rem] text-[#fff] cursor-pointer">View Quote</p></router-link>
-                   </div>
-                   <div class="flex items-center gap-[1.6rem]">
-                    <edit-pencil></edit-pencil>
-                    <router-link :to="{ name: 'quote-edit', params: { id: movie.id }}"><p class="text-[1.6rem] text-[#fff] cursor-pointer">Edit</p></router-link>
-                   </div>
-                   <div class="flex items-center gap-[1.6rem]">
-                    <delete-trash></delete-trash>
-                    <p class="text-[1.6rem] text-[#fff] cursor-pointer">Delete</p>
-                   </div>
-              </div>
-              <div class="flex items-center gap-[3.1rem] pb-[2.4rem] border-b border-b-[#f0f0f036] border-b-solid">
-                <img src="/src/assets/LordofRingsMovie.png" class="w-[30%] rounded-[2px]"/>
-                <p class="text-[2.4rem] text-[#CED4DA]">"Frankly, my dear, I don'tgive a damn." </p>
-                </div>
-              <div class="flex items-center gap-[3.2rem] mt-[2.4rem]">
-                <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">3</span>
-                  <description-comment></description-comment>
-                </div>
-                <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">10</span>
-                  <heart-icon></heart-icon>
-               </div>
-              </div>
-            </div>
-            </div>
-          </div>
+            <quote-list :id="currentId"></quote-list>
         </div>
         
         <div class="h-[100%] pr-[8rem]">
@@ -138,9 +134,9 @@ return {addMoviesModal, movieData, quoteEditModal, movieName, moviesData, curren
             <div class="mb-[2.4rem] flex items-center justify-between">
               <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ movieName.en }}</p>
               <div class="flex items-center justify-center bg-[#24222F] px-[2.7rem] py-[1rem] rounded-[10px]">
-                <router-link :to="{ name: 'quote-edit', params: { id: currentId }}"><edit-pencil class="mr-[2.5rem] cursor-pointer"></edit-pencil></router-link>
+                <edit-pencil @click="addMoviesModal=true" class="mr-[2.5rem] cursor-pointer"></edit-pencil>
                 <div class="bg-[#6C757D] w-[1px] h-[1.8rem]"></div>
-                <delete-trash class="ml-[2.5rem] cursor-pointer"></delete-trash>
+                <delete-trash @click="deleteMovie(currentId)" class="ml-[2.5rem] cursor-pointer"></delete-trash>
               </div>
             </div>
             <div class="flex items-center gap-[8px]">

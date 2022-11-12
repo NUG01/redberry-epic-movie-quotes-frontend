@@ -18,7 +18,7 @@ export default {
     name:'Profile',
     components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton},
   
-  setup(){
+ async setup(){
 
     const login = useLoginStore();
     const image=ref('')
@@ -31,12 +31,10 @@ export default {
     const imageDisplay=ref('')
     const selectedFile=ref('')
 
-   onMounted(async () => {
       const res = await axios.get("auth-user");
       login.updateUserData(res.data);
       user.value =res.data;
       imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail
-    });
 
     function handleChange(ev){
       const file=ev.target.files[0]

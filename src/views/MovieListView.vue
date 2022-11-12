@@ -31,20 +31,21 @@ export default {
     const moviesData=ref([])
 
     onMounted(async () => {
-      const res = await axios.get("movies");
+     const res = await axios.get("movies");
      movies.saveMovies(res.data)
      moviesData.value=movies.getMovies
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
     });
 
-
-const data=ref({})
-
-function handleCloseEmit(){
-  addMoviesModal.value=false
-}
+    function handleCloseEmit(){
+      addMoviesModal.value=false
+    }
     
-return {addMoviesModal,handleCloseEmit, moviesData}
+return {
+  addMoviesModal,
+  handleCloseEmit, 
+  moviesData
+}
   }
   
 }
@@ -55,7 +56,7 @@ return {addMoviesModal,handleCloseEmit, moviesData}
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header></basic-header>
   <main>
-    <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" class="absolute"></addmovie-form>
+    <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
     <div>
       <basic-navigation feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>

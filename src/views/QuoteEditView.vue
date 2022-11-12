@@ -11,39 +11,83 @@ import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
+import axios from "@/config/axios/index.js";
 
 
 
 export default {
   name:'EditQuote',
   emits:['emit-close'],
+  props:['id'],
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput, BasicNavigation, DeleteTrash },
-  setup(){
+  
+  async setup(props){
 
    const router=useRouter();
 
+
    const imageDisplay=ref('')
    const selectedFile=ref('')
+   const currentId=props.id
 
+   const quoteData=await axios.get(`quote/${currentId}`);
 
-    function handleImageChange(ev){
+    
+    
+  function handleImageChange(ev){
     const file=ev.target.files[0]
     selectedFile.value=ev.target.files[0]
+    const reader= new FileReader();
+    reader.onload= () =>{
+      imageDisplay.value=reader.result
+    }
+    reader.readAsDataURL(file)
+  }
 
-      const reader= new FileReader();
-      reader.onload= () =>{
-        imageDisplay.value=reader.result
-      }
-      reader.readAsDataURL(file)
+
+  function onSubmit(values){
+    if(!imageDisplay.value){
+    return;
+    }
+    const form=new FormData();
+    form.append('quote_id', currentId);
+    form.append('thumbnail', selectedFile.value);
+    form.append('quote_en', values.quote_en);
+    form.append('quote_ka', values.quote_ka);
+    basicAxios.post('update-quote',form)
+  .then((res)=>{
+    router.go(-1)
+  })
+  .catch((err)=>{
+    alert('Something went wrong!')
+  })
+  }
+
+  function deleteQuote(){
+      axios.delete(`quotes/${currentId}`)
+      .then((res)=>{
+        router.go(-1)
+      })
+      .catch((err)=>{
+        alert('Something went wrong!')
+      })
     }
   
 
 
-    return {imageDisplay, handleImageChange, router}
+    return {
+    imageDisplay, 
+    handleImageChange, 
+    router, 
+    onSubmit, 
+    quoteData:quoteData.data, 
+    deleteQuote
+    }
   }
   
 }
 </script>
+
 
 
 
@@ -52,9 +96,9 @@ export default {
     <div @click="router.go(-1)" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
      <div class="absolute w-[45%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">Add Quote</p>
+      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">Edit Quote</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <div class="absolute top-1/2 left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
+      <div @click="deleteQuote" class="absolute top-1/2 left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
         <delete-trash></delete-trash>
         <p class="text-[#CED4DA] text-[1.6rem]">Delete</p>
       </div>
@@ -66,8 +110,8 @@ export default {
       </div>
       
       
-      <addmovie-input rules="required" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input rules="required" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.en" rules="required" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.ka" rules="required" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       
       <div class="w-[100%] h-[45rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
