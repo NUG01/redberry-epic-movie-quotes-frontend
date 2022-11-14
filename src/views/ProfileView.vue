@@ -12,6 +12,8 @@ import axios from "@/config/axios/index.js";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import FormHeader from "@/components/FormHeader.vue";
+import { imageUpload } from "@/helpers/ImageUpload/index.js";
+
 
 
 export default {
@@ -36,17 +38,9 @@ export default {
       user.value =res.data;
       imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail
 
-    function handleChange(ev){
-      const file=ev.target.files[0]
-      selectedFile.value=ev.target.files[0]
-
-      const reader= new FileReader();
-      reader.onload= () =>{
-        imageUrl.value=reader.result
-        imageDisplay.value=reader.result
-      }
-      reader.readAsDataURL(file)
-    }
+    function handleImageChange(ev){
+    imageUpload(ev,selectedFile, imageDisplay, imageUrl);
+  }
 
     function onSubmitGoogleProfile(values){
       const form=new FormData();
@@ -93,7 +87,7 @@ return {
   reload, 
   onSubmit, 
   imageUrl,
-  handleChange, 
+  handleImageChange, 
   imageDisplay, 
   imageError, 
   responseError, 
@@ -112,13 +106,13 @@ return {
        <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="reload"></div>
        <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center px-[12rem] py-[5.4rem] bg-[#222030] rounded-[10px] z-50">
       <form-header>
-        Profile has been updated
+        {{ $t('newsFeed.profile_updated') }}
         <template v-slot:secondaryText>
-         Reload page to see changes<br><br><span v-if="!user.google_id">If you changed yor email address<br>don't forget to confirm it</span>
+         {{ $t('newsFeed.reload_page') }}<br><br><span v-if="!user.google_id">{{ $t('newsFeed.if_email_changed') }}<br>{{ $t('newsFeed.dont_forget_confirm') }}</span>
         </template>
       </form-header>
       <div class="flex items-center justify-center">
-        <basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]" @click="reload">Reload page</basic-button>
+        <basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]" @click="reload">{{ $t('newsFeed.reload_page') }}</basic-button>
       </div>
        </div>
     </div>
@@ -128,21 +122,21 @@ return {
       <basic-navigation feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
     </div>
     <div class="bg-gray">
-      <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem]">My profile</p>
+      <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem]">{{ $t('newsFeed.my_profile') }}</p>
       <div v-if="user.google_id" class="bg-[#11101A] w-[90rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
         <Form @submit="onSubmitGoogleProfile" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center" enctype="multipart/form-data">
           <div class="relative inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
-            <p class="text-[2rem] text-[#fff] text-center mt-[8px]">Upload new photo</p>
-             <input type="file" @change="handleChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
+            <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
+             <input type="file" @change="handleImageChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
           </div>
            <div v-if="responseError.length>0" @click="responseError=[]" id="responseError" class="mt-[2rem] px-[6px] py-[4px] cursor-pointer border border-solid border-[#EC9524] bg-[#ec952234] text-[#fff] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><span class="flex items-center justify-between gap-[1rem]"><p>{{ responseError[0] }}</p><profileinvalid-icon/></span></div>        
           <div class="flex flex-col w-[100%]">
-         <profile-input rules='required|min:8|max:15' :vModel="user.name" name="name" type="name" label="Name"/>
-          <label for="googleEmail" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">Email</label>
+         <profile-input rules='required|min:8|max:15' :vModel="user.name" name="name" type="name" :label="$t('landing.name')"/>
+          <label for="googleEmail" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">{{ $t('landing.email') }}</label>
           <input name="googleEmail" :value="user.email" class="border border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow disabled:bg-[#E9ECEF]" disabled/>
           </div>
-          <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">Save changes</basic-button>  
+          <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">{{ $t('newsFeed.save_changes') }}</basic-button>  
        </Form>
       </div>
       
@@ -150,16 +144,16 @@ return {
         <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center">
           <div class="relative flex flex-col items-center justify-center inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
-            <p class="text-[2rem] text-[#fff] text-center mt-[8px]">Upload new photo</p>
-            <input type="file" @change="handleChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
+            <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
+            <input type="file" @change="handleImageChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
           </div>
            <div v-if="responseError.length>0" @click="responseError=[]" id="responseError" class="mt-[2rem] px-[6px] py-[4px] cursor-pointer border border-solid border-[#EC9524] bg-[#ec952234] text-[#fff] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><span class="flex items-center justify-between gap-[1rem]"><p>{{ responseError[0] }}</p><profileinvalid-icon/></span></div>        
           <div class="flex flex-col w-[100%] gap-[2rem]">
-          <profile-input rules='required|min:8|max:15|lower_case' :vModel="user.name" name="name" type="name" label="Name"/>
-          <profile-input rules='email|required' :vModel="user.email" name="email" type="email" label="Email"/>
-          <profile-input rules='required|min:8|max:15|lower_case'  name="password" type="password" placeholder="••••••••••" label="Password"/>
+          <profile-input rules='required|min:8|max:15|lower_case' :vModel="user.name" name="name" type="name" :label="$t('landing.name')"/>
+          <profile-input rules='email|required' :vModel="user.email" name="email" type="email" :label="$t('landing.email')"/>
+          <profile-input rules='required|min:8|max:15|lower_case'  name="password" type="password" placeholder="••••••••••" :label="$t('landing.password')"/>
           </div>
-      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">Save changes</basic-button>  
+      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">{{ $t('newsFeed.save_changes') }}</basic-button>  
       </Form>
       </div>
     </div>

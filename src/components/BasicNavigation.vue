@@ -66,16 +66,16 @@ export default {
     <img src="/src/assets/InterstellarMovie.png" :class="profileColor" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%]"/>
     <div class="flex flex-col ietms-center justify-center">
       <p class="text-[2.4rem] text-[#fff]">{{ users.name }}</p>
-      <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">Edit your profile</p>
+      <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">{{ $t('newsFeed.edit_profile') }}</p>
     </div>
   </div>
   <div class="flex items-center justify-content gap-[4.2rem]">
     <home-icon :color="feedColor"></home-icon>
-    <div @click="redirectToNewsFeed" class="text-[2.4rem] text-[#fff] hover:cursor-pointer">News feed</div>
+    <div @click="redirectToNewsFeed" class="text-[2.4rem] text-[#fff] hover:cursor-pointer">{{ $t('newsFeed.news_feed') }}</div>
   </div>
   <div class="flex items-center justify-content gap-[4.2rem]">
     <movies-icon :color="moviesColor"></movies-icon>
-    <div @click="redirectToMoviesPage" class="text-[2.4rem] text-[#fff] hover:cursor-pointer">List of movies</div>
+    <div @click="redirectToMoviesPage" class="text-[2.4rem] text-[#fff] hover:cursor-pointer">{{ $t('newsFeed.movie_list') }}</div>
 </div>
 </div>
   

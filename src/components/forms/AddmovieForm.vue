@@ -9,16 +9,19 @@ import CloseIcon from "@/components/icons/CloseIcon.vue";
 import CameraIcon from "@/components/icons/CameraIcon.vue";
 import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
+import { imageUpload } from "@/helpers/ImageUpload/index.js";
+
 
 
 export default {
-  props:['name', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka'],
+  props:['name', 'user', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka'],
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
     const router=useRouter()
     const headerName=props.name
     const axiosEndpoint=props.axiosEndpoint
     const id=props.id
+    const user=props.user
     const name_en=props.name_en
     const name_ka=props.name_ka
     const director_en=props.director_en
@@ -35,15 +38,8 @@ export default {
    }
 
    function handleImageChange(ev){
-     const file=ev.target.files[0]
-     selectedFile.value=ev.target.files[0]
-     const reader= new FileReader();
-       reader.onload= () =>{
-         imageDisplay.value=reader.result
-      }
-    reader.readAsDataURL(file)
-    }
-
+    imageUpload(ev,selectedFile, imageDisplay);
+  }
     function onSubmit(values){
       if(!imageDisplay.value){
         return;
@@ -90,7 +86,8 @@ export default {
     director_en, 
     director_ka, 
     description_en, 
-    description_ka
+    description_ka,
+    user
     }
   }
   
@@ -109,31 +106,31 @@ export default {
      <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-center gap-[1.6rem]">
         <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
-        <p class="text-[2rem] text-[#fff]">Nino Tabagari</p>
+        <p class="text-[2rem] text-[#fff]">{{ user.name }}</p>
       </div>
       
-      <addmovie-input :value="name_en" rules="required" inputName="name_en" placeholder="Movie name" label="Eng" classLabel="top-1/2"></addmovie-input>
-      <addmovie-input :value="name_ka" rules="required" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
+      <addmovie-input :value="name_en" rules="required|eng_alphabet" inputName="name_en" placeholder="Movie name" label="Eng" classLabel="top-1/2"></addmovie-input>
+      <addmovie-input :value="name_ka" rules="required|geo_alphabet" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
       
       <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
       <checkbox-input rules="required" v-for="genre in genres" :key="genre" :genreValue="genre"></checkbox-input>
       </div>
       
-      <addmovie-input :value="director_en" rules="required" inputName="director_en" placeholder="Director" label="Eng" classLabel="top-1/2"></addmovie-input>
-      <addmovie-input :value="director_ka" rules="required" inputName="director_ka" placeholder="რეჟისორი" label="ქარ" classLabel="top-1/2"></addmovie-input>
-      <addmovie-input :value="description_en" rules="required" as="textarea" inputName="description_en" placeholder="Movie description" label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input :value="description_ka" rules="required" as="textarea" inputName="description_ka" placeholder="ფილმის აღწერა" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="director_en" rules="required|eng_alphabet" inputName="director_en" placeholder="Director" label="Eng" classLabel="top-1/2"></addmovie-input>
+      <addmovie-input :value="director_ka" rules="required|geo_alphabet" inputName="director_ka" placeholder="რეჟისორი" label="ქარ" classLabel="top-1/2"></addmovie-input>
+      <addmovie-input :value="description_en" rules="required|eng_alphabet" as="textarea" inputName="description_en" placeholder="Movie description" label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="description_ka" rules="required|geo_alphabet" as="textarea" inputName="description_ka" placeholder="ფილმის აღწერა" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       
       <div class="w-[100%] h-[100%] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit">
         <div class="flex items-center gap-[1.2rem]">
           <camera-icon></camera-icon>
-          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>Drag & drop your image here or <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">Choose file</span></p></div>
+          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>{{ $t('newsFeed.drag_and_drop') }} <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span></p></div>
         </div>
         <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] rounded-[5px] absolute top-0 right-0" />
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
 
-      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[3.2rem] mb-[1.8rem]" width="w-[100%]">Add movie</basic-button>
+      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[3.2rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.add_movie') }}</basic-button>
      </Form>
     </div>
 </div>

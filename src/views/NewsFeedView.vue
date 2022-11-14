@@ -39,14 +39,14 @@ return {}
     <div class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div class="relative w-[85%]">
-      <textarea placeholder="Write new quote" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
+      <textarea :placeholder="$t('newsFeed.new_quote')" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
         <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
         </div>
 
       <form class="w-[15%]">
         <div class="flex items-center gap-[1.6rem]">
        <button type="submit"><search-icon></search-icon></button>
-        <input type="text" placeholder="Search by"/>
+        <input type="text" :placeholder="$t('newsFeed.search_by')"/>
         </div>
       </form>
       </div>
@@ -80,7 +80,7 @@ return {}
         </div>
         <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea placeholder="Write a comment" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
+          <textarea :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
         </div>
       </div>
     </div>

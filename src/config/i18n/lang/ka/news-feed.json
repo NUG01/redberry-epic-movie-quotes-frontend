@@ -1,0 +1,55 @@
+{
+  "logout": "გასვლა",
+  "new_quote": "დაწერე ახალი ციტატა",
+  "search_by": "მოძებნე",
+  "search": "მოძებნე",
+  "write_comment": "დაწერე კომენტარი",
+  "edit_profile": "პროფილის შეცვლა",
+  "news_feed": "სიახლეები",
+  "movie_list": "ფილმების სია",
+  "my_profile": "ჩემი პროფილი",
+  "upload_photo": "სურათის განახლება",
+  "save_changes": "ცვლილების შენახვა",
+  "profile_updated": "პროფილი განახლდა",
+  "reload_page": "გადატვირთე გვერდი",
+  "if_email_changed": "თუ ელ.ფოსტა შეცვალე",
+  "dont_forget_confirm": "არ დაგავიწყდეს გააქტიურება",
+  "my_list_of": "ჩემი ფილმების სია",
+  "total": "სულ",
+  "add_movie": "ფილმის დამატება",
+  "movie_description": "ფილმის აღწერა",
+  "director": "რეჟისორი",
+  "quotes": "ციტატები",
+  "add_quote": "დამატება",
+  "add_quote_exact": "ციტატის დამატება",
+  "choose_file": "აირჩიე ფაილი",
+  "drag_and_drop": "ჩააგდე შენი სურათი აქ ან",
+  "change_photo": "სურათის შეცვლა",
+  "edit_movie": "ფილმის რედაქტირება",
+  "edit_quote": "ციტატის შესწორება",
+  "delete": "წაშლა",
+  "edit": "შესწორება",
+  "view_quote": "ნახვა"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

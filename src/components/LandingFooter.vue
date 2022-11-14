@@ -1,6 +1,6 @@
 <template>
   <div class="w-[100%] h-[4.5rem] absolute bottom-0 left-0"><div class="gradient-five relative top-0 left-0 h-[100%] w-[100%] z-10 flex items-center">
-  <p class="font-medium text-[1.2rem] text-[#DDCCAA] uppercase ml-[7rem]">&#169;  2022 movie quotes. all rights reserved.</p></div></div>
+  <p class="font-medium text-[1.2rem] text-[#DDCCAA] uppercase ml-[7rem]">&#169;  2022 movie quotes. {{ $t('landing.all_rights_reserved') }}</p></div></div>
 </template>
 
 <style scoped>

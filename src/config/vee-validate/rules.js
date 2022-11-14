@@ -12,7 +12,25 @@ const regexNum=/^[0-9]*$/;
 const regexLetter=/^[a-z]*$/;
 defineRule('lower_case', value => {
 if (value && !regexName.test(value) || regexNum.test(value) || regexLetter.test(value)) {
-  return 'Please use lowercase latin symbols and numbers';
+  return 'The password field must consist of lower case characters';
+}else{
+  return true;
+}
+ });
+
+const regexEnglish=/^[A-Za-z0-9 ]*$/;
+defineRule('eng_alphabet', value => {
+  if (value && !regexEnglish.test(value)) {
+    return 'Please use latin symbols and numbers';
+  }else{
+    return true;
+  }
+});
+
+const regexGeorgian=/^[ა-ჰ-0-9 ]*$/;
+defineRule('geo_alphabet', value => {
+if (value && !regexGeorgian.test(value)) {
+  return 'Please use Georgian symbols and numbers';
 }else{
   return true;
 }
@@ -21,7 +39,7 @@ if (value && !regexName.test(value) || regexNum.test(value) || regexLetter.test(
 const regexEmail=/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 defineRule('email_valid', value => {
 if (value && !regexEmail.test(value)) {
-  return 'Please use correct email address';
+  return 'This email must be in a valid format';
 }else{
   return true;
 }

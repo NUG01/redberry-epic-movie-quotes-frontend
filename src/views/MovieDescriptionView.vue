@@ -34,21 +34,23 @@ export default {
 
     const addMoviesModal=ref(false);
     const imageDisplay=ref('');
-    const movieData=ref({})
+    const movieData=ref([])
     const moviesData=ref({})
     const movieName=ref({})
+    const authUser=ref({})
     const currentId=props.id
     const quotesLength=ref('')
 
       
      const res = await axios.get("movies");
      const resQuotes = await axios.get(`quotes/${currentId}`);
+     const resUser = await axios.get("auth-user");
      movies.saveMovies(res.data)
-     movies.saveQuotes(resQuotes.data)
+     authUser.value=resUser.data
      movieData.value=movies.getMovies.find(x => x.id == props.id);
      moviesData.value=movies.getMovies
      movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
-    quotesLength.value=movies.getQuotes.length                        
+     quotesLength.value=resQuotes.data.length                        
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
       
@@ -83,7 +85,8 @@ currentId,
 addMoviesModal, 
 handleCloseEmit,
 deleteMovie,
-quotesLength
+quotesLength,
+authUser
 }
   }
   
@@ -95,7 +98,7 @@ quotesLength
   <div class="main w-[100vw] h-[100vh] relative main overflow-x-hidden">
   <basic-header></basic-header>
   <main>
-  <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" name="Edit Movie" 
+  <addmovie-form :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
   :director_en="movieData.director.en" 
@@ -109,7 +112,7 @@ quotesLength
       <basic-navigation feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
     <div>
-      <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem]">Movie description</div>
+      <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem]">{{ $t('newsFeed.movie_description') }}</div>
       <div class="mt-[3rem] listGrid">
         
         <div class="w-[100%]">
@@ -117,12 +120,12 @@ quotesLength
           <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>
           <div class="mt-[4rem] flex items-center w-[55%]">
             <div>
-            <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">Quotes (total <span>{{ quotesLength }}</span>)</p>
+            <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">{{ $t('newsFeed.quotes') }} ({{ $t('newsFeed.total') }} <span>{{ quotesLength }}</span>)</p>
             </div>
             <div class="w-[1px] h-[2.4rem] bg-[#6C757D]"></div>
             <div class="inline-block ml-[1.6rem]">
             <router-link :to="{ name: 'quote-add', params: { id: currentId }}"><basic-button  type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[4px]" width="w-[100%]">
-          <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>Add quote</p></div></basic-button></router-link>
+          <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_quote') }}</p></div></basic-button></router-link>
             </div>
           </div>
           </div>
@@ -132,7 +135,7 @@ quotesLength
         <div class="h-[100%] pr-[8rem]">
           <div class="mb-[3rem]">
             <div class="mb-[2.4rem] flex items-center justify-between">
-              <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ movieName.en }}</p>
+              <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movieName.en : movieName.ka }}</p>
               <div class="flex items-center justify-center bg-[#24222F] px-[2.7rem] py-[1rem] rounded-[10px]">
                 <edit-pencil @click="addMoviesModal=true" class="mr-[2.5rem] cursor-pointer"></edit-pencil>
                 <div class="bg-[#6C757D] w-[1px] h-[1.8rem]"></div>
@@ -145,11 +148,11 @@ quotesLength
           </div>
           <div class="flex justify-center flex-col gap-[2rem] pl-[1.2rem]">
             <div class="flex items-center gap-[1rem]">
-              <p class="text-[#CED4DA] text-[1.8rem] font-bold">Director:</p>
-              <p class="text-[#fff] text-[1.8rem] font-medium">NICK CASSAVETES</p>
+              <p class="text-[#CED4DA] text-[1.8rem] font-bold">{{ $t('newsFeed.director') }}:</p>
+              <p class="text-[#fff] text-[1.8rem] font-medium">{{ $i18n.locale=='en'? movieData.director.en : movieData.director.ka }}</p>
             </div>
             <p class="text-[#CED4DA] text-[1.8rem] font-normal">
-              In a nursing home, resident Duke reads a romance story to an old woman who has senile dementia with memory loss. In the late 1930s, wealthy seventeen year-old Allie Hamilton is spending summer vacation in Seabrook. Local worker Noah Calhoun meets Allie at a carnival 
+             {{ $i18n.locale=='en'? movieData.description.en : movieData.description.ka }}
             </p>
           </div>
         </div>

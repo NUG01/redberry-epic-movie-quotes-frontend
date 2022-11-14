@@ -12,6 +12,7 @@ import basicAxios from "@/config/axios/BasicAxios.js";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import axios from "@/config/axios/index.js";
+import { imageUpload } from "@/helpers/ImageUpload/index.js";
 
 
 
@@ -29,19 +30,16 @@ export default {
    const imageDisplay=ref('')
    const selectedFile=ref('')
    const currentId=props.id
+   const authUser=ref({})
+
 
    const quoteData=await axios.get(`quote/${currentId}`);
+   const resUser = await axios.get("auth-user");
+   authUser.value=resUser.data
 
-    
-    
+
   function handleImageChange(ev){
-    const file=ev.target.files[0]
-    selectedFile.value=ev.target.files[0]
-    const reader= new FileReader();
-    reader.onload= () =>{
-      imageDisplay.value=reader.result
-    }
-    reader.readAsDataURL(file)
+    imageUpload(ev,selectedFile, imageDisplay);
   }
 
 
@@ -81,7 +79,8 @@ export default {
     router, 
     onSubmit, 
     quoteData:quoteData.data, 
-    deleteQuote
+    deleteQuote,
+    authUser
     }
   }
   
@@ -96,33 +95,33 @@ export default {
     <div @click="router.go(-1)" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
      <div class="absolute w-[45%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">Edit Quote</p>
+      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.edit_quote') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
       <div @click="deleteQuote" class="absolute top-1/2 left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
         <delete-trash></delete-trash>
-        <p class="text-[#CED4DA] text-[1.6rem]">Delete</p>
+        <p class="text-[#CED4DA] text-[1.6rem]">{{ $t('newsFeed.delete') }}</p>
       </div>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-start gap-[1.6rem]">
         <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
-        <p class="text-[2rem] text-[#fff]">Nino Tabagari</p>
+        <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
       </div>
       
       
-      <addmovie-input :value="quoteData.quote.en" rules="required" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input :value="quoteData.quote.ka" rules="required" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       
       <div class="w-[100%] h-[45rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
-          <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">Change Photo</p>
+          <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">{{ $t('newsFeed.change_photo') }}</p>
         </div>
         <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
 
-      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1rem] mb-[1.8rem]" width="w-[100%]">Save changes</basic-button>
+      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.save_changes') }}</basic-button>
      </Form>
      </div>
    <div>

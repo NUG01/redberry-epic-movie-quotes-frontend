@@ -11,6 +11,8 @@ import QuoteIcon from "@/components/icons/QuoteIcon.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
 import { useMoviesStore } from '@/stores/MoviesStore.js';
+import { getJwtToken } from "@/helpers/jwt/index.js";
+
 
 
 
@@ -37,13 +39,13 @@ export default {
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
     });
 
-    function handleCloseEmit(){
+    function closeAddMoviesModal(){
       addMoviesModal.value=false
     }
     
 return {
   addMoviesModal,
-  handleCloseEmit, 
+  closeAddMoviesModal, 
   moviesData
 }
   }
@@ -56,17 +58,17 @@ return {
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header></basic-header>
   <main>
-    <addmovie-form @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
+    <addmovie-form @emit-close="closeAddMoviesModal" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
     <div>
       <basic-navigation feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
     <div class="bg-gray h-[92.65vh] pr-[8rem] pt-[3rem]">
       <div class="w-[100%] flex items-center justify-between mb-[5rem]">
-        <div class="text-[2.4rem] font-medium text-[#fff]">My list of movies  (Total <span>{{ moviesData.length }}</span>)</div>
+        <div class="text-[2.4rem] font-medium text-[#fff]">{{ $t('newsFeed.my_list_of') }}  ({{ $t('newsFeed.total') }} <span>{{ moviesData.length }}</span>)</div>
         <div class="flex items-center justify-center gap-[3rem]">
-          <div class="text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem]"><search-icon></search-icon><span>search</span></div>
+          <div class="text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem]"><search-icon></search-icon><span>{{ $t('newsFeed.search') }}</span></div>
           <basic-button @click="addMoviesModal=true" type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[4px]" width="w-[100%]">
-          <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>Add movie</p></div></basic-button>
+          <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_movie') }}</p></div></basic-button>
         </div>
       </div>
       <div class="w-[100%] movies-grid h-[90.3%] overflow-scroll scrollHide pb-[1.5rem]">
