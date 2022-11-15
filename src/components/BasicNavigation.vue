@@ -9,25 +9,18 @@ import axios from "@/config/axios/index.js";
 
 export default {
   components:{HomeIcon, MoviesIcon},
-  props:['feed', 'movies', 'profile'],
+  props:['feed', 'movies', 'profile','dataIsFetched', 'user'],
 
  setup(props){
 
     const login = useLoginStore();
     const router = useRouter();
-
-    
-    
-    const users = ref({});
   
-     onMounted(async () => {
-       const res = await axios.get("auth-user");
-      login.updateUserData(res.data);
-      users.value =res.data;
-    });
 
 
 
+    const user=props.user;
+    const dataIsFetched=props.dataIsFetched;
     const feedColor=props.feed;
     const moviesColor=props.movies;
     const profileColor=props.profile;
@@ -46,13 +39,16 @@ export default {
    
 
 
-    return{users,
+    return{user,
     redirectToMoviesPage, 
     redirectToNewsFeed, 
     profilePage,
     moviesColor,
     profileColor,
-    feedColor
+    feedColor,
+    dataIsFetched,
+    user,
+    dataIsFetched
     }
   }
   
@@ -61,11 +57,11 @@ export default {
 
 
 <template>
-<div class="flex flex-col items-start justify-center gap-[4.5rem] pl-[7rem] mt-[3rem]">
+<div v-if="dataIsFetched" class="flex flex-col items-start justify-center gap-[4.5rem] pl-[7rem] mt-[3rem]">
   <div class="flex items-center gap-[1.3rem]">
     <img src="/src/assets/InterstellarMovie.png" :class="profileColor" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%]"/>
     <div class="flex flex-col ietms-center justify-center">
-      <p class="text-[2.4rem] text-[#fff]">{{ users.name }}</p>
+      <p class="text-[2.4rem] text-[#fff]">{{ user.name }}</p>
       <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">{{ $t('newsFeed.edit_profile') }}</p>
     </div>
   </div>

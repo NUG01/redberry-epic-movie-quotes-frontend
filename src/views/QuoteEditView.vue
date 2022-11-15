@@ -1,6 +1,6 @@
 <script>
 import { Form, Field } from 'vee-validate';
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
@@ -13,6 +13,10 @@ import BasicNavigation from "@/components/BasicNavigation.vue";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import axios from "@/config/axios/index.js";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { useLoginStore } from '@/stores/LoginStore.js';
+
+
 
 
 
@@ -20,10 +24,10 @@ export default {
   name:'EditQuote',
   emits:['emit-close'],
   props:['id'],
-  components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput, BasicNavigation, DeleteTrash },
+  components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput, BasicNavigation, DeleteTrash, LoadingSpinner },
   
-  async setup(props){
-
+   setup(props){
+   const login = useLoginStore();
    const router=useRouter();
 
 
@@ -31,11 +35,17 @@ export default {
    const selectedFile=ref('')
    const currentId=props.id
    const authUser=ref({})
+   const dataIsFetched=ref(false)
+   const quoteData=ref([])
 
 
-   const quoteData=await axios.get(`quote/${currentId}`);
-   const resUser = await axios.get("auth-user");
-   authUser.value=resUser.data
+onMounted(async ()=>{
+  const resQuote=await axios.get(`quote/${currentId}`);
+   authUser.value=login.getUserData
+  quoteData.value=resQuote.data
+   dataIsFetched.value=true
+
+})
 
 
   function handleImageChange(ev){
@@ -78,9 +88,10 @@ export default {
     handleImageChange, 
     router, 
     onSubmit, 
-    quoteData:quoteData.data, 
+    quoteData,
     deleteQuote,
-    authUser
+    authUser,
+    dataIsFetched
     }
   }
   
@@ -91,7 +102,9 @@ export default {
 
 
 <template>
-  <div class="main w-[100vw] min-h-[100vh]">
+<div>
+<loading-spinner texts="hidden" location="pt-[35rem] bg-[#181623]" v-if="!dataIsFetched"></loading-spinner>
+  <div v-else class="main w-[100vw] min-h-[100vh]">
     <div @click="router.go(-1)" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
      <div class="absolute w-[45%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
@@ -125,10 +138,11 @@ export default {
      </Form>
      </div>
    <div>
-      <basic-navigation feed="#fff" movies="#E31221" profile="border-[2px] border-solid border-[#fff]"></basic-navigation>
+      <basic-navigation :user="authUser" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-[2px] border-solid border-[#fff]"></basic-navigation>
     </div>
     <div></div>
   </div>
+</div>
 </template>
 
 

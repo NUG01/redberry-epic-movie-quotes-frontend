@@ -16,6 +16,8 @@ import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
 import { useMoviesStore } from '@/stores/MoviesStore.js';
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
 
 
 
@@ -23,13 +25,15 @@ export default {
   name:'MovieDescription',
   props:['id'],
   emits:['emit-dots'],
-  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
+  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
   
- async setup(props){
+  setup(props){
 
     const login = useLoginStore();
     const router = useRouter();
     const movies = useMoviesStore();
+    const dataIsFetched=ref(false)
+
 
 
     const addMoviesModal=ref(false);
@@ -37,20 +41,23 @@ export default {
     const movieData=ref([])
     const moviesData=ref({})
     const movieName=ref({})
-    const authUser=ref({})
+    const authUser=ref([])
     const currentId=props.id
     const quotesLength=ref('')
 
-      
-     const res = await axios.get("movies");
-     const resQuotes = await axios.get(`quotes/${currentId}`);
-     const resUser = await axios.get("auth-user");
-     movies.saveMovies(res.data)
-     authUser.value=resUser.data
-     movieData.value=movies.getMovies.find(x => x.id == props.id);
-     moviesData.value=movies.getMovies
-     movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
-     quotesLength.value=resQuotes.data.length                        
+      onMounted(async ()=>{
+        authUser.value=login.getUserData
+       const res= await axios.get(`movies/${authUser.value.id}`)
+       const resQuotes = await axios.get(`quotes/${currentId}`);
+       movies.saveMovies(res.data)
+       movieData.value=movies.getMovies.find(x => x.id == props.id);
+       moviesData.value=movies.getMovies
+       movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
+       quotesLength.value=resQuotes.data.length      
+       dataIsFetched.value=true
+     
+        })
+     
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
       
@@ -86,7 +93,8 @@ addMoviesModal,
 handleCloseEmit,
 deleteMovie,
 quotesLength,
-authUser
+authUser,
+dataIsFetched
 }
   }
   
@@ -97,7 +105,8 @@ authUser
 <template>
   <div class="main w-[100vw] h-[100vh] relative main overflow-x-hidden">
   <basic-header></basic-header>
-  <main>
+  <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
+  <main v-else>
   <addmovie-form :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
@@ -109,7 +118,7 @@ authUser
    ></addmovie-form>
 
     <div>
-      <basic-navigation feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
+      <basic-navigation :user="authUser" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
     <div>
       <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem]">{{ $t('newsFeed.movie_description') }}</div>

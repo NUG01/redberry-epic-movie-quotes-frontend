@@ -15,15 +15,20 @@ export default {
  emits:['emit-dots'],
  props:['id'],
  components:{HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote },
-async setup(props){
+ setup(props){
   const router = useRouter();
   const quotesData=ref({})
   const currentId=props.id
   const movies = useMoviesStore();
   const detailsModal=ref(false)
+  const dataIsFetched=ref(false)
+
   
-  const resQuotes = await axios.get(`quotes/${currentId}`);
-  quotesData.value = resQuotes.data;
+  onMounted(async ()=>{
+    const resQuotes = await axios.get(`quotes/${currentId}`);
+    quotesData.value = resQuotes.data;
+    dataIsFetched.value=true;
+})
   
   // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
 
@@ -49,7 +54,8 @@ async setup(props){
     quoteEditModal, 
     quotesData, 
     deleteQuote,
-    detailsModal
+    detailsModal,
+    dataIsFetched
   }
     }
 
@@ -60,7 +66,7 @@ async setup(props){
 
 
 <template>
-  <div class="flex flex-col gap-[4rem] h-[17%]">
+  <div v-if="dataIsFetched" class="flex flex-col gap-[4rem] h-[17%]">
             <div class="px-[3.2rem] py-[2.4rem] w-[100%] bg-[#09090f] rounded-[10px]" v-for="quote in quotesData" :key="quote">
             <div class="relative">
               <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-40"></dots-icon>

@@ -17,11 +17,24 @@ export default {
 
     const login = useLoginStore();
     const router = useRouter();
+    const dataIsFetched=ref(false)
+    const user = ref([]);
+
+
+    user.value =login.getUserData;
+    dataIsFetched.value=login.getDataIsFetched
+
+     function commentSubmit(ev){
+    if(ev.target.value!=''){
+      console.log(ev.target.value, 'okC')
+    }
+    return
+  }
 
 
     
 
-return {}
+return {user,dataIsFetched, commentSubmit}
   }
   
 }
@@ -29,11 +42,11 @@ return {}
 
 
 <template>
-<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
+<div v-if="dataIsFetched" class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
   <basic-header></basic-header>
   <main class="w-[100%] h-[93%]">
     <div>
-      <basic-navigation feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
+      <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
 
     </div>
     <div class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
@@ -80,7 +93,7 @@ return {}
         </div>
         <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
+          <textarea @keydown.enter.prevent="commentSubmit" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
         </div>
       </div>
     </div>

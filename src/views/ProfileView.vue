@@ -20,24 +20,27 @@ export default {
     name:'Profile',
     components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton},
   
- async setup(){
+  setup(){
 
     const login = useLoginStore();
     const image=ref('')
     const imageError=ref(false)
     const responseError=ref([])
     const requestSuccess=ref(false)
+    const dataIsFetched=ref(false)
 
-    const user=ref({})
+
+    const user=ref([])
     const imageUrl=ref('')
     const imageDisplay=ref('')
     const selectedFile=ref('')
 
-      const res = await axios.get("auth-user");
-      login.updateUserData(res.data);
-      user.value =res.data;
-      imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail
+      user.value =login.getUserData;
+      dataIsFetched.value=login.getDataIsFetched
 
+        
+      // imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail
+    
     function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay, imageUrl);
   }
@@ -91,7 +94,8 @@ return {
   imageDisplay, 
   imageError, 
   responseError, 
-  onSubmitGoogleProfile}
+  onSubmitGoogleProfile,
+  dataIsFetched}
   }
   
 }
@@ -99,7 +103,7 @@ return {
 
 
 <template>
-  <div class="main w-[100vw] bg-[#181623] min-h-[100vh]">
+  <div v-if="dataIsFetched" class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
   <main>
     <div v-if="requestSuccess" class="absolute w-[100vw] h-[100vh] top-0 left-0">
@@ -119,7 +123,7 @@ return {
    
    
     <div>
-      <basic-navigation feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
+      <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
     </div>
     <div class="bg-gray">
       <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem]">{{ $t('newsFeed.my_profile') }}</p>
