@@ -6,6 +6,7 @@ export const useLoginStore = defineStore("useLoginStore",{
  state(){
   return{
       isLogged:false,
+      dataIsFetched:false,
       userData:null,
       isGoogleLogged:false,
       googleData:null,
@@ -16,6 +17,7 @@ export const useLoginStore = defineStore("useLoginStore",{
 
    getters:{
     getIsLogged: (state) => state.isLogged,
+    getDataIsFetched: (state) => state.dataIsFetched,
     getIsLoggedOut: (state) => state.isLoggedOut,
     getIsGoogleLogged: (state) => state.isLogged,
     getUserData: (state)=>state.userData,
@@ -35,6 +37,9 @@ export const useLoginStore = defineStore("useLoginStore",{
     cleanErrors(){
       this.errors=[];
     },
+    changeFetchedStatus(){
+      this.dataIsFetched=true
+    },
 
 
     sendLoginData(values){
@@ -45,15 +50,13 @@ export const useLoginStore = defineStore("useLoginStore",{
       .then((response)=>{
         setJwtToken(response.data.access_token, response.data.expires_in);
         this.isLogged=true;
-        this.userData=response.data;
+        this.userData=response.data.userData;
+        this.changeFetchedStatus();
         this.router.push({ name: 'news-feed'})
       })
       .catch((error)=> {
         this.errors.push(error.response.data.error);
       })
-      .finally(()=>{
-        location.reload();
-      });
     },
 
     updateUserData(data){
@@ -63,12 +66,7 @@ export const useLoginStore = defineStore("useLoginStore",{
     loginWithGoogle(token, expires_in){
       setJwtToken(token, expires_in);
       this.isGoogleLogged=true;
-     const promise= new Promise((resolve, reject)=>{
-      resolve(this.router.push({ name: 'news-feed' }))
-  });
-     promise.then(()=>{
-       location.reload()
-   }) 
+      this.router.push({ name: 'news-feed' })
     },
 
     deleteCookie(){

@@ -15,10 +15,9 @@ export const useMoviesStore = defineStore("useMoviesStore",{
 
 
     actions:{
-
     saveMovies(moviesData){
       this.movies=moviesData;
-    }
+    },
 
  }
 });

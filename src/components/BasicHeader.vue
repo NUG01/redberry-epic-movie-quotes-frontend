@@ -51,15 +51,15 @@ export default {
       </div>
       <div class="mr-[2.4rem] relative flex items-center justify-center">
         <div @click="langDropDown" class="flex items-center justify-center gap-[1rem] cursor-pointer">
-        <p class="text-[1.6rem] text-[white]">Eng</p>
+        <p class="text-[1.6rem] text-[white]">{{ $i18n.locale=='en'? 'Eng' : 'Ka' }}</p>
       <dropdown-arrow></dropdown-arrow>
         </div>
       <div class="absolute top-full left-0 bg-[#222030] border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
-          <router-link to="#" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600]"><p class="text-[1.4rem] px-[5px] py-[4px]">Eng</p></router-link>
-          <router-link to="#" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600]"><p class="text-[1.4rem] px-[5px] py-[4px]">Ka</p></router-link>
+          <div @click="$i18n.locale='en'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] px-[5px] py-[4px]">Eng</p></div>
+          <div @click="$i18n.locale='ka'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] px-[5px] py-[4px]">Ka</p></div>
       </div>
       </div>
-      <button @click="logoutHandle" type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] hover:bg-[#cdc9c2] hover:text-[#222030] font-medium active:bg-[#b6b1a8] disabled:bg-[#e6e2da] focus:bg-[#a5a199] focus:text-[#222030]">Log out</button>
+      <button @click="logoutHandle" type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] hover:bg-[#cdc9c2] hover:text-[#222030] font-medium active:bg-[#b6b1a8] disabled:bg-[#e6e2da] focus:bg-[#a5a199] focus:text-[#222030]">{{ $t('newsFeed.logout') }}</button>
     </div>
   </header>
 </div>

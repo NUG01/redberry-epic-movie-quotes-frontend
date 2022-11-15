@@ -17,11 +17,24 @@ export default {
 
     const login = useLoginStore();
     const router = useRouter();
+    const dataIsFetched=ref(false)
+    const user = ref([]);
+
+
+    user.value =login.getUserData;
+    dataIsFetched.value=login.getDataIsFetched
+
+     function commentSubmit(ev){
+    if(ev.target.value!=''){
+      console.log(ev.target.value, 'okC')
+    }
+    return
+  }
 
 
     
 
-return {}
+return {user,dataIsFetched, commentSubmit}
   }
   
 }
@@ -29,24 +42,24 @@ return {}
 
 
 <template>
-<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
+<div v-if="dataIsFetched" class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
   <basic-header></basic-header>
   <main class="w-[100%] h-[93%]">
     <div>
-      <basic-navigation feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
+      <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
 
     </div>
     <div class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div class="relative w-[85%]">
-      <textarea placeholder="Write new quote" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
+      <textarea :placeholder="$t('newsFeed.new_quote')" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
         <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
         </div>
 
       <form class="w-[15%]">
         <div class="flex items-center gap-[1.6rem]">
        <button type="submit"><search-icon></search-icon></button>
-        <input type="text" placeholder="Search by"/>
+        <input type="text" :placeholder="$t('newsFeed.search_by')"/>
         </div>
       </form>
       </div>
@@ -80,7 +93,7 @@ return {}
         </div>
         <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea placeholder="Write a comment" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
+          <textarea @keydown.enter.prevent="commentSubmit" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
         </div>
       </div>
     </div>

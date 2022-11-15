@@ -1,7 +1,21 @@
+<script>
+export default {
+  props:['texts', 'bgColor', 'location'],
+  setup(props){
+     const texts=props.texts
+     const bgColor=props.bgColor
+     const location=props.location
+
+    return{bgColor, texts, location}
+  }
+  
+}
+</script>
+
 <template>
-  <div class="spinner w-[100vw] h-[100vh] flex flex-col">
-    <p class="text-[2rem] font-[600] mb-[2rem] text-center">Wait for 5 seconds,still spinning❓<br>then click on the Button🚀</p>
-    <router-link :to="{name : 'landing'}" type="button" class="mb-[9rem] text-[white] text-[1.8rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[31%]"><span class="flex items-center justify-center">Go Back</span></router-link>
+  <div class="spinner w-[100vw] h-[100vh] flex flex-col" :class="location" >
+    <p class="text-[2rem] font-[600] mb-[2rem] text-center" :class="texts">Wait for 5 seconds,still spinning❓<br>then click on the Button🚀</p>
+    <router-link :to="{name : 'landing'}" type="button" :class="texts" class="mb-[9rem] text-[white] text-[1.8rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[31%]"><span class="flex items-center justify-center">Go Back</span></router-link>
     <div class="lds-roller">
       <div></div>
       <div></div>
@@ -19,7 +33,7 @@
 <style scoped>
 .spinner {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   width: 100%;
 }
@@ -41,7 +55,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #3d008d;
+  background: #E31221;
   margin: -4px 0 0 -4px;
 }
 .lds-roller div:nth-child(1) {
