@@ -8,33 +8,96 @@ import CommentsIcon from "@/components/icons/CommentsIcon.vue";
 import LikesIcon from "@/components/icons/LikesIcon.vue";
 import PencilIcon from "@/components/icons/PencilIcon.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
+import axios from "@/config/axios/index.js";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
+
 
 export default {
   name:'NewsFeed',
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon},
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner},
   
   setup(){
 
     const login = useLoginStore();
     const router = useRouter();
     const dataIsFetched=ref(false)
+    const feedDataIsFetched=ref(false)
     const user = ref([]);
+    const usersData=ref([])
+    const quoteData=ref([])
+    const moviesData=ref([])
+    const commentsData=ref(null)
+    const showComments=ref(false)
+    const comments=ref([])
 
 
-    user.value =login.getUserData;
+
+    onMounted(async ()=>{
+    usersData.value=login.getAllUser;
+    const res= await axios.get('quotes');
+    const resMovies= await axios.get('movies');
+    const resComments= await axios.get(`comments`);
+    commentsData.value=resComments.data
+    quoteData.value=res.data
+    comments.value=commentsData.value
+    moviesData.value=resMovies.data
+    feedDataIsFetched.value=true
+   })
+
+   user.value =login.getUserData;
     dataIsFetched.value=login.getDataIsFetched
 
-     function commentSubmit(ev){
-    if(ev.target.value!=''){
-      console.log(ev.target.value, 'okC')
+
+    function commentSubmit(quote_id, event){
+    if(event.target.value==''){
+      return
+    }else{
+      axios.post('comments',{
+        body: event.target.value,
+        quote_id: quote_id,
+        user_id: user.value.id
+     }).then(()=>{
+        comments.value.push({
+          body:event.target.value,
+          user_id:user.value.id,
+          quote_id: quote_id
+        });
+         event.target.value='';
+         showComments.value=quote_id
+     }).catch(()=>{
+      alert('Something went wrong')
+     })
     }
-    return
+    
   }
+
+
+   function handleShowComments(id){
+    if(showComments.value==id){
+    showComments.value=0
+    return;
+  }
+  showComments.value=id
+   }
 
 
     
 
-return {user,dataIsFetched, commentSubmit}
+return {
+       user,
+       dataIsFetched, 
+       commentSubmit,
+       quoteData, 
+       feedDataIsFetched, 
+       moviesData, 
+       usersData, 
+       commentsData, 
+       showComments,
+       handleShowComments,
+       commentSubmit,
+       comments
+       }
   }
   
 }
@@ -42,14 +105,17 @@ return {user,dataIsFetched, commentSubmit}
 
 
 <template>
-<div v-if="dataIsFetched" class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
+<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
   <basic-header></basic-header>
   <main class="w-[100%] h-[93%]">
     <div>
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
 
     </div>
-    <div class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
+    
+    <loading-spinner bgColor="bg-none" v-if="!feedDataIsFetched" texts="hidden" location="pt-[35rem]"></loading-spinner>
+
+    <div v-else class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div class="relative w-[85%]">
       <textarea :placeholder="$t('newsFeed.new_quote')" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
@@ -63,42 +129,37 @@ return {user,dataIsFetched, commentSubmit}
         </div>
       </form>
       </div>
-      <div class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
+      <div v-for="quote in quoteData" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
         <div class="flex items-center justify-start gap-[1.6rem]">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <p class="text-[2rem] text-[#fff]">Maia Nakashidze</p>
+          <p class="text-[2rem] text-[#fff]">{{ usersData.find(x => x.id == quote.user_id).name }}</p>
         </div>
-        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“Follow your dream.”movie-<span class="text-[#DDCCAA]">Billy Elliot.</span> (2000)</p>
+        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“{{ $i18n.locale=='en'? quote.quote.en : quote.quote.ka }}” - <span class="text-[#DDCCAA]">{{ $i18n.locale=='en'? moviesData.find(x => x.id == quote.movie_id).name.en :  moviesData.find(x => x.id == quote.movie_id).name.ka }}</span></p>
         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
         <img src="/src/assets/InterstellarMovie.png" class="rounded-[10px]"/>
         <div class="flex items-center justify-start gap-[2.4rem] mt-[2.4rem]">
-        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">3</span><comments-icon></comments-icon></div>
+        <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsData.filter(x => x.quote_id == quote.id).length }}</span><comments-icon></comments-icon></div>
         <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">10</span><likes-icon></likes-icon></div>
         </div>
         </div>
       <div>
-        <div class="flex gap-[2.4rem] pt-[2.4rem]">
+        <div v-if="showComments==quote.id">
+        <div v-for="comment in comments.filter(x => x.quote_id == quote.id)" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">Nina Baldadze</p>
-          <p class="text-[2rem] font-normal text-[#fff]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque nunc vel massa facilisis consequat elit morbi convallis convallis. Volutpat vitae et nisl et. Adipiscing enim integer mi leo nisl. Arcu vitae mauris odio eget.</p>
+          <p class="text-[2rem] font-medium text-[#fff]">{{ usersData.find(x => x.id == comment.user_id).name }}</p>
+          <p class="text-[2rem] font-normal text-[#fff]">{{ comment.body }}</p>
          </div>
         </div>
-        <div class="flex gap-[2.4rem] pt-[2.4rem]">
-         <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">Nika Tsetskhladze</p>
-          <p class="text-[2rem] font-normal text-[#fff]">Lorem ipsum dolor sit amet, consectetur adipiscin</p>
-         </div>
         </div>
         <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea @keydown.enter.prevent="commentSubmit" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
+          <textarea @keydown.enter.prevent="commentSubmit(quote.id, $event)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
         </div>
       </div>
     </div>
+      </div>
       <div></div>
-    </div>
     <div></div>
 
   </main>

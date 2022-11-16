@@ -3,10 +3,11 @@ import { Field } from 'vee-validate';
 
 export default {
   components:{Field},
-  props:['inputName', 'placeholder', 'label', 'as', 'classLabel', 'rules', 'value'],
+  props:['inputName', 'placeholder', 'label', 'as', 'classLabel', 'rules', 'value', 'disabled'],
   setup(props){
 
     const rules=props.rules;
+    const disabled=props.disabled;
     const inputName=props.inputName;
     const placeholder=props.placeholder;
     const label=props.label;
@@ -15,7 +16,7 @@ export default {
     const value=props.value;
 
 
-    return {inputName, placeholder, label, asField, classLabel, rules, value}
+    return {inputName, placeholder, label, asField, classLabel, rules, value, disabled}
   }
   
 }
@@ -30,6 +31,7 @@ export default {
   :name="inputName"
   :placeholder="placeholder"
   :as="asField"
+  :disabled="disabled"
   />
 </div>
   

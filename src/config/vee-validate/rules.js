@@ -18,9 +18,10 @@ if (value && !regexName.test(value) || regexNum.test(value) || regexLetter.test(
 }
  });
 
+const regexSpecialCharacters=/[-._!"`'#%&,:;<>=@{}~\$\(\)\*\+\/\\\?\[\]\^\|]+/;
 const regexEnglish=/^[A-Za-z0-9 ]*$/;
 defineRule('eng_alphabet', value => {
-  if (value && !regexEnglish.test(value)) {
+  if (value && !regexEnglish.test(value) && !regexSpecialCharacters.test(value)) {
     return 'Please use latin symbols and numbers';
   }else{
     return true;
@@ -29,7 +30,7 @@ defineRule('eng_alphabet', value => {
 
 const regexGeorgian=/^[ა-ჰ-0-9 ]*$/;
 defineRule('geo_alphabet', value => {
-if (value && !regexGeorgian.test(value)) {
+if (value && !regexGeorgian.test(value) && !regexSpecialCharacters.test(value)) {
   return 'Please use Georgian symbols and numbers';
 }else{
   return true;

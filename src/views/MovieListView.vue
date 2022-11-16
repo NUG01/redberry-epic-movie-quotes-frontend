@@ -66,7 +66,7 @@ return {
 
 <template>
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
-  <basic-header></basic-header>
+  <basic-header class="z-50"></basic-header>
   <main>
     <addmovie-form @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
     <div>
@@ -85,7 +85,7 @@ return {
       <div class="w-[100%] movies-grid h-[90.3%] overflow-scroll scrollHide pb-[1.5rem]">
         <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesData" :key="movie.id">
           <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
-          <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}}</p>
+          <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
             <span class="text-[2rem] font-medium text-[#fff]">10</span>
             <quote-icon></quote-icon>

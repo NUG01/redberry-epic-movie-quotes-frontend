@@ -1,15 +1,14 @@
 <script>
-import { Form, Field } from 'vee-validate';
-import { ref, onMounted } from 'vue';
+import { Form } from 'vee-validate';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
-import CheckboxInput from "@/components/inputs/CheckBox.vue";
 import CloseIcon from "@/components/icons/CloseIcon.vue";
+import SuccessIcon from "@/components/icons/SuccessIcon.vue";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import EditPencil from "@/components/icons/EditPencil.vue";
 import CameraIcon from "@/components/icons/CameraIcon.vue";
-import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
@@ -25,7 +24,7 @@ import LikesIcon from "@/components/icons/LikesIcon.vue";
 export default {
   name:'ViewQuote',
   props:['id'],
-  components:{LoadingSpinner,Form, BasicNavigation, CloseIcon, DeleteTrash, EditPencil, AddmovieInput, BasicButton, CameraIcon, CommentsIcon, LikesIcon},
+  components:{LoadingSpinner,Form, BasicNavigation, CloseIcon, DeleteTrash, EditPencil, AddmovieInput, BasicButton, CameraIcon, CommentsIcon, LikesIcon, SuccessIcon},
   setup(props){
 
    const router=useRouter();
@@ -33,20 +32,37 @@ export default {
 
    const authUser=ref([])
    const dataIsFetched=ref(false)
+   const quoteUpdated=ref(false)
+   const showComments=ref(false)
    const currentId=props.id
    const quoteData=ref([])
+   const commentsData=ref([])
+   const moviesData=ref([])
    const imageDisplay=ref('')
    const selectedFile=ref('')
+   const usersData=ref([])
+   const comments=ref([])
+   const userEligibilityForChange=ref(null)
 
    onMounted(async()=>{
+    usersData.value=login.getAllUser;
     const res= await axios.get(`quote/${currentId}`);
+    const resComments= await axios.get(`comments/${currentId}`);
     authUser.value=login.getUserData
     quoteData.value=res.data
+    const resMovies= await axios.get(`movies/${authUser.value.id}`);
+    moviesData.value=resMovies.data
+    userEligibilityForChange.value= moviesData.value.find(x => x.id == quoteData.value.movie_id)
+    commentsData.value=resComments.data
+    comments.value=resComments.data
     dataIsFetched.value=true
    })
 
 
 function deleteQuote(id){
+  if(userEligibilityForChange==null){
+      return
+  }
     axios.delete(`quotes/${id}`)
     .then((res)=>{
       router.go(-1)
@@ -57,27 +73,59 @@ function deleteQuote(id){
   }
 
   function onSubmit(values){
-    console.log(values, 'okC')
-    return
+    if(!imageDisplay.value){
+      return;
+    }
+    const form=new FormData();
+      form.append('quote_id', currentId);
+      form.append('thumbnail', selectedFile.value);
+      form.append('quote_en', values.quote_en);
+      form.append('quote_ka', values.quote_ka);
+      basicAxios.post('update-quote',form)
+      .then((res)=>{
+        quoteUpdated.value=true
+     })
+      .catch((err)=>{
+        alert('Something went wrong!')
+     })
+
   }
 
+  watch(quoteUpdated, () => {
+    setTimeout(function(){
+    quoteUpdated.value=false
+    }, 3600);
+});
+
+function commentsHandle(){
+  showComments.value=!showComments.value
+}
+
   function commentSubmit(ev){
-    if(ev.target.value!=''){
-      console.log(ev.target.value, 'okC')
+    if(ev.target.value==''){
+      return
+    }else{
+      axios.post('comments',{
+        body: ev.target.value,
+        quote_id: currentId,
+        user_id: authUser.value.id
+     }).then(()=>{
+        comments.value.push({
+          body:ev.target.value,
+          user_id:authUser.value.id
+        });
+         ev.target.value='';
+     }).catch(()=>{
+      alert('Something went wrong')
+     })
     }
-    return
+    
   }
 
   
   function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
   }
-
-
-
-  
-
-  
 
 
     return {
@@ -90,7 +138,14 @@ function deleteQuote(id){
       quoteData,
       handleImageChange,
       imageDisplay,
-      commentSubmit
+      commentSubmit,
+      quoteUpdated,
+      commentsData,
+      comments,
+      usersData,
+      userEligibilityForChange,
+      showComments,
+      commentsHandle
       
     }
   }
@@ -109,10 +164,10 @@ function deleteQuote(id){
         <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
       <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.view_quote_exact') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <div @click="deleteQuote" class="absolute top-1/2 left-[3.6rem] flex items-center gap-[1rem] cursor-pointer">
+      <button  @click="deleteQuote(currentId)" class="absolute top-1/2 left-[3.6rem] flex items-center gap-[1rem] cursor-pointer">
         <delete-trash></delete-trash>
         <p class="text-[#CED4DA] text-[1.6rem]">{{ $t('newsFeed.delete') }}</p>
-      </div>
+      </button>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-start gap-[1.6rem]">
@@ -121,8 +176,8 @@ function deleteQuote(id){
       </div>
       
 
-      <addmovie-input :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :disabled="userEligibilityForChange==null" :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :disabled="userEligibilityForChange==null" :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       <div class="w-[100%] h-[45rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
@@ -134,40 +189,39 @@ function deleteQuote(id){
       </div>
       <div class="w-[100%] border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
       <div class="flex items-center justify-start gap-[2.4rem] mt-[0.5rem] self-start ">
-        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">3</span><comments-icon></comments-icon></div>
+        <div @click="commentsHandle" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ comments.length }}</span><comments-icon></comments-icon></div>
         <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">10</span><likes-icon></likes-icon></div>
         </div>
       </div>
-        <div>
-        <div class="flex gap-[2.4rem] pt-[1rem">
+        <div v-if="showComments" class=" self-start w-[100%]">
+        <div class="flex gap-[2.4rem] pt-[1rem]" v-for="comment in comments" :key="comment">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">Nina Baldadze</p>
-          <p class="text-[2rem] font-normal text-[#fff]">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque nunc vel massa facilisis consequat elit morbi convallis convallis. Volutpat vitae et nisl et. Adipiscing enim integer mi leo nisl. Arcu vitae mauris odio eget.</p>
-         </div>
-        </div>
-        <div class="flex gap-[2.4rem] pt-[2.4rem]">
-         <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">Nika Tsetskhladze</p>
-          <p class="text-[2rem] font-normal text-[#fff]">Lorem ipsum dolor sit amet, consectetur adipiscin</p>
+         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%] flex flex-col">
+          <p class="text-[2rem] font-medium text-[#fff]">{{ usersData.find(x => x.id == comment.user_id).name }}</p>
+          <div><p class="text-[2rem] font-normal text-[#fff] wordwrap">{{ comment.body }}</p></div>
          </div>
         </div>
       </div>
-     <div class="w-[100%] mt-[1rem]">
+     <div v-if="showComments" class="w-[100%] mt-[1rem]">
         <div class="gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
           <textarea @keydown.enter.prevent="commentSubmit" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
         </div>
         </div>
 
-      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1.6rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.save_changes') }}</basic-button>
+      <basic-button :disabled="userEligibilityForChange==null" type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1.6rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.save_changes') }}</basic-button>
      </Form>
 
      </div>
 </div>
     <div class="fixed">
       <basic-navigation :user="authUser" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-[2px] border-solid border-[#fff]"></basic-navigation>
+    </div>
+    <div v-if="quoteUpdated" class="fixed z-50 right-0 top-0 -translate-x-[30%] translate-y-1/2 px-[2.4rem] py-[1.5rem] bg-[#BADBCC] rounded-[4px]">
+      <div class="flex items-center justify-center gap-[1rem]">
+        <success-icon></success-icon>
+        <p class="text-[#11101A] text-[1.8rem] font-medium">Quote updated successfully!</p>
+      </div>
     </div>
     <div></div>
   </div>
@@ -208,5 +262,8 @@ input {
   font-weight: 400;
     color: #CED4DA;
     font-size: 2rem;
+}
+.wordwrap { 
+  word-break : break-all;
 }
 </style>

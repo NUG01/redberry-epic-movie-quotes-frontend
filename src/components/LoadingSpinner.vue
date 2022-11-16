@@ -14,7 +14,6 @@ export default {
 
 <template>
   <div class="spinner w-[100vw] h-[100vh] flex flex-col" :class="location" >
-    <p class="text-[2rem] font-[600] mb-[2rem] text-center" :class="texts">Wait for 5 seconds,still spinning❓<br>then click on the Button🚀</p>
     <router-link :to="{name : 'landing'}" type="button" :class="texts" class="mb-[9rem] text-[white] text-[1.8rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[31%]"><span class="flex items-center justify-center">Go Back</span></router-link>
     <div class="lds-roller">
       <div></div>
