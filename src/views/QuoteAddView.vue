@@ -59,6 +59,7 @@ onMounted(async ()=>{
       }
       const form=new FormData();
       form.append('id', currentId.value);
+      form.append('user_id', login.getUserData.id);
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);

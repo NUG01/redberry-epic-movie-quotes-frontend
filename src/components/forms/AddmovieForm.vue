@@ -10,6 +10,7 @@ import CameraIcon from "@/components/icons/CameraIcon.vue";
 import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
+import { useLoginStore } from '@/stores/LoginStore.js';
 
 
 
@@ -18,6 +19,8 @@ export default {
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
     const router=useRouter()
+    const login = useLoginStore();
+
     const headerName=props.name
     const axiosEndpoint=props.axiosEndpoint
     const id=props.id
@@ -47,6 +50,9 @@ export default {
       const form=new FormData();
       if(id){
       form.append('id', id);
+      }
+      if(login.getUserData.id){
+        form.append('user_id', login.getUserData.id);
       }
       form.append('thumbnail', selectedFile.value);
       form.append('genre', values.genre);

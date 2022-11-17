@@ -9,9 +9,16 @@ export default {
   setup(){
     const login = useLoginStore();
     const dataIsFetched=ref(false)
+    const usersIsFetched=ref(false)
 
 
   onMounted(async()=>{
+    if(login.getAllUser==null){
+      const resUsers= await axios.get("users")
+      login.updateAllUserData(resUsers.data);
+      login.changeUsersFetchedStatus()
+      usersIsFetched.value=login.getUsersIsFetched
+      }
     if(login.getUserData==null){
       const res= await axios.get("auth-user")
       login.updateUserData(res.data);
@@ -22,13 +29,13 @@ export default {
 
 
 
-    return{dataIsFetched}
+    return{dataIsFetched, usersIsFetched}
   }
 }
 </script>
 
 <template>
-    <router-view v-if="dataIsFetched"></router-view>
+    <router-view v-if="dataIsFetched && usersIsFetched"></router-view>
 </template>
 
 <style>

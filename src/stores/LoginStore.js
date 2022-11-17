@@ -7,7 +7,9 @@ export const useLoginStore = defineStore("useLoginStore",{
   return{
       isLogged:false,
       dataIsFetched:false,
+      usersIsFetched:false,
       userData:null,
+      allUser:null,
       isGoogleLogged:false,
       googleData:null,
       isLoggedOut:false,
@@ -18,9 +20,11 @@ export const useLoginStore = defineStore("useLoginStore",{
    getters:{
     getIsLogged: (state) => state.isLogged,
     getDataIsFetched: (state) => state.dataIsFetched,
+    getUsersIsFetched: (state) => state.usersIsFetched,
     getIsLoggedOut: (state) => state.isLoggedOut,
     getIsGoogleLogged: (state) => state.isLogged,
     getUserData: (state)=>state.userData,
+    getAllUser: (state)=>state.allUser,
     getIsLoggedErrors: (state) => state.errors,
  },
 
@@ -39,6 +43,9 @@ export const useLoginStore = defineStore("useLoginStore",{
     },
     changeFetchedStatus(){
       this.dataIsFetched=true
+    },
+    changeUsersFetchedStatus(){
+      this.usersIsFetched=true
     },
 
 
@@ -62,9 +69,15 @@ export const useLoginStore = defineStore("useLoginStore",{
     updateUserData(data){
         this.userData=data
     },          
+    updateAllUserData(data){
+        this.allUser=data
+    },          
 
-    loginWithGoogle(token, expires_in){
+   async loginWithGoogle(token, expires_in, user_id){
       setJwtToken(token, expires_in);
+      const response=await axios.get(`user/${user_id}`)
+      this.userData=response.data;
+      this.changeFetchedStatus();
       this.isGoogleLogged=true;
       this.router.push({ name: 'news-feed' })
     },

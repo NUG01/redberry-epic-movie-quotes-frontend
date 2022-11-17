@@ -46,7 +46,7 @@ export default {
     const quotesLength=ref('')
 
       onMounted(async ()=>{
-        authUser.value=login.getUserData
+       authUser.value=login.getUserData
        const res= await axios.get(`movies/${authUser.value.id}`)
        const resQuotes = await axios.get(`quotes/${currentId}`);
        movies.saveMovies(res.data)
