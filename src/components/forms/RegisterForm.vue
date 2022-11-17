@@ -5,23 +5,21 @@ import GoogleIcon from "@/components/icons/GoogleIcon.vue";
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import { Form } from 'vee-validate';                 
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
-import { useRegisterStore } from '@/stores/RegisterStore.js';
+import { ref } from 'vue';
+import axios from "@/config/axios/index.js";
+
 export default {
   components:{BasicInput,BasicButton, GoogleIcon,Form,InvalidIcon},
    setup(){
     const router=useRouter();
-    const register = useRegisterStore();
 
     const errors=ref([]);
 
        function deleteError(el){
        el.target.closest('li').remove();
-       register.cleanErrors;
+       errors.value=[];
        }
-     errors.value = computed(() => {
-    return register.getIsRegisteredErrors;
-});
+
 
 function googleRegister(){
 window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
@@ -30,12 +28,25 @@ window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
 
       
       function onSubmit(values){
-        register.sendRegisterData(values);
-       register.cleanErrors();
+        axios.post('register', {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        password_confirmation: values.confirm_password,
+      })
+      .then(()=>{
+        context.emit('isRegistered')
+      })
+      .catch((error)=> {
+        errors.value=[];
+        errors.value.push(error.response.data.errors.email[0]);
+        errors.value.push(error.response.data.errors.name[0]);
+      });
+       errors.value=[];
     }
     return {
     onSubmit,
-    errors:errors.value,
+    errors,
     deleteError,
     googleRegister
    }

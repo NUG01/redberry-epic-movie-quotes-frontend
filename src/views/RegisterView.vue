@@ -4,25 +4,24 @@ import RegisterForm from "@/components/forms/RegisterForm.vue";
 import VerifyEmail from "@/components/icons/VerifyEmail.vue";
 import BasicButton from "@/components/BasicButton.vue";
 import { useRouter } from "vue-router";
-import { ref, computed } from "vue";
-import { useRegisterStore } from '@/stores/RegisterStore.js';
+import { ref } from "vue";
 export default {
   name:"Registration",
-  emits:['showSuccess'],
+  emits:['showSuccess', 'isRegistered'],
   components:{FormHeader,RegisterForm,VerifyEmail,BasicButton},
-  setup(){
+  setup(props, context){
     const router=useRouter();
-     const register = useRegisterStore();
 
      const registrationModal=ref(true);
 
-     registrationModal.value = computed(() => {
-    return register.getIsRegistered;
-})
+     function changeRegisterStatus(){
+    registrationModal.value=false
+
+  }
 
 
     setTimeout(() => {
-     register.changeStatus();
+     registrationModal.value=true
     }, "3600")
 
     function modalHide(){
@@ -32,7 +31,8 @@ export default {
     
     return {
       modalHide,
-      registrationModal:registrationModal.value,
+      registrationModal,
+      changeRegisterStatus
     }
   }
 }
@@ -51,7 +51,7 @@ export default {
          {{ $t('landing.start_journey') }}
         </template>
       </form-header>
-     <register-form></register-form>
+     <register-form @is-registered="changeRegisterStatus"></register-form>
       <div class="flex items-center justify-center">
       <p class="text-[#6C757D] text-[1.6rem]">{{ $t('landing.have_account_?') }} <router-link to="/landing/login"><button class="text-[#0D6EFD]">{{ $t('landing.login') }}</button></router-link></p>
       </div>
