@@ -1,28 +1,25 @@
 <script>
 import FormHeader from "@/components/FormHeader.vue";
-import PasswordforgetForm from "@/components/forms/PasswordforgetForm.vue";
 import PasswordrecoverForm from "@/components/forms/PasswordrecoverForm.vue";
 import { useRouter } from "vue-router";
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import VerifiedTick from "@/components/icons/VerifiedTick.vue";
-import { useRecoverStore } from '@/stores/RecoverPasswordStore.js';
 import BasicButton from "@/components/BasicButton.vue";
 export default {
   name:"RecoverPassword",
+  emits:['isRecovered'],
   components:{FormHeader,PasswordrecoverForm, VerifiedTick, BasicButton},
   setup(){
     const router=useRouter();
-     const recoverPassword = useRecoverStore();
+    const recoverModal=ref(true);
 
-     const recoverModal=ref(true);
+    function changeRecoverStatus(){
+    recoverModal.value=false
 
-     recoverModal.value = computed(() => {
-    return recoverPassword.getIsRecovered;
-})
+  }
 
-
-    setTimeout(() => {
-     recoverPassword.changeStatus();
+   setTimeout(() => {
+     recoverModal.value=true
     }, "3600")
 
     function modalHide(){
@@ -33,7 +30,8 @@ export default {
     
     return {
       modalHide,
-      recoverModal:recoverModal.value,
+      recoverModal,
+      changeRecoverStatus
     }
   }
 }
@@ -54,7 +52,7 @@ export default {
 previous used passwords
         </template>
       </form-header>
-     <passwordrecover-form></passwordrecover-form>
+     <passwordrecover-form @is-recovered="changeRecoverStatus"></passwordrecover-form>
     </div>
   </div>
   <div v-if="!recoverModal" class="flex items-center justify-center">

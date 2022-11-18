@@ -2,26 +2,25 @@
 import FormHeader from "@/components/FormHeader.vue";
 import PasswordforgetForm from "@/components/forms/PasswordforgetForm.vue";
 import { useRouter } from "vue-router";
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import VerifyEmail from "@/components/icons/VerifyEmail.vue";
-import { useForgotPasswordStore } from '@/stores/ForgotPasswordStore.js';
 import BasicButton from "@/components/BasicButton.vue";
 export default {
   name:"ForgotPassword",
+  emits:['isReset'],
   components:{FormHeader,PasswordforgetForm, VerifyEmail, BasicButton},
   setup(){
     const router=useRouter();
-     const forgetPassword = useForgotPasswordStore();
-
      const resetModal=ref(true);
 
-     resetModal.value = computed(() => {
-    return forgetPassword.getIsReset;
-})
 
+  function changeResetStatus(){
+    resetModal.value=false
+
+  }
 
     setTimeout(() => {
-     forgetPassword.changeStatus();
+      resetModal.value=true
     }, "3600")
 
     function modalHide(){
@@ -30,7 +29,8 @@ export default {
     
     return {
       modalHide,
-      resetModal:resetModal.value,
+      resetModal,
+      changeResetStatus
     }
   }
 }
@@ -49,7 +49,7 @@ export default {
          Enter the email and we’ll send an email with
         </template>
       </form-header>
-     <passwordforget-form></passwordforget-form>
+     <passwordforget-form @is-reset="changeResetStatus"></passwordforget-form>
     </div>
   </div>
   <div v-if="!resetModal" class="flex items-center justify-center">

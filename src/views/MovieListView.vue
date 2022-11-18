@@ -36,15 +36,11 @@ export default {
     const imageDisplay=ref('');
     const moviesData=ref({})
 
-      user.value=login.getUserData
-      dataIsFetched.value=login.getDataIsFetched
-    onMounted(async () => {
-     const res = await axios.get(`movies/${user.value.id}`);
-     movies.saveMovies(res.data)
-     moviesData.value=res.data
-     moviesIsFetched.value=true
+    user.value=login.getUserData
+    dataIsFetched.value=login.getDataIsFetched
+    moviesData.value=movies.getMovies
+    moviesIsFetched.value=true
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
-    });
 
     function closeAddMoviesModal(){
       addMoviesModal.value=false

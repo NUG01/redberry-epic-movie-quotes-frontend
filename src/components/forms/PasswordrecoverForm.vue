@@ -4,33 +4,42 @@ import BasicButton from "@/components/BasicButton.vue";
 import BackArrow from "@/components/icons/BackArrow.vue";
 import { Form } from 'vee-validate';
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
-import { useRecoverStore } from '@/stores/RecoverPasswordStore.js';
+import { ref } from 'vue';
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
+import axios from "@/config/axios/index.js";
+
 export default {
   components:{BasicInput,BasicButton,Form,BackArrow,useRouter,InvalidIcon},
-    setup(){
-    const recoverPassword = useRecoverStore();
+    setup(props, context){
     const router = useRouter();
      const errors=ref([]);
+     const isRecovered=ref(true);
 
     function deleteError(el){
        el.target.closest('#div').remove();
        }
-     errors.value = computed(() => {
-    return recoverPassword.getRecoverPasswordErrors;
-});
 
       const token=router.currentRoute.value.params;
       const email= router.currentRoute.value.query;
       function onSubmit(values){
-        recoverPassword.sendPasswordResetRequest(values, token, email);
-        recoverPassword.cleanErrors();
+        axios.post('reset-password', {
+        password: values.password,
+        token: token,
+        email: email
+      })
+      .then(()=>{
+       context.emit('isRecovered')
+      })
+      .catch((error)=> {
+        errors.value=[],
+        errors.value.push(error.response.data)
+      });
+        errors.value=[];
     }
     return {
     onSubmit,
     deleteError,
-    errors:errors.value,
+    errors,
    }
   }
   }

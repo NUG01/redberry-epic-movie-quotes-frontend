@@ -3,30 +3,36 @@ import BasicInput from "@/components/BasicInput.vue";
 import BasicButton from "@/components/BasicButton.vue";
 import BackArrow from "@/components/icons/BackArrow.vue";
 import { Form } from 'vee-validate';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
+import axios from "@/config/axios/index.js";
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
-import { useForgotPasswordStore } from '@/stores/ForgotPasswordStore.js';
 export default {
   components:{BasicInput,BasicButton,Form,BackArrow,InvalidIcon},
-    setup(){
-    const forgotPassword = useForgotPasswordStore();
+    setup(props,context){
     const errors=ref([]);
 
     function deleteError(el){
        el.target.closest('#div').remove();
        }
-     errors.value = computed(() => {
-    return forgotPassword.getForgotPasswordErrors;
-});
       
       function onSubmit(values){
-        forgotPassword.sendForgotPasswordData(values);
-        forgotPassword.cleanErrors();
+        axios.post('forgot-password', {
+        email: values.email
+      })
+      .then(()=>{
+        context.emit('isReset')
+      })
+      .catch((error)=> {
+        errors.value=[],
+        errors.value.push(error.response.data.message)
+      })
+      errors.value=[];
     }
+
     return {
     onSubmit,
     deleteError,
-    errors:errors.value,
+    errors,
    }
   }
   }

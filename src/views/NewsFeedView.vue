@@ -15,6 +15,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default {
   name:'NewsFeed',
+  emits:['likedStatus'],
   components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner},
   
   setup(){
@@ -28,8 +29,10 @@ export default {
     const quoteData=ref([])
     const moviesData=ref([])
     const commentsData=ref(null)
+    const likesData=ref(null)
     const showComments=ref(false)
     const comments=ref([])
+    const likes=ref([])
 
 
 
@@ -38,6 +41,9 @@ export default {
     const res= await axios.get('quotes');
     const resMovies= await axios.get('movies');
     const resComments= await axios.get(`comments`);
+    const resLikes= await axios.get(`likes`);
+    likesData.value=resLikes.data
+    likes.value=likesData.value
     commentsData.value=resComments.data
     quoteData.value=res.data
     comments.value=commentsData.value
@@ -72,6 +78,20 @@ export default {
     
   }
 
+  function handleLikes(id){
+    axios.post('likes',{
+      quote_id: id,
+      user_id: user.value.id
+    })
+    .then((res)=>{
+      likes.value=res.data.attributes
+    })
+    .catch(()=>{
+      alert('Something went wrong')
+
+    })
+  }
+
 
    function handleShowComments(id){
     if(showComments.value==id){
@@ -80,6 +100,33 @@ export default {
   }
   showComments.value=id
    }
+
+   function quoteAuthor(user_id){
+     return usersData.value.find(x => x.id == user_id).name
+   }
+   function commentAuthor(user_id){
+     return usersData.value.find(x => x.id == user_id).name
+   }
+   function commentsQuantity(quote_id){
+   return comments.value.filter(x => x.quote_id == quote_id).length
+   }
+   function likesQuantity(quote_id){
+   return likes.value.filter(x => x.quote_id == quote_id).length
+   }
+   function likesColor(quote_id){
+   return likes.value.filter(x => x.quote_id == quote_id).find(x => x.user_id == user.value.id) ? '#F3426C': '#fff'
+   }
+   function movieName(movie_id){
+     return  moviesData.value.find(x => x.id == movie_id).name
+   }
+   function localeChange(locale, object){
+    if(locale=='ka'){
+      return object.ka
+    }else{
+      return object.en
+    }
+   }
+ 
 
 
     
@@ -96,7 +143,19 @@ return {
        showComments,
        handleShowComments,
        commentSubmit,
-       comments
+       comments,
+       handleLikes,
+       likesData,
+       likes,
+       likesQuantity,
+       likesColor,
+       commentAuthor,
+       commentsQuantity,
+       quoteAuthor,
+       movieName,
+       localeChange
+       
+    
        }
   }
   
@@ -132,14 +191,14 @@ return {
       <div v-for="quote in quoteData" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
         <div class="flex items-center justify-start gap-[1.6rem]">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <p class="text-[2rem] text-[#fff]">{{ usersData.find(x => x.id == quote.user_id).name }}</p>
+          <p class="text-[2rem] text-[#fff]">{{ quoteAuthor(quote.user_id) }}</p>
         </div>
-        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“{{ $i18n.locale=='en'? quote.quote.en : quote.quote.ka }}” - <span class="text-[#DDCCAA]">{{ $i18n.locale=='en'? moviesData.find(x => x.id == quote.movie_id).name.en :  moviesData.find(x => x.id == quote.movie_id).name.ka }}</span></p>
+        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote.movie_id)) }}</span></p>
         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
         <img src="/src/assets/InterstellarMovie.png" class="rounded-[10px]"/>
         <div class="flex items-center justify-start gap-[2.4rem] mt-[2.4rem]">
-        <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsData.filter(x => x.quote_id == quote.id).length }}</span><comments-icon></comments-icon></div>
-        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">10</span><likes-icon></likes-icon></div>
+        <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsQuantity(quote.id) }}</span><comments-icon></comments-icon></div>
+        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ likesQuantity(quote.id) }}</span><likes-icon  @liked-status="handleLikes(quote.id)" :fill="likesColor(quote.id)" class="cursor-pointer"></likes-icon></div>
         </div>
         </div>
       <div>
@@ -147,7 +206,7 @@ return {
         <div v-for="comment in comments.filter(x => x.quote_id == quote.id)" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">{{ usersData.find(x => x.id == comment.user_id).name }}</p>
+          <p class="text-[2rem] font-medium text-[#fff]">{{ commentAuthor(comment.user_id) }}</p>
           <p class="text-[2rem] font-normal text-[#fff]">{{ comment.body }}</p>
          </div>
         </div>

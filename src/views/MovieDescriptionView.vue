@@ -47,9 +47,7 @@ export default {
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const res= await axios.get(`movies/${authUser.value.id}`)
        const resQuotes = await axios.get(`quotes/${currentId}`);
-       movies.saveMovies(res.data)
        movieData.value=movies.getMovies.find(x => x.id == props.id);
        moviesData.value=movies.getMovies
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))

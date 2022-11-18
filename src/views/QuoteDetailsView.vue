@@ -1,6 +1,6 @@
 <script>
 import { Form } from 'vee-validate';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
@@ -43,6 +43,10 @@ export default {
    const usersData=ref([])
    const comments=ref([])
    const userEligibilityForChange=ref(null)
+   const likes=ref([])
+   const likesData=ref(null)
+
+
 
    onMounted(async()=>{
     usersData.value=login.getAllUser;
@@ -52,6 +56,9 @@ export default {
     quoteData.value=res.data
     const resMovies= await axios.get(`movies/${authUser.value.id}`);
     moviesData.value=resMovies.data
+    const resLikes= await axios.get(`likes/${currentId}`);
+    likesData.value=resLikes.data
+    likes.value=likesData.value
     userEligibilityForChange.value= moviesData.value.find(x => x.id == quoteData.value.movie_id)
     commentsData.value=resComments.data
     comments.value=resComments.data
@@ -122,10 +129,34 @@ function commentsHandle(){
     
   }
 
+  function handleLikes(id){
+    axios.post('likes',{
+      quote_id: id,
+      user_id: authUser.value.id
+    })
+    .then((res)=>{
+      likes.value=res.data.attributes
+    })
+    .catch(()=>{
+      alert('Something went wrong')
+
+    })
+  }
+
   
   function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
   }
+
+  const userName=computed((comment_id)=>{
+     return usersData.value.find(x => x.id == comment_id).name
+    })
+  const likesQuantity=computed(()=>{
+     return likes.value.filter(x => x.quote_id == currentId).length
+    })
+  const likeColor=computed(()=>{
+     return likes.value.filter(x => x.quote_id == currentId).find(x => x.user_id == authUser.value.id) ? '#F3426C': '#fff'
+    })
 
 
     return {
@@ -145,7 +176,12 @@ function commentsHandle(){
       usersData,
       userEligibilityForChange,
       showComments,
-      commentsHandle
+      commentsHandle,
+      handleLikes,
+      likes,
+      likesQuantity,
+      likeColor,
+      userName
       
     }
   }
@@ -190,14 +226,14 @@ function commentsHandle(){
       <div class="w-[100%] border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
       <div class="flex items-center justify-start gap-[2.4rem] mt-[0.5rem] self-start ">
         <div @click="commentsHandle" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ comments.length }}</span><comments-icon></comments-icon></div>
-        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">10</span><likes-icon></likes-icon></div>
+        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ likesQuantity }}</span><likes-icon @liked-status="handleLikes(currentId)" :fill="likeColor" class="cursor-pointer"></likes-icon></div>
         </div>
       </div>
         <div v-if="showComments" class=" self-start w-[100%]">
         <div class="flex gap-[2.4rem] pt-[1rem]" v-for="comment in comments" :key="comment">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%] flex flex-col">
-          <p class="text-[2rem] font-medium text-[#fff]">{{ usersData.find(x => x.id == comment.user_id).name }}</p>
+          <p class="text-[2rem] font-medium text-[#fff]">{{ userName(comment.user_id) }}</p>
           <div><p class="text-[2rem] font-normal text-[#fff] wordwrap">{{ comment.body }}</p></div>
          </div>
         </div>
