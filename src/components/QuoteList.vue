@@ -15,7 +15,7 @@ export default {
  emits:['emit-dots'],
  props:['id'],
  components:{HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote },
- setup(props){
+ setup(props, context){
   const router = useRouter();
   const quotesData=ref({})
   const currentId=props.id
@@ -40,14 +40,14 @@ export default {
   detailsModal.value=id
   }
 
-  function deleteQuote(id){
-    axios.delete(`quotes/${id}`)
-    .then((res)=>{
-      router.go(0)
-    })
+ async function deleteQuote(id){
+   await axios.delete(`quotes/${id}`)
     .catch((err)=>{
       alert('Something went wrong!')
     })
+    const resQuotes=await axios.get(`quotes/${currentId}`);
+    quotesData.value = resQuotes.data;
+    context.emit('quotesQuantity', resQuotes.data)
   }
 
   return {

@@ -1,6 +1,6 @@
 <script>
 import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -10,13 +10,13 @@ import PencilIcon from "@/components/icons/PencilIcon.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-
+import AddquoteForm from "@/components/forms/AddquoteForm.vue";
 
 
 export default {
   name:'NewsFeed',
-  emits:['likedStatus'],
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner},
+  emits:['likedStatus', 'addpostClose', 'updateQuotes'],
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm},
   
   setup(){
 
@@ -33,6 +33,9 @@ export default {
     const showComments=ref(false)
     const comments=ref([])
     const likes=ref([])
+    const addPost=ref(false)
+    const searchActivated=ref(false)
+    const quotesList=ref([])
 
 
 
@@ -48,6 +51,7 @@ export default {
     quoteData.value=res.data
     comments.value=commentsData.value
     moviesData.value=resMovies.data
+    quotesList.value=quoteData.value
     feedDataIsFetched.value=true
    })
 
@@ -90,6 +94,54 @@ export default {
       alert('Something went wrong')
 
     })
+  }
+
+  function openAddPostModal(){
+    searchActivated.value=false
+    addPost.value=!addPost.value
+  }
+  function searchClicked(){
+       searchActivated.value=true
+  }
+
+  function updateQuotesIntoArray(data){
+    quotesList.value=data
+  }
+
+  function searchSubmit(locale, ev){
+    quotesList.value=quoteData.value
+    let target=ev.target.value
+    if(target==''){
+      quotesList.value=quoteData.value
+    }
+    if(target[0]==='#'){
+      let quote=(target).substring((target).indexOf("#")+1)
+      if(locale=='en'){
+        quotesList.value=quoteData.value.filter(x => (x.quote.en).includes(quote))
+     }
+     if(locale=='ka'){
+       quotesList.value=quoteData.value.filter(x => (x.quote.ka).includes(quote))
+      }
+    }
+    if(target[0]==='@'){
+      let movie=(target).substring((target).indexOf("@")+1)
+      if(locale=='en'){
+      quotesList.value=[]
+      const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
+      const moviesId = filteredMovies.map(s=>s.id);
+      for (let i = 0; i < moviesId.length; i++) {
+       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      }
+     }
+     if(locale=='ka'){
+      quotesList.value=[]
+      const filteredMovies=moviesData.value.filter(x => (x.name.ka).includes(movie))
+      const moviesId = filteredMovies.map(s=>s.id);
+      for (let i = 0; i < moviesId.length; i++) {
+       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      }
+      }
+    }
   }
 
 
@@ -135,7 +187,7 @@ return {
        user,
        dataIsFetched, 
        commentSubmit,
-       quoteData, 
+       quotesList, 
        feedDataIsFetched, 
        moviesData, 
        usersData, 
@@ -153,7 +205,13 @@ return {
        commentsQuantity,
        quoteAuthor,
        movieName,
-       localeChange
+       localeChange,
+       addPost,
+       openAddPostModal,
+       searchActivated,
+       searchClicked,
+       updateQuotesIntoArray,
+       searchSubmit
        
     
        }
@@ -164,31 +222,36 @@ return {
 
 
 <template>
-<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-hidden">
+<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll">
+<div class="fixed z-50">
   <basic-header></basic-header>
-  <main class="w-[100%] h-[93%]">
-    <div>
-      <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
+  </div>
+  <div class="w-[100vw] h-[8rem]"></div>
 
+  <main class="w-[100%] h-[93%]">
+    <div class="fixed">
+      <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
     </div>
+    <div class="w-[100%] h-[100%] min-w-[32rem]"></div>
     
     <loading-spinner bgColor="bg-none" v-if="!feedDataIsFetched" texts="hidden" location="pt-[35rem]"></loading-spinner>
 
-    <div v-else class="bg-gray overflow-y-scroll scrollHide overflow-x-hidden">
+    <div v-else class="bg-gray min-w-[36vw]">
+      <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
-        <div class="relative w-[85%]">
-      <textarea :placeholder="$t('newsFeed.new_quote')" class="post rounded-[10px] h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
+        <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
+      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
         <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
         </div>
 
-      <form class="w-[15%]">
-        <div class="flex items-center gap-[1.6rem]">
-       <button type="submit"><search-icon></search-icon></button>
-        <input type="text" :placeholder="$t('newsFeed.search_by')"/>
+      <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']">
+        <div  class="flex items-center gap-[1.6rem] pb-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']">
+       <search-icon></search-icon>
+        <input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
         </div>
-      </form>
       </div>
-      <div v-for="quote in quoteData" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
+      </div>
+      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
         <div class="flex items-center justify-start gap-[1.6rem]">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
           <p class="text-[2rem] text-[#fff]">{{ quoteAuthor(quote.user_id) }}</p>
@@ -218,8 +281,6 @@ return {
       </div>
     </div>
       </div>
-      <div></div>
-    <div></div>
 
   </main>
   </div>

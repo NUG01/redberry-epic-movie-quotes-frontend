@@ -2,7 +2,7 @@
   "logout": "Log out",
   "new_quote": "Write new quote",
   "search_by": "Search by",
-  "search": "search",
+  "search": "Search",
   "write_comment": "Write a comment",
   "edit_profile": "Edit your profile",
   "news_feed": "News feed",
@@ -30,5 +30,8 @@
   "delete": "Delete",
   "edit": "Edit",
   "view_quote": "View Quote",
-  "view_quote_exact": "View Quote"
+  "view_quote_exact": "View Quote",
+  "write_new_quote": "Write New Quote",
+  "post": "Post",
+  "choose_movie": "Choose movie"
 }

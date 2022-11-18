@@ -30,7 +30,10 @@
   "delete": "წაშლა",
   "edit": "შესწორება",
   "view_quote": "ნახვა",
-  "view_quote_exact": "ციტატის ნახვა"
+  "view_quote_exact": "ციტატის ნახვა",
+  "write_new_quote": "ახალი ციტატის დამატება",
+  "post": "დაპოსტვა",
+  "choose_movie": "აირჩიე ფილმი"
 
 
 
