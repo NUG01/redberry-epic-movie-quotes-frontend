@@ -46,8 +46,8 @@ export default {
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const resQuotes = await axios.get(`quotes/${currentId}`);
        const res = await axios.get(`movies/${authUser.value.id}`);
+       const resQuotes = await axios.get(`quotes/${currentId}`);
        moviesData.value=res.data
        movieData.value=moviesData.value.find(x => x.id == props.id);
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
@@ -71,11 +71,7 @@ export default {
      
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
-      
-
-      function quoteEditModal(id){
-        document.getElementById(`movie${id}`).classList.toggle('hidden')
-      }
+    
 
       function handleCloseEmit(){
        addMoviesModal.value=false
@@ -95,8 +91,7 @@ export default {
     
 return {
 addMoviesModal, 
-movieData, 
-quoteEditModal, 
+movieData,  
 movieName, 
 moviesData, 
 currentId, 
@@ -151,7 +146,7 @@ updateQuantity
             </div>
           </div>
           </div>
-            <quote-list @quotes-quantity="updateQuantity" :id="currentId"></quote-list>
+            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :id="currentId"></quote-list>
         </div>
         
         <div class="h-[100%] pr-[8rem]">

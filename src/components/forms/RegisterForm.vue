@@ -10,7 +10,7 @@ import axios from "@/config/axios/index.js";
 
 export default {
   components:{BasicInput,BasicButton, GoogleIcon,Form,InvalidIcon},
-   setup(){
+   setup(props, context){
     const router=useRouter();
 
     const errors=ref([]);

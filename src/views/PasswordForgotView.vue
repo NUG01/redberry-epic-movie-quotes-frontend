@@ -61,7 +61,7 @@ export default {
       <p class="text-[1.6rem] text-[#ffffff]">Please check your email and follow the instructions to activate your account.</p>
       </div>
       <a href="https://mail.google.com/" style="width:100%"><basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]">Go to my email</basic-button></a>
-      <router-link :to="{name:'landing'}"><p class="text-[1.6rem] mt-[2.7rem] text-[#6C757D]">Skip, I’ll confirm later</p></router-link>
+      <router-link :to="{name:'landing'}" class="mt-[2.7rem]"><p class="text-[1.6rem] text-[#6C757D]">Skip, I’ll confirm later</p></router-link>
 </div>
   </div>
 </div>

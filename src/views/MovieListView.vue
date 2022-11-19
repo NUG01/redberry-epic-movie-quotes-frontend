@@ -10,8 +10,6 @@ import SearchIcon from "@/components/icons/SearchIcon.vue";
 import QuoteIcon from "@/components/icons/QuoteIcon.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
-import { useMoviesStore } from '@/stores/MoviesStore.js';
-import { getJwtToken } from "@/helpers/jwt/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
@@ -19,7 +17,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default {
   name:'MovieList',
-  emits:['emit-close'],
+  emits:['emitClose', 'updateMovie'],
   components:{BasicHeader, BasicNavigation, BasicButton, AddMovie,SearchIcon, QuoteIcon, AddmovieForm, LoadingSpinner },
   
   setup(){
@@ -30,6 +28,7 @@ export default {
     const moviesIsFetched=ref(false)
     const user = ref([]);
     const moviesData=ref([])
+    const quotesData=ref([])
     const moviesList=ref([])
 
 
@@ -40,14 +39,29 @@ export default {
       dataIsFetched.value=login.getDataIsFetched
     onMounted(async () => {
      const res = await axios.get(`movies/${user.value.id}`);
+     const resQuotes= await axios.get(`quotes`);
+     quotesData.value=resQuotes.data
      moviesData.value=res.data
      moviesList.value=res.data
+     moviesList.value=(moviesList.value).reverse()
      moviesIsFetched.value=true
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
     });
 
     function closeAddMoviesModal(){
       addMoviesModal.value=false
+    }
+
+    function quotesFilter(movie_id){
+      return quotesData.value.filter(x => x.movie_id == movie_id).length
+    }
+
+   async function updateMovieList(){
+        moviesIsFetched.value=false
+        const res = await axios.get(`movies/${user.value.id}`);
+        moviesList.value=res.data
+        moviesList.value=(moviesList.value).reverse()
+        moviesIsFetched.value=true
     }
 
      function searchSubmit(locale, ev){
@@ -74,7 +88,10 @@ return {
   user,
   dataIsFetched,
   moviesIsFetched,
-  searchSubmit
+  searchSubmit,
+  updateMovieList,
+  quotesData,
+  quotesFilter
 }
   }
   
@@ -86,7 +103,7 @@ return {
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header class="z-50"></basic-header>
   <main>
-    <addmovie-form @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
+    <addmovie-form @update-movie="updateMovieList" @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
     <div>
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
@@ -100,12 +117,12 @@ return {
           <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_movie') }}</p></div></basic-button>
         </div>
       </div>
-      <div class="w-[100%] movies-grid h-[90.3%] overflow-scroll scrollHide pb-[1.5rem]">
+      <div class="w-[100%] movies-grid h-[90.3%] overflow-y-scroll scrollHide pb-[1.5rem]">
         <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesList" :key="movie.id">
           <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
-            <span class="text-[2rem] font-medium text-[#fff]">10</span>
+            <span class="text-[2rem] font-medium text-[#fff]">{{ quotesFilter(movie.id) }}</span>
             <quote-icon></quote-icon>
           </div>
         </div>

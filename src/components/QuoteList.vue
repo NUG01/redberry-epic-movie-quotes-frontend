@@ -9,12 +9,13 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "@/config/axios/index.js";
 import { useMoviesStore } from '@/stores/MoviesStore.js';
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
 export default {
  emits:['emit-dots'],
  props:['id'],
- components:{HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote },
+ components:{HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, LoadingSpinner },
  setup(props, context){
   const router = useRouter();
   const quotesData=ref({})
@@ -22,10 +23,16 @@ export default {
   const movies = useMoviesStore();
   const detailsModal=ref(false)
   const dataIsFetched=ref(false)
+  const commentsData=ref(null)
+  const likesData=ref(null)
 
   
   onMounted(async ()=>{
+    const resComments= await axios.get(`comments`);
+    const resLikes= await axios.get(`likes`);
     const resQuotes = await axios.get(`quotes/${currentId}`);
+    likesData.value = resLikes.data;
+    commentsData.value = resComments.data;
     quotesData.value = resQuotes.data;
     dataIsFetched.value=true;
 })
@@ -38,6 +45,13 @@ export default {
     return;
   }
   detailsModal.value=id
+  }
+
+  function commentsQuantity(quote_id){
+    return commentsData.value.filter(x => x.quote_id == quote_id).length
+  }
+  function likesQuantity(quote_id){
+   return likesData.value.filter(x => x.quote_id == quote_id).length
   }
 
  async function deleteQuote(id){
@@ -55,7 +69,9 @@ export default {
     quotesData, 
     deleteQuote,
     detailsModal,
-    dataIsFetched
+    dataIsFetched,
+    commentsQuantity,
+    likesQuantity
   }
     }
 
@@ -66,7 +82,10 @@ export default {
 
 
 <template>
-  <div v-if="dataIsFetched" class="flex flex-col gap-[4rem] h-[17%]">
+<div>
+  <loading-spinner  v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
+
+  <div v-else class="flex flex-col gap-[4rem] h-[17%]">
             <div class="px-[3.2rem] py-[2.4rem] w-[100%] bg-[#09090f] rounded-[10px]" v-for="quote in quotesData" :key="quote">
             <div class="relative">
               <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-40"></dots-icon>
@@ -90,15 +109,16 @@ export default {
                 </div>
               <div class="flex items-center gap-[3.2rem] mt-[2.4rem]">
                 <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">3</span>
+                  <span class="text-[2rem] text-[#fff]">{{ commentsQuantity(quote.id) }}</span>
                   <description-comment></description-comment>
                 </div>
                 <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">10</span>
+                  <span class="text-[2rem] text-[#fff]">{{ likesQuantity(quote.id) }}</span>
                   <heart-icon></heart-icon>
                </div>
               </div>
             </div>
             </div>
           </div>
+</div>
 </template>

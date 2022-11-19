@@ -48,8 +48,8 @@ export default {
     likesData.value=resLikes.data
     likes.value=likesData.value
     commentsData.value=resComments.data
-    quoteData.value=res.data
     comments.value=commentsData.value
+    quoteData.value=res.data
     moviesData.value=resMovies.data
     quotesList.value=quoteData.value
     feedDataIsFetched.value=true
@@ -222,7 +222,7 @@ return {
 
 
 <template>
-<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll">
+<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
 <div class="fixed z-50">
   <basic-header></basic-header>
   </div>
@@ -240,7 +240,7 @@ return {
       <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
-      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
+      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem] overflow-hidden"></textarea> 
         <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
         </div>
 
@@ -340,4 +340,17 @@ input {
     color: #CED4DA;
     font-size: 2rem;
 }
+.scrollbar::-webkit-scrollbar {
+  width: 1.5rem;
+  background: none;
+  border-radius: 0 0 0 0;
+        }
+.scrollbar:hover{
+   cursor:auto;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #222030;
+  border-radius: 0 0 0 0;
+        }
 </style>
