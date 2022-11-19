@@ -59,9 +59,11 @@ export default {
     .catch((err)=>{
       alert('Something went wrong!')
     })
+    dataIsFetched.value=false;
     const resQuotes=await axios.get(`quotes/${currentId}`);
     quotesData.value = resQuotes.data;
     context.emit('quotesQuantity', resQuotes.data)
+    dataIsFetched.value=true;
   }
 
   return {
