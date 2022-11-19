@@ -65,7 +65,7 @@ export default {
       basicAxios.post(axiosEndpoint,form)
     .then((res)=>{
       context.emit('emit-close');
-      router.go(0)
+      context.emit('update-movie');
     })
     .catch((err)=>{
       alert('Something went wrong!')

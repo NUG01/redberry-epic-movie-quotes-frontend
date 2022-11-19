@@ -26,33 +26,55 @@ export default {
 
     const login = useLoginStore();
     const router = useRouter();
-    const movies = useMoviesStore();
     const dataIsFetched=ref(false)
     const moviesIsFetched=ref(false)
     const user = ref([]);
+    const moviesData=ref([])
+    const moviesList=ref([])
 
 
     const addMoviesModal=ref(false);
     const imageDisplay=ref('');
-    const moviesData=ref({})
 
-    user.value=login.getUserData
-    dataIsFetched.value=login.getDataIsFetched
-    moviesData.value=movies.getMovies
-    moviesIsFetched.value=true
+      user.value=login.getUserData
+      dataIsFetched.value=login.getDataIsFetched
+    onMounted(async () => {
+     const res = await axios.get(`movies/${user.value.id}`);
+     moviesData.value=res.data
+     moviesList.value=res.data
+     moviesIsFetched.value=true
       // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
+    });
 
     function closeAddMoviesModal(){
       addMoviesModal.value=false
+    }
+
+     function searchSubmit(locale, ev){
+    moviesList.value=moviesData.value
+    let target=ev.target.value
+    if(target==''){
+      moviesList.value=moviesData.value
+    }
+    if(locale=='en'){
+      moviesList.value=[]
+       moviesList.value=moviesData.value.filter(x => (x.name.en).includes(target))
+    }
+    if(locale=='ka'){
+      moviesList.value=[]
+      moviesList.value=moviesData.value.filter(x => (x.name.ka).includes(target))
+
+    }
     }
     
 return {
   addMoviesModal,
   closeAddMoviesModal, 
-  moviesData,
+  moviesList,
   user,
   dataIsFetched,
-  moviesIsFetched
+  moviesIsFetched,
+  searchSubmit
 }
   }
   
@@ -71,15 +93,15 @@ return {
     <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!moviesIsFetched"></loading-spinner>
     <div v-else class="bg-gray h-[92.65vh] pr-[8rem] pt-[3rem]">
       <div class="w-[100%] flex items-center justify-between mb-[5rem]">
-        <div class="text-[2.4rem] font-medium text-[#fff]">{{ $t('newsFeed.my_list_of') }}  ({{ $t('newsFeed.total') }} <span>{{ moviesData.length }}</span>)</div>
+        <div class="text-[2.4rem] font-medium text-[#fff]">{{ $t('newsFeed.my_list_of') }}  ({{ $t('newsFeed.total') }} <span>{{ moviesList.length }}</span>)</div>
         <div class="flex items-center justify-center gap-[3rem]">
-          <div class="text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem]"><search-icon></search-icon><span>{{ $t('newsFeed.search') }}</span></div>
+          <div class="text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem] border-b-[#6C757D] border-b border-b-solid pb-[0.9rem]"><search-icon></search-icon><input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :placeholder="$t('newsFeed.search')"/></div>
           <basic-button @click="addMoviesModal=true" type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[4px]" width="w-[100%]">
           <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_movie') }}</p></div></basic-button>
         </div>
       </div>
       <div class="w-[100%] movies-grid h-[90.3%] overflow-scroll scrollHide pb-[1.5rem]">
-        <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesData" :key="movie.id">
+        <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesList" :key="movie.id">
           <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
@@ -118,5 +140,18 @@ main{
 }
 .scrollHide {
   scrollbar-width: none; 
+}
+input {
+ border:none;
+ outline: none;
+ background: none;
+  font-weight: 400;
+    color: #CED4DA;
+    font-size: 2rem;
+}
+input::placeholder {
+    font-weight: 400;
+    color: #CED4DA;
+    font-size: 2rem;
 }
 </style>

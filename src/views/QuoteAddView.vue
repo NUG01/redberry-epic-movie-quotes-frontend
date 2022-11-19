@@ -31,7 +31,7 @@ export default {
    const imageDisplay=ref('')
    const selectedFile=ref('')
    const currentId=ref('')
-   const authUser=ref({})
+   const authUser=ref([])
    const moviesData=ref([])
    const movie=ref([])
    const dataIsFetched=ref(false)

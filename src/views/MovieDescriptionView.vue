@@ -24,14 +24,13 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
   name:'MovieDescription',
   props:['id'],
-  emits:['emit-dots'],
+  emits:['emitDots', 'updateMovie', 'quotesQuantity'],
   components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
   
   setup(props){
 
     const login = useLoginStore();
     const router = useRouter();
-    const movies = useMoviesStore();
     const dataIsFetched=ref(false)
 
 
@@ -39,8 +38,8 @@ export default {
     const addMoviesModal=ref(false);
     const imageDisplay=ref('');
     const movieData=ref([])
-    const moviesData=ref({})
-    const movieName=ref({})
+    const moviesData=ref([])
+    const movieName=ref([])
     const authUser=ref([])
     const currentId=props.id
     const quotesLength=ref('')
@@ -48,13 +47,27 @@ export default {
       onMounted(async ()=>{
        authUser.value=login.getUserData
        const resQuotes = await axios.get(`quotes/${currentId}`);
-       movieData.value=movies.getMovies.find(x => x.id == props.id);
-       moviesData.value=movies.getMovies
+       const res = await axios.get(`movies/${authUser.value.id}`);
+       moviesData.value=res.data
+       movieData.value=moviesData.value.find(x => x.id == props.id);
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
        quotesLength.value=resQuotes.data.length      
        dataIsFetched.value=true
      
         })
+
+       async function updateMovie(){
+        dataIsFetched.value=false
+          const res = await axios.get(`movies/${authUser.value.id}`);
+          moviesData.value=res.data
+          movieData.value=moviesData.value.find(x => x.id == props.id);
+          movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
+          dataIsFetched.value=true
+        }
+
+        function updateQuantity(data){
+          quotesLength.value=data.length   
+        }
      
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
@@ -92,7 +105,9 @@ handleCloseEmit,
 deleteMovie,
 quotesLength,
 authUser,
-dataIsFetched
+dataIsFetched,
+updateMovie,
+updateQuantity
 }
   }
   
@@ -105,7 +120,7 @@ dataIsFetched
   <basic-header></basic-header>
   <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
   <main v-else>
-  <addmovie-form :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
+  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
   :director_en="movieData.director.en" 
@@ -136,7 +151,7 @@ dataIsFetched
             </div>
           </div>
           </div>
-            <quote-list :id="currentId"></quote-list>
+            <quote-list @quotes-quantity="updateQuantity" :id="currentId"></quote-list>
         </div>
         
         <div class="h-[100%] pr-[8rem]">
