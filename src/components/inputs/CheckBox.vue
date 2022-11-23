@@ -3,12 +3,13 @@ import { Field } from "vee-validate";
 import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 
 export default {
-  props:['genreValue', 'rules'],
+  props:['genreValue', 'rules', 'id'],
   components:{Field, CloseCheckbox},
 
   setup(props){
     const genreValue=props.genreValue
     const rules=props.rules
+    const id=props.id
 
 
      function deleteGenre(el){
@@ -22,7 +23,7 @@ export default {
  
 
 
-    return {genreValue, deleteGenre, addColor, rules}
+    return {genreValue, deleteGenre, addColor, rules, id}
   }
   
 }
@@ -31,12 +32,12 @@ export default {
 
 <template>
 <div class="checkboxWrapper bg-[#6C757D]">
-      <Field v-slot="{ field }" :rules="rules" name="genre" type="checkbox" :value="genreValue">
+      <Field v-slot="{ field }" :rules="rules" name="genre" type="checkbox" :value="id">
         <div class="rounded-[2px] inline-block relative h-full">
           <div class="flex items-center justify-center">
            <label @click="addColor" :for="genreValue" :class="genreValue" class="w-[100%] h-[100%] text-[2rem] text-[#fff] cursor-pointer px-[1rem]">{{ genreValue }}</label>
            <close-checkbox @click="deleteGenre" class="cursor-pointer"/>
-           <input :rules="rules" type="checkbox" :id="genreValue" name="genre" class="opacity-0 absolute top-0 left-0 cursor-pointer" v-bind="field" :value="genreValue" />
+           <input :rules="rules" type="checkbox" :id="genreValue" name="genre" class="opacity-0 absolute top-0 left-0 cursor-pointer" v-bind="field" :value="id" />
           </div>
         </div>
       </Field>

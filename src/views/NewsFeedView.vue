@@ -11,6 +11,7 @@ import SearchIcon from "@/components/icons/SearchIcon.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import AddquoteForm from "@/components/forms/AddquoteForm.vue";
+import { useAuthStore } from "@/stores/AuthStore.js";
 
 
 export default {
@@ -22,6 +23,9 @@ export default {
 
     const login = useLoginStore();
     const router = useRouter();
+    const authStore = useAuthStore();
+
+
     const dataIsFetched=ref(false)
     const feedDataIsFetched=ref(false)
     const user = ref([]);
@@ -55,8 +59,11 @@ export default {
     feedDataIsFetched.value=true
    })
 
-   user.value =login.getUserData;
-    dataIsFetched.value=login.getDataIsFetched
+    user.value =login.getUserData;
+    if(user.value!=null){
+     
+      dataIsFetched.value=login.getDataIsFetched
+    }
 
 
     function commentSubmit(quote_id, event){

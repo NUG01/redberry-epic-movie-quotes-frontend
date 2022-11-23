@@ -15,7 +15,6 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
-import { useMoviesStore } from '@/stores/MoviesStore.js';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
@@ -43,14 +42,15 @@ export default {
     const authUser=ref([])
     const currentId=props.id
     const quotesLength=ref('')
+    const genres=ref([])
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const res = await axios.get(`movies/${authUser.value.id}`);
-       const resQuotes = await axios.get(`quotes/${currentId}`);
-       moviesData.value=res.data
-       movieData.value=moviesData.value.find(x => x.id == props.id);
+       const res = await axios.get(`movie/${currentId}`);
+       genres.value=res.data.genres
+       movieData.value=res.data.movie
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
+       const resQuotes = await axios.get(`quotes/${currentId}`);
        quotesLength.value=resQuotes.data.length      
        dataIsFetched.value=true
      
@@ -58,9 +58,9 @@ export default {
 
        async function updateMovie(){
         dataIsFetched.value=false
-          const res = await axios.get(`movies/${authUser.value.id}`);
-          moviesData.value=res.data
-          movieData.value=moviesData.value.find(x => x.id == props.id);
+          const res = await axios.get(`movie/${currentId}`);
+          movieData.value=res.data.movie
+          genres.value=res.data.genres
           movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
           dataIsFetched.value=true
         }
@@ -102,7 +102,8 @@ quotesLength,
 authUser,
 dataIsFetched,
 updateMovie,
-updateQuantity
+updateQuantity,
+genres
 }
   }
   
@@ -160,7 +161,7 @@ updateQuantity
               </div>
             </div>
             <div class="flex items-center gap-[8px]">
-              <p v-for="genre in movieData.genre" :key="genre" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre }}</p>
+              <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
             </div>
           </div>
           <div class="flex justify-center flex-col gap-[2rem] pl-[1.2rem]">

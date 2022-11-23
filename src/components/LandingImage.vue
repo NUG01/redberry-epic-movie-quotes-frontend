@@ -1,24 +1,29 @@
 <script>
 export default {
-props:['margintop','image','gradient'],
-setup(props){
+props:['margintop','image','gradient', 'imageSource'],
+setup(props, context){
   const margintop=props.margintop;
   const image=props.image;
+  const imageSource=props.imageSource;
   const gradient=props.gradient;
+
+  
 
   return {
     margintop,
     image,
-    gradient
+    gradient,
+    imageSource,
      }
   }
 }
 
 </script>
 
-
+ 
 <template>
-  <div class="w-[100%] h-[100vh] relative"><img class="w-[100%] h-[100%]" :src='image' /><div class="absolute top-0 left-0 h-[100%] w-[100%] z-10" :class="gradient">
+  <div class="w-[100%] h-[100vh] relative backImg" :class="image">
+    <div class="absolute top-0 left-0 h-[100%] w-[100%] z-10" :class="gradient">
    <div class="h-[auto] w-[60%] custom-grid ml-[5%] gap-[1.6rem]" :class="margintop">
        <div class="w-[5rem] h-[4.5rem] flex items-end"><div class="h-[2px] w-[100%] bg-white text-[white]"></div></div>
        <div class="font-bold">
@@ -46,5 +51,10 @@ setup(props){
 .custom-grid{
   display: grid;
   grid-template-columns: auto 1fr;
+}
+.backImg{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>

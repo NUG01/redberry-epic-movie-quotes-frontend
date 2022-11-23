@@ -5,16 +5,19 @@ import BasicButton from "@/components/BasicButton.vue";
 import RememberMe from "@/components/RememberMe.vue";
 import GoogleIcon from "@/components/icons/GoogleIcon.vue";
 import { Form } from 'vee-validate';
-import { getJwtToken } from "@/helpers/jwt/index.js";
 import { ref, computed } from 'vue';
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import { useLoginStore } from '@/stores/LoginStore.js';
 import { useRouter } from 'vue-router';
+import axios from "@/config/axios/index.js";
+import { useAuthStore } from "@/stores/AuthStore.js";
+
 export default {
   components:{BasicInput,BasicButton, GoogleIcon,Form,RememberMe,InvalidIcon},
    setup(){
     const login = useLoginStore();
     const router = useRouter();
+    const authStore = useAuthStore();
 
     const errors=ref([]);
 
@@ -30,9 +33,14 @@ function googleLogin(){
 window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
 }
 
-   function onSubmit(values){
-      login.sendLoginData(values);
-      login.cleanErrors();
+  async function onSubmit(values){
+       await axios.post('login', {name: values.name,password: values.password,})
+       const response= await axios.get('user');
+        login.isLogged=true;
+        login.userData=response.data.user;
+        authStore.authenticated = true;
+        login.changeFetchedStatus();
+        router.push({ name: 'news-feed'})
        }
 
     

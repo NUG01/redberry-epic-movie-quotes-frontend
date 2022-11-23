@@ -33,5 +33,9 @@
   "view_quote_exact": "View Quote",
   "write_new_quote": "Write New Quote",
   "post": "Post",
-  "choose_movie": "Choose movie"
+  "choose_movie": "Choose movie",
+  "notifications": "Notifications",
+  "mark_as_read": "Mark as all read",
+  "commented": "Commented to your quote..",
+  "liked": "Reacted to your quote"
 }

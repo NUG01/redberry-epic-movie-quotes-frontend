@@ -4,6 +4,8 @@ import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { useAuthStore } from "@/stores/AuthStore.js";
+
 export default {
   name:'OAuth',
   components:{LoadingSpinner},
@@ -11,10 +13,18 @@ export default {
 
     const login = useLoginStore();
     const router = useRouter();
+    const authStore = useAuthStore();
+    
 
-    onMounted(()=>{
-      login.loginWithGoogle(router.currentRoute.value.query.token, router.currentRoute.value.query.expires_in, router.currentRoute.value.query.user_id);
-    })
+
+    onMounted(async()=>{
+      const userId=router.currentRoute.value.query.user_id
+      const response=await axios.get(`user/${userId}`)
+      login.userData=response.data;
+      login.changeFetchedStatus();
+      login.isGoogleLogged=true;
+      authStore.authenticated=true;
+      router.push({ name: 'news-feed' })})
 
 
     return {}

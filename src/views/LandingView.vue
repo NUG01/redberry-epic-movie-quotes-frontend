@@ -21,23 +21,24 @@ export default{
 
       }
 
+
      
 
       return {
         langDropDown,
-        active: langActive
+        active: langActive,
         }
      }
 }
 
 </script>
 
-<template>
+<template >
 <section class="w-[100vw] bg-[#08080D] relative">
   <router-view></router-view>
-
-<div class="gradient-two absolute top-0 left-0 h-[100%] w-[100%] z-10">
-  <header class="absolute top-0 left-0 w-[100%] h-[auto] py-[3rem] px-[7rem] flex items-center justify-between">
+<div class="absolute top-0 left-0 h-[100%] w-[100%] gradient-two z-10"></div>
+<div class="fixed top-0 left-0 h-[100%] w-[100%] z-30">
+  <header class="absolute top-0 left-0 w-[100%] h-[auto] py-[3rem] px-[5rem] flex items-center justify-between z-50">
     <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA]">movie quotes</div>
     <div class="flex gap-[1.6rem]">
       <div class="mr-[2.4rem] relative flex items-center justify-center">
@@ -63,21 +64,21 @@ export default{
   </div>
 </div>
   
-  <landing-image margintop="mt-[18%]" image="/src/assets/InterstellarMovie.png" gradient="gradient-two">
+  <landing-image margintop="mt-[18%]" image="bg-[url(/src/assets/InterstellarMovie.png)]" :imageSource="true" gradient="gradient-two">
     &#8220;{{ $t('landing.interstellar_quote_one') }}<br>{{ $t('landing.interstellar_quote_two') }}&#8221;
     <template v-slot:movie>
         {{ $t('landing.interstellar') }}, 2014
     </template>
   </landing-image>
-  
-  <landing-image margintop="mt-[21%]" image="/src/assets/TenenbaumsMovie.png" gradient="gradient-three">
+
+    <landing-image margintop="mt-[18%]" image="bg-[url(/src/assets/TenenbaumsMovie.png)] bg-fixed" gradient="gradient-three">
     &#8220;{{ $t('landing.tenenbaums_quote_one') }}<br>{{ $t('landing.tenenbaums_quote_two') }}<br>{{ $t('landing.tenenbaums_quote_three') }}&#8221;
     <template v-slot:movie>
         {{ $t('landing.tenenbaums') }}, 2001
     </template>
   </landing-image>
   
-  <landing-image margintop="mt-[27%]" image="/src/assets/LordofRingsMovie.png" gradient="gradient-four">
+    <landing-image margintop="mt-[18%]" image="bg-[url(/src/assets/LordofRingsMovie.png)] bg-fixed" gradient="gradient-four">
     &#8220;{{ $t('landing.lord_of_rings_quote_one') }}<br>{{ $t('landing.lord_of_rings_quote_two') }},<br>{{ $t('landing.lord_of_rings_quote_three') }}&#8221;
     <template v-slot:movie>
         {{ $t('landing.lord_of_rings') }}, 2003

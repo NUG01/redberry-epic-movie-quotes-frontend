@@ -1,6 +1,6 @@
 <script>
 import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import BasicInput from "@/components/BasicInput.vue";
@@ -8,17 +8,18 @@ import ProfileInput from "@/components/ProfileInput.vue";
 import BasicButton from "@/components/BasicButton.vue";
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import InvalidIcon from "@/components/icons/InvalidIcon.vue";
-import axios from "@/config/axios/index.js";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import FormHeader from "@/components/FormHeader.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
 
 
 
 export default {
     name:'Profile',
-    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton},
+    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner},
   
   setup(){
 
@@ -103,7 +104,9 @@ return {
 
 
 <template>
-  <div v-if="dataIsFetched" class="main w-[100vw] bg-[#181623] min-h-[100vh]">
+<div>
+  <loading-spinner v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
+  <div v-else class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
   <main>
     <div v-if="requestSuccess" class="absolute w-[100vw] h-[100vh] top-0 left-0">
@@ -164,6 +167,7 @@ return {
     <div></div>
 
   </main>
+  </div>
   </div>
 </template>
 

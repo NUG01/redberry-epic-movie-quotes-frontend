@@ -1,15 +1,27 @@
 import axios from "axios";
-import { getJwtToken } from "@/helpers/jwt/index.js";
+import { useAuthStore } from "@/stores/AuthStore.js";
+import router from "@/router/index";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "X-Requested-With": "XMLHttpRequest",
-    Authorization: "Bearer" + getJwtToken(),
-  },
+  baseURL: 'http://127.0.0.1:8000/api/',
+  // baseURL: import.meta.env.VITE_API_BASE_UR,
+  timeout: 15000,
 });
+
+axiosInstance.defaults.withCredentials = true;
+
+axiosInstance.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    if (error.response.status == 401) {
+      const authStore = useAuthStore();
+      authStore.authenticated = false;
+      router.push({name: 'not-found'});
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

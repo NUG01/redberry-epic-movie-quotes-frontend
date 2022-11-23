@@ -1,8 +1,8 @@
 <script>
 import { ref, onMounted } from "vue";
-import { RouterView } from "vue-router";
 import axios from "@/config/axios/index.js";
 import { useLoginStore } from '@/stores/LoginStore.js';
+import { useAuthStore } from "@/stores/AuthStore.js";
 
 
 
@@ -11,21 +11,28 @@ export default {
     const login = useLoginStore();
     const dataIsFetched=ref(false)
     const usersIsFetched=ref(false)
+    const authStore = useAuthStore();
 
 
 
   onMounted(async()=>{
+    if(login.getUserData==null){
+      const res= await axios.get("user")
+      login.updateUserData(res.data.user);
+      if(login.getUserData!=null){
+        authStore.authenticated = true;
+      }
+      login.changeFetchedStatus()
+      dataIsFetched.value=login.getDataIsFetched
+      }else{
+        authStore.authenticated = true;
+      }
+
     if(login.getAllUser==null){
       const resUsers= await axios.get("users")
       login.updateAllUserData(resUsers.data);
       login.changeUsersFetchedStatus()
       usersIsFetched.value=login.getUsersIsFetched
-      }
-    if(login.getUserData==null){
-      const res= await axios.get("auth-user")
-      login.updateUserData(res.data);
-      login.changeFetchedStatus()
-      dataIsFetched.value=login.getDataIsFetched
       }
    })
 
