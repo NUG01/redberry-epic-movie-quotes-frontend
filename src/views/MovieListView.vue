@@ -1,5 +1,5 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
@@ -22,7 +22,7 @@ export default {
   
   setup(){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
     const dataIsFetched=ref(false)
     const moviesIsFetched=ref(false)
@@ -36,11 +36,10 @@ export default {
     const imageDisplay=ref('');
 
       user.value=login.getUserData
-      dataIsFetched.value=login.getDataIsFetched
+      dataIsFetched.value=true
     onMounted(async () => {
      const res = await axios.get(`movies/${user.value.id}`);
-     const resQuotes= await axios.get(`quotes`);
-     quotesData.value=resQuotes.data
+     quotesData.value=res.data.quotes
      moviesData.value=res.data
      moviesList.value=res.data
      moviesList.value=(moviesList.value).reverse()
@@ -50,10 +49,6 @@ export default {
 
     function closeAddMoviesModal(){
       addMoviesModal.value=false
-    }
-
-    function quotesFilter(movie_id){
-      return quotesData.value.filter(x => x.movie_id == movie_id).length
     }
 
    async function updateMovieList(){
@@ -91,7 +86,6 @@ return {
   searchSubmit,
   updateMovieList,
   quotesData,
-  quotesFilter
 }
   }
   
@@ -122,7 +116,7 @@ return {
           <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
-            <span class="text-[2rem] font-medium text-[#fff]">{{ quotesFilter(movie.id) }}</span>
+            <span class="text-[2rem] font-medium text-[#fff]">{{ movie.quotes.length }}</span>
             <quote-icon></quote-icon>
           </div>
         </div>

@@ -14,12 +14,13 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default {
  emits:['emit-dots'],
- props:['id'],
+ props:['id', 'quotes'],
  components:{HeartIcon, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, LoadingSpinner },
  setup(props, context){
   const router = useRouter();
   const quotesData=ref({})
   const currentId=props.id
+  const quotes=props.quotes
   const movies = useMoviesStore();
   const detailsModal=ref(false)
   const dataIsFetched=ref(false)
@@ -30,10 +31,9 @@ export default {
   onMounted(async ()=>{
     const resComments= await axios.get(`comments`);
     const resLikes= await axios.get(`likes`);
-    const resQuotes = await axios.get(`quotes/${currentId}`);
     likesData.value = resLikes.data;
     commentsData.value = resComments.data;
-    quotesData.value = resQuotes.data;
+    quotesData.value = quotes;
     dataIsFetched.value=true;
 })
   

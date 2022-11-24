@@ -1,10 +1,8 @@
 <script>
 import  HomeIcon  from "@/components/icons/HomeIcon.vue";
 import  MoviesIcon  from "@/components/icons/MoviesIcon.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
-import { onMounted, ref, computed} from "vue";
+import { useUserStore } from '@/stores/UserStore.js';
 import { useRouter } from "vue-router";
-import axios from "@/config/axios/index.js";
 
 
 export default {
@@ -13,7 +11,7 @@ export default {
 
  setup(props){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
   
 

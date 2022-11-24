@@ -13,7 +13,7 @@ import BasicNavigation from "@/components/BasicNavigation.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 
 
 
@@ -25,7 +25,7 @@ export default {
   setup(props){
 
    const router=useRouter();
-   const login = useLoginStore();
+   const login = useUserStore();
 
 
    const imageDisplay=ref('')
@@ -34,6 +34,7 @@ export default {
    const authUser=ref([])
    const moviesData=ref([])
    const movie=ref([])
+   const genres=ref([])
    const dataIsFetched=ref(false)
 
 
@@ -41,9 +42,10 @@ export default {
    currentId.value=props.id
 onMounted(async ()=>{
   authUser.value=login.getUserData
-  const resMovies = await axios.get(`movies/${authUser.value.id}`);
-  moviesData.value=resMovies.data
-  movie.value=moviesData.value.find(x => x.id == props.id);
+  const res = await axios.get(`movie/${props.id}`);
+  movie.value=res.data.movie
+  genres.value=res.data.genres
+  console.log(movie.value, genres.value)
   dataIsFetched.value=true
 
 })
@@ -82,7 +84,8 @@ onMounted(async ()=>{
     onSubmit,
     authUser,
     movie,
-    dataIsFetched
+    dataIsFetched,
+    genres
     }
   }
   
@@ -111,7 +114,7 @@ onMounted(async ()=>{
           <div class="flex flex-col justify-center gap-[2.4rem]">
             <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
               <div class="flex items-center gap-[8px]">
-              <p v-for="index in movie.genre.length" :key="index" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ movie.genre[index-1] }}</p>
+              <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
             </div>
             <div class="flex items-center gap-[1rem]">
               <p class="text-[#CED4DA] text-[1.8rem] font-bold">{{ $t('newsFeed.director') }}:</p>

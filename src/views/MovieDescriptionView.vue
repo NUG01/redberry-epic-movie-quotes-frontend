@@ -1,5 +1,5 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import QuoteList from "@/components/QuoteList.vue";
@@ -15,6 +15,7 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
+import { useMoviesStore } from '@/stores/MoviesStore.js';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
@@ -28,7 +29,7 @@ export default {
   
   setup(props){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
     const dataIsFetched=ref(false)
 
@@ -43,15 +44,16 @@ export default {
     const currentId=props.id
     const quotesLength=ref('')
     const genres=ref([])
+    const quotes=ref([])
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
        const res = await axios.get(`movie/${currentId}`);
        genres.value=res.data.genres
        movieData.value=res.data.movie
+       quotes.value=res.data.quotes
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
-       const resQuotes = await axios.get(`quotes/${currentId}`);
-       quotesLength.value=resQuotes.data.length      
+       quotesLength.value=res.data.quotes.length  
        dataIsFetched.value=true
      
         })
@@ -61,6 +63,8 @@ export default {
           const res = await axios.get(`movie/${currentId}`);
           movieData.value=res.data.movie
           genres.value=res.data.genres
+          quotes.value=res.data.quotes
+          quotesLength.value=res.data.quotes.length 
           movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
           dataIsFetched.value=true
         }
@@ -81,7 +85,7 @@ export default {
       function deleteMovie(id){
         axios.delete(`movies/${id}`)
         .then((res)=>{
-          router.go(-1)
+          router.push({name: 'movie-list'})
         })
         .catch((err)=>{
           alert('Something went wrong!')
@@ -103,7 +107,8 @@ authUser,
 dataIsFetched,
 updateMovie,
 updateQuantity,
-genres
+genres,
+quotes
 }
   }
   
@@ -147,7 +152,7 @@ genres
             </div>
           </div>
           </div>
-            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :id="currentId"></quote-list>
+            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :quotes="quotes" :id="currentId"></quote-list>
         </div>
         
         <div class="h-[100%] pr-[8rem]">

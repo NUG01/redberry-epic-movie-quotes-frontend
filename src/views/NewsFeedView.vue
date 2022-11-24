@@ -1,6 +1,6 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
-import { computed, onMounted, ref } from "vue";
+import { useUserStore } from '@/stores/UserStore.js';
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -21,7 +21,7 @@ export default {
   
   setup(){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
     const authStore = useAuthStore();
 
@@ -29,10 +29,9 @@ export default {
     const dataIsFetched=ref(false)
     const feedDataIsFetched=ref(false)
     const user = ref([]);
-    const usersData=ref([])
     const quoteData=ref([])
     const moviesData=ref([])
-    const commentsData=ref(null)
+    const commentsData=ref([])
     const likesData=ref(null)
     const showComments=ref(false)
     const comments=ref([])
@@ -40,29 +39,35 @@ export default {
     const addPost=ref(false)
     const searchActivated=ref(false)
     const quotesList=ref([])
+    const authors=ref([])
+    const movieAuthors=ref([])
 
 
 
     onMounted(async ()=>{
-    usersData.value=login.getAllUser;
     const res= await axios.get('quotes');
     const resMovies= await axios.get('movies');
     const resComments= await axios.get(`comments`);
     const resLikes= await axios.get(`likes`);
     likesData.value=resLikes.data
-    likes.value=likesData.value
-    commentsData.value=resComments.data
-    comments.value=commentsData.value
+    likes.value=resLikes.data
     quoteData.value=res.data
     moviesData.value=resMovies.data
     quotesList.value=quoteData.value
+    for (let i = 0; i < resComments.data.length; i++) {
+      authors.value.push(resComments.data[i].user)
+      commentsData.value.push(resComments.data[i])
+      comments.value.push(resComments.data[i])
+    }
+    for (let i = 0; i < resMovies.data.length; i++) {
+      movieAuthors.value.push(resMovies.data[i].user)
+    }
     feedDataIsFetched.value=true
    })
 
     user.value =login.getUserData;
     if(user.value!=null){
-     
-      dataIsFetched.value=login.getDataIsFetched
+     dataIsFetched.value=true
     }
 
 
@@ -74,7 +79,7 @@ export default {
         body: event.target.value,
         quote_id: quote_id,
         user_id: user.value.id
-     }).then(()=>{
+     }).then((res)=>{
         comments.value.push({
           body:event.target.value,
           user_id:user.value.id,
@@ -112,6 +117,7 @@ export default {
   }
 
   function updateQuotesIntoArray(data){
+    quoteData.value=data
     quotesList.value=data
   }
 
@@ -133,19 +139,27 @@ export default {
     if(target[0]==='@'){
       let movie=(target).substring((target).indexOf("@")+1)
       if(locale=='en'){
-      quotesList.value=[]
+        quotesList.value=[]
       const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
-      const moviesId = filteredMovies.map(s=>s.id);
-      for (let i = 0; i < moviesId.length; i++) {
-       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      for (let i = 0; i < filteredMovies.length; i++) {
+          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
+              let quote=filteredMovies[i].quotes[k]
+              if(quote){
+                quotesList.value.push(quote)
+              }
+         }
       }
-     }
+  }
      if(locale=='ka'){
       quotesList.value=[]
-      const filteredMovies=moviesData.value.filter(x => (x.name.ka).includes(movie))
-      const moviesId = filteredMovies.map(s=>s.id);
-      for (let i = 0; i < moviesId.length; i++) {
-       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
+      for (let i = 0; i < filteredMovies.length; i++) {
+          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
+              let quote=filteredMovies[i].quotes[k]
+              if(quote){
+                quotesList.value.push(quote)
+              }
+         }
       }
       }
     }
@@ -161,11 +175,13 @@ export default {
    }
 
    function quoteAuthor(user_id){
-     return usersData.value.find(x => x.id == user_id).name
+     return movieAuthors.value.find(x => x.id == user_id).name
    }
    function commentAuthor(user_id){
-     return usersData.value.find(x => x.id == user_id).name
+     return authors.value.find(x => x.id == user_id).name
    }
+
+
    function commentsQuantity(quote_id){
    return comments.value.filter(x => x.quote_id == quote_id).length
    }
@@ -197,7 +213,6 @@ return {
        quotesList, 
        feedDataIsFetched, 
        moviesData, 
-       usersData, 
        commentsData, 
        showComments,
        handleShowComments,

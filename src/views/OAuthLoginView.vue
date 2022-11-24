@@ -1,5 +1,5 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "@/config/axios/index.js";
@@ -11,7 +11,7 @@ export default {
   components:{LoadingSpinner},
    setup(){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
     const authStore = useAuthStore();
     
@@ -21,8 +21,6 @@ export default {
       const userId=router.currentRoute.value.query.user_id
       const response=await axios.get(`user/${userId}`)
       login.userData=response.data;
-      login.changeFetchedStatus();
-      login.isGoogleLogged=true;
       authStore.authenticated=true;
       router.push({ name: 'news-feed' })})
 

@@ -15,10 +15,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   function (error) {
-    if (error.response.status == 401) {
+    if (error.response.status === 401) {
       const authStore = useAuthStore();
       authStore.authenticated = false;
-      router.push({name: 'not-found'});
+      router.push({name: 'forbidden'});
     }
     return Promise.reject(error);
   }

@@ -14,7 +14,7 @@ import BasicNavigation from "@/components/BasicNavigation.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import CommentsIcon from "@/components/icons/CommentsIcon.vue";
 import LikesIcon from "@/components/icons/LikesIcon.vue";
 
@@ -28,7 +28,7 @@ export default {
   setup(props){
 
    const router=useRouter();
-   const login = useLoginStore();
+   const login = useUserStore();
 
    const authUser=ref([])
    const dataIsFetched=ref(false)

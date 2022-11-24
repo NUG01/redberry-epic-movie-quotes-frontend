@@ -1,7 +1,6 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { ref } from "vue";
-import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import BasicInput from "@/components/BasicInput.vue";
 import ProfileInput from "@/components/ProfileInput.vue";
@@ -13,6 +12,7 @@ import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import FormHeader from "@/components/FormHeader.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import BasicHeader from "@/components/BasicHeader.vue";
 
 
 
@@ -23,7 +23,7 @@ export default {
   
   setup(){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const image=ref('')
     const imageError=ref(false)
     const responseError=ref([])
@@ -37,7 +37,7 @@ export default {
     const selectedFile=ref('')
 
       user.value =login.getUserData;
-      dataIsFetched.value=login.getDataIsFetched
+      dataIsFetched.value=true
 
         
       // imageDisplay.value='http://localhost:8000/public/'+user.value.thumbnail

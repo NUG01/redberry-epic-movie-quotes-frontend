@@ -1,12 +1,12 @@
 import { useAuthStore } from "@/stores/AuthStore.js";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import axios from "@/config/axios/index.js";
 
 
 
 export async function isAuthenticated() {
   const authStore = useAuthStore();
-  const login = useLoginStore();
+  const login = useUserStore();
   if(login.getUserData==null){
      let res= await axios.get("user")
      if(res.data.user==null){
@@ -21,7 +21,7 @@ export async function isAuthenticated() {
 
 export async function isLoggedIn() {
   const authStore = useAuthStore();
-  const login = useLoginStore();
+  const login = useUserStore();
   
   if(login.getUserData==null){
     let res= await axios.get("user")

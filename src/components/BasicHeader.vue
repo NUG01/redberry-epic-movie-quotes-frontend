@@ -3,7 +3,7 @@ import { ref } from "vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
 import NotificationIcon from "@/components/icons/NotificationIcon.vue";
 import BasicButton from "@/components/BasicButton.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import NotificationComment from "@/components/icons/NotificationComment.vue";
 import NotificationLike from "@/components/icons/NotificationLike.vue";
 import axios from "@/config/axios/index.js";
@@ -17,7 +17,7 @@ export default {
   components:{DropdownArrow,BasicButton, NotificationIcon, NotificationComment, NotificationLike},
   setup(){
 
-    const login=useLoginStore();
+    const login=useUserStore();
     const router = useRouter();
     const authStore = useAuthStore();
 
@@ -39,7 +39,6 @@ export default {
 
      async function logoutHandle(){
      await axios.post('logout')
-     login.isLogged=false
      authStore.authenticated = false;
      router.push({ name: 'landing'})
     }

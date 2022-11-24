@@ -1,16 +1,15 @@
 <script>
 import { ref, onMounted } from "vue";
 import axios from "@/config/axios/index.js";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { useAuthStore } from "@/stores/AuthStore.js";
 
 
 
 export default {
   setup(){
-    const login = useLoginStore();
+    const login = useUserStore();
     const dataIsFetched=ref(false)
-    const usersIsFetched=ref(false)
     const authStore = useAuthStore();
 
 
@@ -18,33 +17,25 @@ export default {
   onMounted(async()=>{
     if(login.getUserData==null){
       const res= await axios.get("user")
-      login.updateUserData(res.data.user);
+      login.userData=res.data.user;
       if(login.getUserData!=null){
         authStore.authenticated = true;
       }
-      login.changeFetchedStatus()
-      dataIsFetched.value=login.getDataIsFetched
+      dataIsFetched.value=true
       }else{
         authStore.authenticated = true;
-      }
-
-    if(login.getAllUser==null){
-      const resUsers= await axios.get("users")
-      login.updateAllUserData(resUsers.data);
-      login.changeUsersFetchedStatus()
-      usersIsFetched.value=login.getUsersIsFetched
       }
    })
 
 
 
-    return{dataIsFetched, usersIsFetched}
+    return{dataIsFetched}
   }
 }
 </script>
 
 <template>
-    <router-view v-if="dataIsFetched && usersIsFetched"></router-view>
+    <router-view v-if="dataIsFetched"></router-view>
 </template>
 
 <style>
