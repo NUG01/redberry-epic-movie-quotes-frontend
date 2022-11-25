@@ -14,14 +14,4 @@ export const useMoviesStore = defineStore("useMoviesStore",{
     getMoviesIsFetched: (state) => state.moviesIsFetched,
 
  },
-
-    actions:{
-      changeMoviesFetchedStatus(){
-        this.moviesIsFetched=true
-      },
-    saveMovies(moviesData){
-      this.movies=moviesData;
-    },
-
- }
 });

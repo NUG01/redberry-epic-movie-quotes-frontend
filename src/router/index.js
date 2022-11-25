@@ -18,6 +18,7 @@ import QuoteDetailsView from "@/views/QuoteDetailsView.vue";
 import QuoteEditView from "@/views/QuoteEditView.vue";
 import QuoteAddView from "@/views/QuoteAddView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

@@ -1,5 +1,5 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import QuoteList from "@/components/QuoteList.vue";
@@ -29,7 +29,7 @@ export default {
   
   setup(props){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
     const dataIsFetched=ref(false)
 
@@ -43,24 +43,28 @@ export default {
     const authUser=ref([])
     const currentId=props.id
     const quotesLength=ref('')
+    const genres=ref([])
+    const quotes=ref([])
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const resQuotes = await axios.get(`quotes/${currentId}`);
-       const res = await axios.get(`movies/${authUser.value.id}`);
-       moviesData.value=res.data
-       movieData.value=moviesData.value.find(x => x.id == props.id);
+       const res = await axios.get(`movie/${currentId}`);
+       genres.value=res.data.genres
+       movieData.value=res.data.movie
+       quotes.value=res.data.quotes
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
-       quotesLength.value=resQuotes.data.length      
+       quotesLength.value=res.data.quotes.length  
        dataIsFetched.value=true
      
         })
 
        async function updateMovie(){
         dataIsFetched.value=false
-          const res = await axios.get(`movies/${authUser.value.id}`);
-          moviesData.value=res.data
-          movieData.value=moviesData.value.find(x => x.id == props.id);
+          const res = await axios.get(`movie/${currentId}`);
+          movieData.value=res.data.movie
+          genres.value=res.data.genres
+          quotes.value=res.data.quotes
+          quotesLength.value=res.data.quotes.length 
           movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
           dataIsFetched.value=true
         }
@@ -71,11 +75,7 @@ export default {
      
     // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
-      
-
-      function quoteEditModal(id){
-        document.getElementById(`movie${id}`).classList.toggle('hidden')
-      }
+    
 
       function handleCloseEmit(){
        addMoviesModal.value=false
@@ -85,7 +85,7 @@ export default {
       function deleteMovie(id){
         axios.delete(`movies/${id}`)
         .then((res)=>{
-          router.go(-1)
+          router.push({name: 'movie-list'})
         })
         .catch((err)=>{
           alert('Something went wrong!')
@@ -95,8 +95,7 @@ export default {
     
 return {
 addMoviesModal, 
-movieData, 
-quoteEditModal, 
+movieData,  
 movieName, 
 moviesData, 
 currentId, 
@@ -107,7 +106,9 @@ quotesLength,
 authUser,
 dataIsFetched,
 updateMovie,
-updateQuantity
+updateQuantity,
+genres,
+quotes
 }
   }
   
@@ -151,7 +152,7 @@ updateQuantity
             </div>
           </div>
           </div>
-            <quote-list @quotes-quantity="updateQuantity" :id="currentId"></quote-list>
+            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :quotes="quotes" :id="currentId"></quote-list>
         </div>
         
         <div class="h-[100%] pr-[8rem]">
@@ -165,7 +166,7 @@ updateQuantity
               </div>
             </div>
             <div class="flex items-center gap-[8px]">
-              <p v-for="genre in movieData.genre" :key="genre" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre }}</p>
+              <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
             </div>
           </div>
           <div class="flex justify-center flex-col gap-[2rem] pl-[1.2rem]">

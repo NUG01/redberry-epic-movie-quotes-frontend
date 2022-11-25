@@ -14,7 +14,7 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import axios from "@/config/axios/index.js";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 
 
 
@@ -27,7 +27,7 @@ export default {
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput, BasicNavigation, DeleteTrash, LoadingSpinner },
   
    setup(props){
-   const login = useLoginStore();
+   const login = useUserStore();
    const router=useRouter();
 
 

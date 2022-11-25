@@ -1,6 +1,6 @@
 <script>
-import { useLoginStore } from '@/stores/LoginStore.js';
-import { computed, onMounted, ref } from "vue";
+import { useUserStore } from '@/stores/UserStore.js';
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -11,6 +11,7 @@ import SearchIcon from "@/components/icons/SearchIcon.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import AddquoteForm from "@/components/forms/AddquoteForm.vue";
+import { useAuthStore } from "@/stores/AuthStore.js";
 
 
 export default {
@@ -20,15 +21,17 @@ export default {
   
   setup(){
 
-    const login = useLoginStore();
+    const login = useUserStore();
     const router = useRouter();
+    const authStore = useAuthStore();
+
+
     const dataIsFetched=ref(false)
     const feedDataIsFetched=ref(false)
     const user = ref([]);
-    const usersData=ref([])
     const quoteData=ref([])
     const moviesData=ref([])
-    const commentsData=ref(null)
+    const commentsData=ref([])
     const likesData=ref(null)
     const showComments=ref(false)
     const comments=ref([])
@@ -36,27 +39,36 @@ export default {
     const addPost=ref(false)
     const searchActivated=ref(false)
     const quotesList=ref([])
+    const authors=ref([])
+    const movieAuthors=ref([])
 
 
 
     onMounted(async ()=>{
-    usersData.value=login.getAllUser;
     const res= await axios.get('quotes');
     const resMovies= await axios.get('movies');
     const resComments= await axios.get(`comments`);
     const resLikes= await axios.get(`likes`);
     likesData.value=resLikes.data
-    likes.value=likesData.value
-    commentsData.value=resComments.data
+    likes.value=resLikes.data
     quoteData.value=res.data
-    comments.value=commentsData.value
     moviesData.value=resMovies.data
     quotesList.value=quoteData.value
+    for (let i = 0; i < resComments.data.length; i++) {
+      authors.value.push(resComments.data[i].user)
+      commentsData.value.push(resComments.data[i])
+      comments.value.push(resComments.data[i])
+    }
+    for (let i = 0; i < resMovies.data.length; i++) {
+      movieAuthors.value.push(resMovies.data[i].user)
+    }
     feedDataIsFetched.value=true
    })
 
-   user.value =login.getUserData;
-    dataIsFetched.value=login.getDataIsFetched
+    user.value =login.getUserData;
+    if(user.value!=null){
+     dataIsFetched.value=true
+    }
 
 
     function commentSubmit(quote_id, event){
@@ -67,7 +79,7 @@ export default {
         body: event.target.value,
         quote_id: quote_id,
         user_id: user.value.id
-     }).then(()=>{
+     }).then((res)=>{
         comments.value.push({
           body:event.target.value,
           user_id:user.value.id,
@@ -105,6 +117,7 @@ export default {
   }
 
   function updateQuotesIntoArray(data){
+    quoteData.value=data
     quotesList.value=data
   }
 
@@ -126,19 +139,27 @@ export default {
     if(target[0]==='@'){
       let movie=(target).substring((target).indexOf("@")+1)
       if(locale=='en'){
-      quotesList.value=[]
+        quotesList.value=[]
       const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
-      const moviesId = filteredMovies.map(s=>s.id);
-      for (let i = 0; i < moviesId.length; i++) {
-       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      for (let i = 0; i < filteredMovies.length; i++) {
+          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
+              let quote=filteredMovies[i].quotes[k]
+              if(quote){
+                quotesList.value.push(quote)
+              }
+         }
       }
-     }
+  }
      if(locale=='ka'){
       quotesList.value=[]
-      const filteredMovies=moviesData.value.filter(x => (x.name.ka).includes(movie))
-      const moviesId = filteredMovies.map(s=>s.id);
-      for (let i = 0; i < moviesId.length; i++) {
-       quotesList.value.push(quoteData.value.find(x => x.movie_id == moviesId[i]))
+      const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
+      for (let i = 0; i < filteredMovies.length; i++) {
+          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
+              let quote=filteredMovies[i].quotes[k]
+              if(quote){
+                quotesList.value.push(quote)
+              }
+         }
       }
       }
     }
@@ -154,11 +175,13 @@ export default {
    }
 
    function quoteAuthor(user_id){
-     return usersData.value.find(x => x.id == user_id).name
+     return movieAuthors.value.find(x => x.id == user_id).name
    }
    function commentAuthor(user_id){
-     return usersData.value.find(x => x.id == user_id).name
+     return authors.value.find(x => x.id == user_id).name
    }
+
+
    function commentsQuantity(quote_id){
    return comments.value.filter(x => x.quote_id == quote_id).length
    }
@@ -190,7 +213,6 @@ return {
        quotesList, 
        feedDataIsFetched, 
        moviesData, 
-       usersData, 
        commentsData, 
        showComments,
        handleShowComments,
@@ -222,7 +244,7 @@ return {
 
 
 <template>
-<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll">
+<div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
 <div class="fixed z-50">
   <basic-header></basic-header>
   </div>
@@ -240,7 +262,7 @@ return {
       <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
       <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
-      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem]"></textarea> 
+      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem] overflow-hidden"></textarea> 
         <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
         </div>
 
@@ -340,4 +362,17 @@ input {
     color: #CED4DA;
     font-size: 2rem;
 }
+.scrollbar::-webkit-scrollbar {
+  width: 1.5rem;
+  background: none;
+  border-radius: 0 0 0 0;
+        }
+.scrollbar:hover{
+   cursor:auto;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #222030;
+  border-radius: 0 0 0 0;
+        }
 </style>

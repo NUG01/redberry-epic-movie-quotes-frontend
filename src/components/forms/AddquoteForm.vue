@@ -15,7 +15,7 @@ import BasicNavigation from "@/components/BasicNavigation.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
 
 
 
@@ -27,13 +27,13 @@ export default {
   setup(props, context){
 
    const router=useRouter();
-   const login = useLoginStore();
+   const login = useUserStore();
 
 
    const imageDisplay=ref('')
    const selectedFile=ref('')
    const currentId=ref('')
-   const authUser=ref({})
+   const authUser=ref([])
    const moviesData=ref([])
    const movie=ref([])
    const dataIsFetched=ref(false)

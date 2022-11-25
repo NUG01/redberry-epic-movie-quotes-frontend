@@ -18,6 +18,6 @@ export default {
       <p class="font-bold text-[4.7rem]">You shall not pass!</p>
       <p class="font-medium text-[2.4rem]">Sorry, but  you don’t have permission to access this page</p>
     </div>
-    <router-link :to="{name:'landing'}"><basic-button type="button" class="mb-[15rem] text-[white] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]">Return home</basic-button></router-link>
+    <router-link :to="{name:'landing'}" class="mb-[15rem] "><basic-button type="button" class="text-[white] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]">Return home</basic-button></router-link>
   </div>
 </template>

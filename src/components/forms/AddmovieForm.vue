@@ -1,6 +1,6 @@
 <script>
 import { Form, Field } from 'vee-validate';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
@@ -10,7 +10,8 @@ import CameraIcon from "@/components/icons/CameraIcon.vue";
 import CloseCheckbox from "@/components/icons/CloseCheckbox.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
-import { useLoginStore } from '@/stores/LoginStore.js';
+import { useUserStore } from '@/stores/UserStore.js';
+import axios from "@/config/axios/index.js";
 
 
 
@@ -19,7 +20,7 @@ export default {
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
     const router=useRouter()
-    const login = useLoginStore();
+    const login = useUserStore();
 
     const headerName=props.name
     const axiosEndpoint=props.axiosEndpoint
@@ -33,12 +34,19 @@ export default {
     const description_ka=props.description_ka
     const imageDisplay=ref('')
     const selectedFile=ref('')
-    const genres=['Drama', 'Fantasy', 'Anime', 'Fighting','Psychological', 'Mystical', 'other']
+    const dataIsFetched=ref(false)
+    const genres=ref([])
 
    function emitClose(){
     context.emit('emit-close');
 
    }
+
+   onMounted(async()=>{
+      const res= await axios.get('genres')
+      genres.value=res.data
+      dataIsFetched.value=true
+   })
 
    function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
@@ -93,7 +101,8 @@ export default {
     director_ka, 
     description_en, 
     description_ka,
-    user
+    user,
+    dataIsFetched
     }
   }
   
@@ -102,7 +111,7 @@ export default {
 
 
 <template>
-<div class="flex items-center justify-center">
+<div v-if="dataIsFetched" class="flex items-center justify-center">
 <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="emitClose"></div>
     <div class="fixed w-[40%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
@@ -119,7 +128,7 @@ export default {
       <addmovie-input :value="name_ka" rules="required|geo_alphabet" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
       
       <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
-      <checkbox-input rules="required" v-for="genre in genres" :key="genre" :genreValue="genre"></checkbox-input>
+      <checkbox-input rules="required" v-for="(genre) in genres" :key="genre" :id="genre.id" :genreValue="genre.name"></checkbox-input>
       </div>
       
       <addmovie-input :value="director_en" rules="required|eng_alphabet" inputName="director_en" placeholder="Director" label="Eng" classLabel="top-1/2"></addmovie-input>
