@@ -5,7 +5,6 @@ import "@/config/vee-validate/messages.js";
 import { markRaw } from 'vue'
 import i18n from "@/config/i18n/index.js";
 
-
 import App from "./App.vue";
 import router from "./router";
 

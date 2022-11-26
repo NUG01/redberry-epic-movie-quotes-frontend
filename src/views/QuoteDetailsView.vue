@@ -49,7 +49,6 @@ export default {
 
 
    onMounted(async()=>{
-    usersData.value=login.getAllUser;
     const res= await axios.get(`quote/${currentId}`);
     const resComments= await axios.get(`comments/${currentId}`);
     authUser.value=login.getUserData
@@ -147,10 +146,6 @@ function commentsHandle(){
   function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
   }
-
-  const userName=computed((comment_id)=>{
-     return usersData.value.find(x => x.id == comment_id).name
-    })
   const likesQuantity=computed(()=>{
      return likes.value.filter(x => x.quote_id == currentId).length
     })
@@ -181,7 +176,6 @@ function commentsHandle(){
       likes,
       likesQuantity,
       likeColor,
-      userName
       
     }
   }
@@ -233,7 +227,7 @@ function commentsHandle(){
         <div class="flex gap-[2.4rem] pt-[1rem]" v-for="comment in comments" :key="comment">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%] flex flex-col">
-          <p class="text-[2rem] font-medium text-[#fff]">{{ userName(comment.user_id) }}</p>
+          <p class="text-[2rem] font-medium text-[#fff]">{{ comment.user.name }}</p>
           <div><p class="text-[2rem] font-normal text-[#fff] wordwrap">{{ comment.body }}</p></div>
          </div>
         </div>

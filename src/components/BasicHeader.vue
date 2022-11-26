@@ -1,5 +1,5 @@
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
 import NotificationIcon from "@/components/icons/NotificationIcon.vue";
 import BasicButton from "@/components/BasicButton.vue";
@@ -9,6 +9,10 @@ import NotificationLike from "@/components/icons/NotificationLike.vue";
 import axios from "@/config/axios/index.js";
 import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/stores/AuthStore.js";
+import moment from 'moment'
+import ka from "moment/dist/locale/ka"
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 
 
@@ -24,6 +28,54 @@ export default {
 
     const langActive=ref(false);
     const notificationModal=ref(false);
+    const notifications=ref([])
+    const notificationsLength=ref(null)
+    const user=ref([])
+    const valuesFetched=ref(false)
+    const oldValue=ref([])
+
+     function now(date, locale){
+      locale=='ka'? moment.locale('ka', ka) : moment.locale('en')
+      return moment(date).fromNow()
+    }
+
+    onMounted(async ()=>{
+      user.value=login.getUserData
+      const resLikes= await axios.get(`notifications/${login.getUserData.id}/likes`);
+      const resComments= await axios.get(`notifications/${login.getUserData.id}/comments`);
+      notifications.value=resLikes.data.concat(resComments.data)
+      notifications.value=notifications.value.filter(x => x.user_id != user.value.id)
+      notifications.value.sort(function(a, b) {
+       return (a.created_at < b.created_at) ? 1 : ((a.created_at > b.created_at) ? -1 : 0);
+      });
+      oldValue.value=resLikes.data.concat(resComments.data)
+      valuesFetched.value=true
+
+
+    window.Pusher = Pusher;
+
+    Pusher.logToConsole = true;
+
+    window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    forceTLS: true,
+    encrypted: true,
+    withCredentials:true,
+    });
+      
+      window.Echo.channel('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
+              let data=e.notification.data
+              data.user=e.notification.user
+              if(e.notification.data.user_id!=user.value.id){
+                notifications.value.unshift(data)
+                notificationsLength.value++
+              }
+          })
+      
+    })
+
 
       function langDropDown(){
         langActive.value=!langActive.value;
@@ -35,6 +87,7 @@ export default {
 
       function notificationShow(){
         notificationModal.value=!notificationModal.value
+        notificationsLength.value=0
       }
 
      async function logoutHandle(){
@@ -43,12 +96,23 @@ export default {
      router.push({ name: 'landing'})
     }
 
+    function newColor(notification){
+      return oldValue.value.find(x => x.id == notification.id) ? false : true
+    }
+
         return {
         langDropDown,
         active: langActive,
         logoutHandle,
         notificationModal,
-        notificationShow
+        notificationShow,
+        notifications,
+        now,
+        notificationsLength,
+        newColor,
+        valuesFetched,
+        
+        
         }
   }
 }
@@ -74,41 +138,29 @@ export default {
 
          
           <div class="flex flex-col justify-center gap-[2rem]">
-            <div class="border border-solid border-[#6d767e80] p-[1.6rem] flex items-center gap-[1.6rem] rounded-[4px]">
+            <div v-for="notify in notifications" :key="notify" class="border border-solid border-[#6d767e80] p-[1.6rem] flex items-center gap-[1.6rem] rounded-[4px]">
               <div>
-                <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]">
+                <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]" :class="[newColor(notify) ? 'border-[2px] border-solid border-[#198754]' : '']">
               </div>
               <div class="flex flex-col items-start gap-[1rem] w-[100%]">
                 <div class="flex items-center justify-between w-[100%]">
-                <p class="text-[2.4rem] text-[#fff] font-normal">Vigaca Saxeli</p>
-                <p class="text-[1.6rem] text-[#D9D9D9] font-normal">5 min ago</p>
+                <p class="text-[2.4rem] text-[#fff] font-normal">{{ notify.user.name }}</p>
+                <p class="text-[1.6rem] text-[#D9D9D9] font-normal">{{now(notify.created_at, $i18n.locale)}}</p>
                 </div>
                 <div class="flex items-center justify-between w-[100%]">
-                <div class="flex items-center justify-between gap-[1rem]">
+                <router-link v-if="notify.body!=null" :to="{ name: 'quote-details', params:{id: notify.quote_id} }">
+                  <div class="flex items-center justify-between gap-[1rem]">
                   <notification-comment></notification-comment>
                   <p class="text-[1.6rem] text-[#CED4DA] font-normal">{{ $t('newsFeed.commented') }}</p>
-                </div>
-                <div class="text-[#198754] text-[1.6rem]">New</div>
-                </div>
-              </div>
-            </div>
-
-
-            <div class="border border-solid border-[#6d767e80] p-[1.6rem] flex items-center gap-[1.6rem] rounded-[4px]">
-              <div>
-                <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]">
-              </div>
-              <div class="flex flex-col items-start gap-[1rem] w-[100%]">
-                <div class="flex items-center justify-between w-[100%]">
-                <p class="text-[2.4rem] text-[#fff] font-normal">Vigaca Saxeli</p>
-                <p class="text-[1.6rem] text-[#D9D9D9] font-normal">5 min ago</p>
-                </div>
-                <div class="flex items-center justify-between w-[100%]">
+                 </div>
+                 </router-link>
+                <router-link v-if="notify.body==null" :to="{ name: 'quote-details', params:{id: notify.quote_id} }">
                 <div class="flex items-center justify-between gap-[1rem]">
                   <notification-like></notification-like>
                   <p class="text-[1.6rem] text-[#CED4DA] font-normal">{{ $t('newsFeed.liked') }}</p>
                 </div>
-                <div class="text-[#198754] text-[1.6rem]">New</div>
+                 </router-link>
+                <div v-if="valuesFetched" class="text-[#198754] text-[1.6rem]" v-show="newColor(notify)">{{ $t('newsFeed.new') }}</div>
                 </div>
               </div>
             </div>
@@ -116,8 +168,8 @@ export default {
           </div>
 
       </div>
-        <div class="cursor-pointer z-50">
-        <div @click="notificationShow" class="bg-[#E33812] w-[25px] h-[25px] rounded-[100%] absolute right-0 top-0 -translate-x-[50%] -translate-y-[9%]"><span class="absolute text-[1.6rem] text-[#fff] font-medium right-1/2 translate-x-1/2">3</span></div>
+        <div v-if="notificationsLength>0" class="cursor-pointer z-50">
+        <div @click="notificationShow" class="bg-[#E33812] w-[25px] h-[25px] rounded-[100%] absolute right-0 top-0 -translate-x-[50%] -translate-y-[9%]"><span class="absolute text-[1.6rem] text-[#fff] font-medium right-1/2 translate-x-1/2">{{ notificationsLength }}</span></div>
         </div>
       <notification-icon @click="notificationShow" class="mr-[2.4rem] hover:cursor-pointer z-40"></notification-icon>
       </div>
