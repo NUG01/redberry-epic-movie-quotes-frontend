@@ -11,8 +11,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/stores/AuthStore.js";
 import moment from 'moment'
 import ka from "moment/dist/locale/ka"
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
+
 
 
 
@@ -50,20 +49,6 @@ export default {
       });
       oldValue.value=resLikes.data.concat(resComments.data)
       valuesFetched.value=true
-
-
-    window.Pusher = Pusher;
-
-    Pusher.logToConsole = true;
-
-    window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    encrypted: true,
-    withCredentials:true,
-    });
       
       window.Echo.channel('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
               let data=e.notification.data

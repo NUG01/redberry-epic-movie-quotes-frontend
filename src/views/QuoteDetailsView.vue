@@ -37,7 +37,6 @@ export default {
    const currentId=props.id
    const quoteData=ref([])
    const commentsData=ref([])
-   const moviesData=ref([])
    const imageDisplay=ref('')
    const selectedFile=ref('')
    const usersData=ref([])
@@ -45,22 +44,17 @@ export default {
    const userEligibilityForChange=ref(null)
    const likes=ref([])
    const likesData=ref(null)
-
-
-
+    
+    
    onMounted(async()=>{
     const res= await axios.get(`quote/${currentId}`);
-    const resComments= await axios.get(`comments/${currentId}`);
     authUser.value=login.getUserData
-    quoteData.value=res.data
-    const resMovies= await axios.get(`movies/${authUser.value.id}`);
-    moviesData.value=resMovies.data
-    const resLikes= await axios.get(`likes/${currentId}`);
-    likesData.value=resLikes.data
+    quoteData.value=res.data.quote
+    likesData.value=res.data.likes
     likes.value=likesData.value
-    userEligibilityForChange.value= moviesData.value.find(x => x.id == quoteData.value.movie_id)
-    commentsData.value=resComments.data
-    comments.value=resComments.data
+    commentsData.value=res.data.comments
+    comments.value=commentsData.value
+    userEligibilityForChange.value= quoteData.value.user_id == authUser.value.id ? true : false;
     dataIsFetched.value=true
    })
 
@@ -118,7 +112,12 @@ function commentsHandle(){
      }).then(()=>{
         comments.value.push({
           body:ev.target.value,
-          user_id:authUser.value.id
+          user_id:authUser.value.id,
+          user:{
+            id: authUser.value.id,
+            name: authUser.value.name,
+            thumbnail: authUser.value.thumbnail
+          }
         });
          ev.target.value='';
      }).catch(()=>{
@@ -194,7 +193,7 @@ function commentsHandle(){
         <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
       <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.view_quote_exact') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <button  @click="deleteQuote(currentId)" class="absolute top-1/2 left-[3.6rem] flex items-center gap-[1rem] cursor-pointer">
+      <button v-show="userEligibilityForChange"  @click="deleteQuote(currentId)" class="absolute top-1/2 left-[3.6rem] flex items-center gap-[1rem] cursor-pointer">
         <delete-trash></delete-trash>
         <p class="text-[#CED4DA] text-[1.6rem]">{{ $t('newsFeed.delete') }}</p>
       </button>
@@ -206,16 +205,16 @@ function commentsHandle(){
       </div>
       
 
-      <addmovie-input :disabled="userEligibilityForChange==null" :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input :disabled="userEligibilityForChange==null" :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :disabled="!userEligibilityForChange" :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :disabled="!userEligibilityForChange" :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       <div class="w-[100%] h-[45rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
-        <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
+        <div v-if="userEligibilityForChange" class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
           <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">{{ $t('newsFeed.change_photo') }}</p>
         </div>
         <img v-if="!imageDisplay" src="/src/assets/TenenbaumsMovie.png" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
         <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
-      <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
+      <input v-if="userEligibilityForChange" @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
       <div class="w-[100%] border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
       <div class="flex items-center justify-start gap-[2.4rem] mt-[0.5rem] self-start ">
@@ -239,7 +238,7 @@ function commentsHandle(){
         </div>
         </div>
 
-      <basic-button :disabled="userEligibilityForChange==null" type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1.6rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.save_changes') }}</basic-button>
+      <basic-button :disabled="!userEligibilityForChange" type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[1.6rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.save_changes') }}</basic-button>
      </Form>
 
      </div>

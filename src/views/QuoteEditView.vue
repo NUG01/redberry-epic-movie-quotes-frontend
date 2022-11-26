@@ -18,8 +18,6 @@ import { useUserStore } from '@/stores/UserStore.js';
 
 
 
-
-
 export default {
   name:'EditQuote',
   emits:['emit-close'],

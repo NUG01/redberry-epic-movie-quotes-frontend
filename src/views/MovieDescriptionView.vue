@@ -15,7 +15,6 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
-import { useMoviesStore } from '@/stores/MoviesStore.js';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 

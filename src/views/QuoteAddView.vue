@@ -37,9 +37,8 @@ export default {
    const genres=ref([])
    const dataIsFetched=ref(false)
 
+  currentId.value=props.id
 
-
-   currentId.value=props.id
 onMounted(async ()=>{
   authUser.value=login.getUserData
   const res = await axios.get(`movie/${props.id}`);
@@ -49,7 +48,6 @@ onMounted(async ()=>{
   dataIsFetched.value=true
 
 })
-
 
    function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
@@ -75,7 +73,6 @@ onMounted(async ()=>{
   
     }
   
-
 
     return {
     imageDisplay, 

@@ -29,11 +29,7 @@ export default {
 
   
   onMounted(async ()=>{
-    const resComments= await axios.get(`comments`);
-    const resLikes= await axios.get(`likes`);
-    likesData.value = resLikes.data;
-    commentsData.value = resComments.data;
-    quotesData.value = quotes;
+    quotesData.value = props.quotes;
     dataIsFetched.value=true;
 })
   
@@ -47,22 +43,15 @@ export default {
   detailsModal.value=id
   }
 
-  function commentsQuantity(quote_id){
-    return commentsData.value.filter(x => x.quote_id == quote_id).length
-  }
-  function likesQuantity(quote_id){
-   return likesData.value.filter(x => x.quote_id == quote_id).length
-  }
-
  async function deleteQuote(id){
    await axios.delete(`quotes/${id}`)
     .catch((err)=>{
       alert('Something went wrong!')
     })
     dataIsFetched.value=false;
-    const resQuotes=await axios.get(`quotes/${currentId}`);
-    quotesData.value = resQuotes.data;
-    context.emit('quotesQuantity', resQuotes.data)
+    const resQuotes = await axios.get(`movie/${currentId}`);
+    quotesData.value = resQuotes.data.quotes;
+    context.emit('quotesQuantity', resQuotes.data.quotes)
     dataIsFetched.value=true;
   }
 
@@ -72,8 +61,6 @@ export default {
     deleteQuote,
     detailsModal,
     dataIsFetched,
-    commentsQuantity,
-    likesQuantity
   }
     }
 
@@ -111,11 +98,11 @@ export default {
                 </div>
               <div class="flex items-center gap-[3.2rem] mt-[2.4rem]">
                 <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">{{ commentsQuantity(quote.id) }}</span>
+                  <span class="text-[2rem] text-[#fff]">{{ quote.comments.length }}</span>
                   <description-comment></description-comment>
                 </div>
                 <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">{{ likesQuantity(quote.id) }}</span>
+                  <span class="text-[2rem] text-[#fff]">{{ quote.likes.length }}</span>
                   <heart-icon></heart-icon>
                </div>
               </div>
