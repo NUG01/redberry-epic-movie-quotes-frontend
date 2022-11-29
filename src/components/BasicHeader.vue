@@ -1,78 +1,58 @@
 <script>
 import { ref, onMounted } from "vue";
-import DropdownArrow from "@/components/icons/DropdownArrow.vue";
 import NotificationIcon from "@/components/icons/NotificationIcon.vue";
 import BasicButton from "@/components/BasicButton.vue";
+import LanguageDropdown from "@/components/LanguageDropdown.vue";
 import { useUserStore } from '@/stores/UserStore.js';
+import HeaderMenu from "@/components/icons/HeaderMenu.vue";
 import NotificationComment from "@/components/icons/NotificationComment.vue";
 import NotificationLike from "@/components/icons/NotificationLike.vue";
+import BasicNavigation from "@/components/BasicNavigation.vue";
+import NotificationsModal from "@/components/NotificationsModal.vue";
 import axios from "@/config/axios/index.js";
 import { useRouter } from 'vue-router';
 import { useAuthStore } from "@/stores/AuthStore.js";
-import moment from 'moment'
-import ka from "moment/dist/locale/ka"
+import SearchIcon from "@/components/icons/HeaderSearch.vue";
+import SearchArrow from "@/components/icons/SearchArrow.vue";
+import BellIcon from "@/components/icons/BellIcon.vue";
 
 
 
 
 
 export default {
-  components:{DropdownArrow,BasicButton, NotificationIcon, NotificationComment, NotificationLike},
-  setup(){
+  emits:['closeMenu', 'logoutMenu', 'notificationLength'],
+  props:['search'],
+  components:{LanguageDropdown,BasicButton,NotificationsModal, NotificationIcon, NotificationComment, NotificationLike, HeaderMenu, BasicNavigation, SearchIcon, BellIcon, SearchArrow},
+  setup(props, context){
 
     const login=useUserStore();
     const router = useRouter();
     const authStore = useAuthStore();
 
+    const search=props.search
 
-    const langActive=ref(false);
+
     const notificationModal=ref(false);
-    const notifications=ref([])
+    const valuesFetched=ref(false);
+    const sideMenuShow=ref(false);
+    const searchShow=ref(false);
     const notificationsLength=ref(null)
     const user=ref([])
-    const valuesFetched=ref(false)
-    const oldValue=ref([])
-
-     function now(date, locale){
-      locale=='ka'? moment.locale('ka', ka) : moment.locale('en')
-      return moment(date).fromNow()
-    }
-
-    onMounted(async ()=>{
-      user.value=login.getUserData
-      const resLikes= await axios.get(`notifications/${login.getUserData.id}/likes`);
-      const resComments= await axios.get(`notifications/${login.getUserData.id}/comments`);
-      notifications.value=resLikes.data.concat(resComments.data)
-      notifications.value=notifications.value.filter(x => x.user_id != user.value.id)
-      notifications.value.sort(function(a, b) {
-       return (a.created_at < b.created_at) ? 1 : ((a.created_at > b.created_at) ? -1 : 0);
-      });
-      oldValue.value=resLikes.data.concat(resComments.data)
-      valuesFetched.value=true
-      
-      window.Echo.channel('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
-              let data=e.notification.data
-              data.user=e.notification.user
-              if(e.notification.data.user_id!=user.value.id){
-                notifications.value.unshift(data)
-                notificationsLength.value++
-              }
-          })
-      
-    })
 
 
-      function langDropDown(){
-        langActive.value=!langActive.value;
-        setTimeout(function(){
-          langActive.value=false
-        }, 1800);
+onMounted(()=>{
+  user.value=login.getUserData
+  valuesFetched.value=true
 
-      }
+})
 
       function notificationShow(){
         notificationModal.value=!notificationModal.value
         notificationsLength.value=0
+      }
+      function notificationLength(){
+        notificationsLength.value++
       }
 
      async function logoutHandle(){
@@ -81,21 +61,33 @@ export default {
      router.push({ name: 'landing'})
     }
 
-    function newColor(notification){
-      return oldValue.value.find(x => x.id == notification.id) ? false : true
+
+    function sideMenuOpen(){
+      sideMenuShow.value=true
+    }
+    function searchSubmit(locale, event){
+      const payload={
+        locale:locale,
+        event:event
+      }
+        context.emit('headerSearch', payload)
+        searchShow.value=false
     }
 
         return {
-        langDropDown,
-        active: langActive,
         logoutHandle,
         notificationModal,
         notificationShow,
-        notifications,
-        now,
         notificationsLength,
-        newColor,
+        notificationLength,
         valuesFetched,
+        sideMenuOpen,
+        sideMenuShow,
+        user,
+        search,
+        searchSubmit,
+        searchShow,
+        
         
         
         }
@@ -107,68 +99,36 @@ export default {
 
 
 <template>
-<div class="relative w-[100vw] h-[8rem] flex items-center justify-center bg-[#222030]">
+<div class="relative w-[100vw] h-[8rem] md:h-[7rem] flex items-center justify-center bg-[#222030]">
+  <div v-if="valuesFetched" class="hidden -translate-x-full md:translate-x-0 absolute top-0 left-0 w-[100vw] min-h-[100vh] bg-[#11101A] md:block z-40" v-show="sideMenuShow">
+      <basic-navigation @close-menu="sideMenuShow=false" @logout-menu="logoutHandle" :user="user" feed="#fff" movies="#fff" profile="border-none" medium="mt-[4.5rem]" :logout="true"></basic-navigation>
+    </div>
   <div class="absolute top-0 left-0 w-[100vw] z-10">
-  <header class="absolute top-0 left-0 w-[100%] h-[auto] px-[7rem] flex items-center justify-between py-[2rem]">
-    <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA]">movie quotes</div>
+  <header class="absolute top-0 left-0 w-[100%] h-[auto] px-[7rem] lg:pr-[5rem] lg:pl-[5rem] md:pr-[5rem] md:pl-[3rem] md:px-0 flex items-center justify-between py-[2rem]">
+    <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA] md:hidden">movie quotes</div>
+    <div class="hidden md:block" @click="sideMenuOpen"><header-menu></header-menu></div>
     <div class="flex gap-[1.6rem]">
-      <div class="flex items-center justify-center relative">
-        <div v-if="notificationModal" class="triangle absolute top-[105%] right-[0.75rem]"></div>
-      <div v-if="notificationModal" class="absolute top-[6.5rem] right-[-415%] bg-red-500 min-w-[40vw] max-h-[50vh] overflow-scroll scrollHide">
-        <div class="bg-[#000] px-[4rem] py-[2rem]">
-          <div class="flex items-end justify-between mb-[2.4rem]">
-            <p class="text-[2.4rem] text-[#fff] font-medium">{{ $t('newsFeed.notifications') }}</p>
-            <p class="text-[1.6rem] text-[#fff] font-normal cursor-pointer">{{ $t('newsFeed.mark_as_read') }}</p>
+      <div class="flex items-center justify-center relative md:static md:w-[100%]">
+        <div v-show="searchShow" class="absolute top-0 left-0 bg-[#11101A] w-[100vw] h-[80vh] z-50 hidden md:block">
+          <div class="w-[100%] border-b border-b-[#ffffff4e] border-b-solid flex items-center gap-[2.4rem] py-[1.8rem] px-[3.2rem]">
+            <search-arrow @click="searchShow=false"></search-arrow>
+          <input @keydown.enter.prevent="searchSubmit($i18n.locale,$event)" type="text" :placeholder="$t('newsFeed.search')" class="w-[100%] pr-[1rem] bg-inherit"/>
           </div>
-
-         
-          <div class="flex flex-col justify-center gap-[2rem]">
-            <div v-for="notify in notifications" :key="notify" class="border border-solid border-[#6d767e80] p-[1.6rem] flex items-center gap-[1.6rem] rounded-[4px]">
-              <div>
-                <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]" :class="[newColor(notify) ? 'border-[2px] border-solid border-[#198754]' : '']">
-              </div>
-              <div class="flex flex-col items-start gap-[1rem] w-[100%]">
-                <div class="flex items-center justify-between w-[100%]">
-                <p class="text-[2.4rem] text-[#fff] font-normal">{{ notify.user.name }}</p>
-                <p class="text-[1.6rem] text-[#D9D9D9] font-normal">{{now(notify.created_at, $i18n.locale)}}</p>
-                </div>
-                <div class="flex items-center justify-between w-[100%]">
-                <router-link v-if="notify.body!=null" :to="{ name: 'quote-details', params:{id: notify.quote_id} }">
-                  <div class="flex items-center justify-between gap-[1rem]">
-                  <notification-comment></notification-comment>
-                  <p class="text-[1.6rem] text-[#CED4DA] font-normal">{{ $t('newsFeed.commented') }}</p>
-                 </div>
-                 </router-link>
-                <router-link v-if="notify.body==null" :to="{ name: 'quote-details', params:{id: notify.quote_id} }">
-                <div class="flex items-center justify-between gap-[1rem]">
-                  <notification-like></notification-like>
-                  <p class="text-[1.6rem] text-[#CED4DA] font-normal">{{ $t('newsFeed.liked') }}</p>
-                </div>
-                 </router-link>
-                <div v-if="valuesFetched" class="text-[#198754] text-[1.6rem]" v-show="newColor(notify)">{{ $t('newsFeed.new') }}</div>
-                </div>
-              </div>
-            </div>
-            </div>
+          <div class="flex flex-col justify-center gap-[2rem] mt-[2.4rem] pl-[7rem]">
+            <p class="text-[#CED4DA] text-[1.6rem]">Enter <span class="text-[#fff]">@</span> to search movies</p>
+            <p class="text-[#CED4DA] text-[1.6rem]">Enter <span class="text-[#fff]">#</span> to search quotes </p>
           </div>
-
-      </div>
+        </div>
+        <notifications-modal @notification-length="notificationLength" :modalShow="notificationModal"></notifications-modal>
         <div v-if="notificationsLength>0" class="cursor-pointer z-50">
-        <div @click="notificationShow" class="bg-[#E33812] w-[25px] h-[25px] rounded-[100%] absolute right-0 top-0 -translate-x-[50%] -translate-y-[9%]"><span class="absolute text-[1.6rem] text-[#fff] font-medium right-1/2 translate-x-1/2">{{ notificationsLength }}</span></div>
+        <div @click="notificationShow" class="bg-[#E33812] w-[25px] h-[25px] md:w-[20px] md:h-[20px] rounded-[100%] absolute right-0 top-0 -translate-x-[50%] -translate-y-[9%] md:top-[20%] md:translate-y-[12%] md:right-[5%]"><span class="absolute text-[1.6rem] md:text-[12px] text-[#fff] font-medium right-1/2 translate-x-1/2">{{ notificationsLength }}</span></div>
         </div>
-      <notification-icon @click="notificationShow" class="mr-[2.4rem] hover:cursor-pointer z-40"></notification-icon>
+        <search-icon @click="searchShow=true" v-show="search" class="hidden md:block translate-x-full"></search-icon>
+      <notification-icon @click="notificationShow" class="mr-[2.4rem] hover:cursor-pointer z-40 md:hidden"></notification-icon>
+      <bell-icon @click="notificationShow" class="mr-[2.4rem] hidden md:block hover:cursor-pointer z-40 md:translate-x-[150%]"></bell-icon>
       </div>
-      <div class="mr-[2.4rem] relative flex items-center justify-center">
-        <div @click="langDropDown" class="flex items-center justify-center gap-[1rem] cursor-pointer">
-        <p class="text-[1.6rem] text-[white]">{{ $i18n.locale=='en'? 'Eng' : 'Ka' }}</p>
-      <dropdown-arrow></dropdown-arrow>
-        </div>
-      <div class="absolute top-full left-0 bg-[#222030] border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
-          <div @click="$i18n.locale='en'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] px-[5px] py-[4px]">Eng</p></div>
-          <div @click="$i18n.locale='ka'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] px-[5px] py-[4px]">Ka</p></div>
-      </div>
-      </div>
-      <button @click="logoutHandle" type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] hover:bg-[#cdc9c2] hover:text-[#222030] font-medium active:bg-[#b6b1a8] disabled:bg-[#e6e2da] focus:bg-[#a5a199] focus:text-[#222030]">{{ $t('newsFeed.logout') }}</button>
+      <language-dropdown></language-dropdown>
+      <button @click="logoutHandle" type="button" class="md:hidden text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] hover:bg-[#cdc9c2] hover:text-[#222030] font-medium active:bg-[#b6b1a8] disabled:bg-[#e6e2da] focus:bg-[#a5a199] focus:text-[#222030]">{{ $t('newsFeed.logout') }}</button>
     </div>
   </header>
 </div>
@@ -179,21 +139,17 @@ export default {
 
 
 <style scoped>
-
-.lang{
-  color:#cdc9c2;
-  height: auto !important;
-  display: block !important;
+input {
+ border:none;
+ outline: none;
+ background: none;
+ font-weight: 400;
+ color: #fff;
+ font-size: 1.6rem;
 }
-.triangle {
-   width: 0px;
-   height: 0px;
-   border-style: solid;
-   border-width: 0 30px 60px 30px;
-   border-color: transparent transparent #000000 transparent;
-   transform: rotate(0deg);
-}
-.scrollHide::-webkit-scrollbar {
-    display: none;
+input::placeholder {
+  font-weight: 400;
+  color: #fff;
+  font-size: 1.6rem;
 }
 </style>

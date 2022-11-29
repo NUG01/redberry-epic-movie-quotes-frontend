@@ -102,15 +102,15 @@ onMounted(async ()=>{
 <template>
 <div>
 <loading-spinner texts="hidden" location="pt-[35rem] bg-[#181623]" v-if="!dataIsFetched"></loading-spinner>
-  <div v-else class="main w-[100vw] min-h-[100vh]">
+  <div v-else class="main w-[100vw] min-h-[100vh] md:overflow-y-scroll">
     <div @click="router.go(-1)" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
-     <div class="absolute w-[45%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
+     <div class="absolute w-[45%] md:w-[100%] md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.edit_quote') }}</p>
+      <p class="text-[2.4rem] md:text-[2rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.edit_quote') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <div @click="deleteQuote" class="absolute top-1/2 left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
+      <div @click="deleteQuote" class="absolute top-1/2 md:top-1/2 md:-translate-y-[25%] left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
         <delete-trash></delete-trash>
-        <p class="text-[#CED4DA] text-[1.6rem]">{{ $t('newsFeed.delete') }}</p>
+        <p class="text-[#CED4DA] text-[1.6rem] md:hidden">{{ $t('newsFeed.delete') }}</p>
       </div>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
@@ -123,7 +123,7 @@ onMounted(async ()=>{
       <addmovie-input :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
       <addmovie-input :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       
-      <div class="w-[100%] h-[45rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
+      <div class="w-[100%] h-[45rem] md:h-[27rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
           <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">{{ $t('newsFeed.change_photo') }}</p>

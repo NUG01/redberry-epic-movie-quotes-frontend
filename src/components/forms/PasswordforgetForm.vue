@@ -40,7 +40,7 @@ export default {
 
 
 <template>
-   <Form @submit="onSubmit" class="w-[36rem]">
+   <Form @submit="onSubmit" class="w-[36rem] sm:w-[32rem]">
       <basic-input rules='required|email|email_valid' name="email" type="email" placeholder="Enter your email" label="Email"/>      
       <div id="div" v-if="errors.length>0">
       <div @click="deleteError" class="cursor-pointer bg-[#dcb9bb] text-[#222030] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><div class="flex items-center justify-between"><p>{{ errors[0] }}</p><invalid-icon/></div></div>

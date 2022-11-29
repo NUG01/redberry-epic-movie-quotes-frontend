@@ -119,9 +119,9 @@ export default {
 <template>
 <div v-if="dataIsFetched">
   <div @click="closePostModal" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
-     <div class="absolute w-[45%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
+     <div class="absolute w-[45%] md:w-[100vw] md:min-h-[100vh] top-1/2 left-1/2 md:top-0 md:left-0 md:-translate-x-0 md:-translate-y-0 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.write_new_quote') }}</p>
+      <p class="text-[2.4rem] md:text-[2.2rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.write_new_quote') }}</p>
       <close-icon @click="closePostModal" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
     </div>
    <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
@@ -138,16 +138,16 @@ export default {
       <div class="w-[100%] h-[100%] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit">
         <div class="flex items-center gap-[1.2rem]">
           <camera-icon></camera-icon>
-          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>{{ $t('newsFeed.drag_and_drop') }} <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span></p></div>
+          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px] md:z-30"><p>{{ $t('newsFeed.drag_and_drop') }} <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span></p></div>
         </div>
-        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] rounded-[5px] absolute top-0 right-0" />
+        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] md:max-w-[45%] rounded-[5px] absolute top-0 right-0" />
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
       <div @click="openSelectModal" class="w-[100%] h-[100%] relative py-[2.5rem] px-[2.4rem] rounded-[5px] bg-[#000] cursor-pointer">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-[1.2rem]">
           <addquote-camera></addquote-camera>
-          <div class="text-[2.4rem] text-[#fff] font-normal flex items-center gap-[2rem]"><p>{{ $t('newsFeed.choose_movie') }}</p><span v-show="movieChoosen" class="bg-[#9747ff36] rounded-[2px] p-[1rem] text-[2.4rem]">{{$i18n.locale=='en'? movieName.en : movieName.ka}}</span></div>
+          <div class="text-[2.4rem] md:text-[1.8rem] text-[#fff] font-normal flex items-center gap-[2rem]"><p>{{ $t('newsFeed.choose_movie') }}</p><span v-show="movieChoosen" class="bg-[#9747ff36] rounded-[2px] p-[1rem] text-[2.4rem] md:text-[1.8rem]">{{$i18n.locale=='en'? movieName.en : movieName.ka}}</span></div>
           </div>
           <div>
           <addquote-arrow></addquote-arrow>

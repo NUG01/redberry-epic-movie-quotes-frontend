@@ -47,7 +47,7 @@ export default {
 
 
 <template>
-   <Form @submit="onSubmit" class="w-[36rem]">
+   <Form @submit="onSubmit" class="w-[36rem] sm:w-[32rem]">
       <basic-input rules='required|min:8|max:15|lower_case' name="password" type="password" placeholder="At least 8 & max.15 lower case characters" label="Password"/>
       <basic-input rules='required|confirmed:@password' name="confirm_password" type="password" placeholder="Confirm password" label="Confirm password"/>
        <div id="div" v-if="errors.length>0">

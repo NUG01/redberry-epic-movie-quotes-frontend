@@ -93,11 +93,11 @@ onMounted(async ()=>{
 
 <template>
 <loading-spinner texts="hidden" location="pt-[35rem] bg-[#181623]" v-if="!dataIsFetched"></loading-spinner>
-  <div v-else class="main w-[100vw] min-h-[100vh]">
+  <div v-else class="main w-[100vw] min-h-[100vh] md:overflow-y-scroll">
     <div @click="router.go(-1)" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50"></div>
-     <div class="absolute w-[52%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
+     <div class="absolute w-[52%] md:w-[100vw] md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 md:min-h-[100vh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.add_quote_exact') }}</p>
+      <p class="text-[2.4rem] md:txt-[2rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.add_quote_exact') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
@@ -106,16 +106,16 @@ onMounted(async ()=>{
         <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
         <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
       </div>
-       <div class="flex items-center gap-[3rem]">
+       <div class="flex items-center gap-[3rem] md:gap-[1.2rem]">
           <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[12px] w-[30%] inline-block"/>
-          <div class="flex flex-col justify-center gap-[2.4rem]">
-            <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
-              <div class="flex items-center gap-[8px]">
-              <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
+          <div class="flex flex-col justify-center gap-[2.4rem] md:gap-0">
+            <p class="text-[2.4rem] md:text-[1.6rem] md:order-1 text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
+              <div class="flex items-center gap-[8px] md:gap-[5px] md:order-3">
+              <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] md:text-[1.4rem] px-[10px] py-[2px] md:px-[7px] md:py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
             </div>
-            <div class="flex items-center gap-[1rem]">
-              <p class="text-[#CED4DA] text-[1.8rem] font-bold">{{ $t('newsFeed.director') }}:</p>
-              <p class="text-[#fff] text-[1.8rem] font-medium">{{ $i18n.locale=='en'? movie.director.en : movie.director.ka }}</p>
+            <div class="flex items-center gap-[1rem] md:order-2 md:mb-[0.7rem]">
+              <p class="text-[#CED4DA] text-[1.8rem] md:text-[1.6rem] font-bold">{{ $t('newsFeed.director') }}:</p>
+              <p class="text-[#fff] text-[1.8rem] md:text-[1.6rem] font-medium">{{ $i18n.locale=='en'? movie.director.en : movie.director.ka }}</p>
             </div>
           </div>
        </div>
@@ -127,9 +127,15 @@ onMounted(async ()=>{
       <div class="w-[100%] h-[100%] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit mt-[2rem]">
         <div class="flex items-center gap-[1.2rem]">
           <camera-icon></camera-icon>
-          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>{{ $t('newsFeed.drag_and_drop') }} <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span></p></div>
+          <div class="md:hidden text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>{{ $t('newsFeed.drag_and_drop') }}
+             <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span>
+             </p></div>
+             <div class="hidden md:block text-[#fff] text-[1.6rem] flex items-center justify-between">
+             <span class="md:z-40">{{ $t('newsFeed.upload_image') }}</span> 
+          <span class="bg-[#9747ff36] rounded-[2px] p-[1rem] ml-[3rem]">{{ $t('newsFeed.choose_file') }}</span>
+             </div>
         </div>
-        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] rounded-[5px] absolute top-0 right-0" />
+        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] md:max-w-[45%] md:z-30 rounded-[5px] absolute top-0 right-0" />
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
 

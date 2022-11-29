@@ -1,6 +1,7 @@
 <script>
 import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted, ref } from "vue";
+import { Form, Field } from "vee-validate";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -16,8 +17,8 @@ import { useAuthStore } from "@/stores/AuthStore.js";
 
 export default {
   name:'NewsFeed',
-  emits:['likedStatus', 'addpostClose', 'updateQuotes'],
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm},
+  emits:['likedStatus', 'addpostClose', 'updateQuotes', 'headerSearch'],
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field},
   
   setup(){
 
@@ -62,16 +63,15 @@ export default {
 
 
     function commentSubmit(quote, event){
-    if(event.target.value==''){
-      return
-    }else{
+      console.log(event)
+    let commentValue=event.comment
       axios.post('comments',{
-        body: event.target.value,
+        body: commentValue,
         quote_id: quote.id,
         user_id: user.value.id
      }).then((res)=>{
         quoteData.value.find(x => x.id ==quote.id).comments.push({
-          body:event.target.value,
+          body:commentValue,
           user_id:user.value.id,
           quote_id: quote.id,
           user:{
@@ -80,12 +80,12 @@ export default {
           },
 
         });
-         event.target.value='';
+
+         document.getElementById('comment'+quote.id).value=''
          showComments.value=quote.id
      }).catch(()=>{
       alert('Something went wrong')
      })
-    }
     
   }
 
@@ -126,9 +126,10 @@ export default {
     quotesList.value=data
   }
 
-  function searchSubmit(locale, ev){
+  function searchSubmit(payload){
+    const locale=payload.locale
+    let target=payload.event.target.value
     quotesList.value=quoteData.value
-    let target=ev.target.value
     if(target==''){
       quotesList.value=quoteData.value
     }
@@ -199,6 +200,10 @@ export default {
       return object.en
     }
    }
+
+   function submitComment(quote){
+       document.getElementById('submitComment'+quote.id).click();
+   }
  
 
 
@@ -229,7 +234,8 @@ return {
        searchActivated,
        searchClicked,
        updateQuotesIntoArray,
-       searchSubmit
+       searchSubmit,
+       submitComment,
        
     
        }
@@ -242,39 +248,39 @@ return {
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
 <div class="fixed z-50">
-  <basic-header></basic-header>
+  <basic-header @header-search="searchSubmit" search="search"></basic-header>
   </div>
-  <div class="w-[100vw] h-[8rem]"></div>
+  <div class="w-[100vw] h-[8rem] md:h-[7rem]"></div>
 
   <main class="w-[100%] h-[93%]">
-    <div class="fixed">
+    <div class="fixed md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
     </div>
-    <div class="w-[100%] h-[100%] min-w-[32rem]"></div>
+    <div class="w-[100%] h-[100%] min-w-[32rem] md:hidden"></div>
     
     <loading-spinner bgColor="bg-none" v-if="!feedDataIsFetched" texts="hidden" location="pt-[35rem]"></loading-spinner>
 
     <div v-else class="bg-gray min-w-[36vw]">
       <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
-      <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
-        <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
-      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem] overflow-hidden"></textarea> 
-        <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
+      <div class="mt-[3.2rem] md:mt-[1.6rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
+        <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden md:w-[100%] md:flex md:items-center md:justify-center" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
+      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] md:bg-inherit md:w-[85%] pr-[2.5rem] pl-[5.6rem] md:pl-[3.6rem] py-[1rem] overflow-hidden"></textarea> 
+        <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 md:translate-x-full hover:cursor-pointer"></pencil-icon>
         </div>
 
-      <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']">
+      <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']" class="md:hidden">
         <div  class="flex items-center gap-[1.6rem] pb-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']">
        <search-icon></search-icon>
-        <input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
+        <input @keydown.enter.prevent="searchSubmit({locale:$i18n.locale, event:$event})" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
         </div>
       </div>
       </div>
-      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
+      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] md:w-[100vw] lg:w-[61rem] llg:w-[72rem] xl:w-[87rem] xxl:w-[94rem] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
         <div class="flex items-center justify-start gap-[1.6rem]">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <p class="text-[2rem] text-[#fff]">{{ quote.user.name }}</p>
+          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+          <p class="text-[2rem] md:text-[1.8rem] text-[#fff]">{{ quote.user.name }}</p>
         </div>
-        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote)) }}</span></p>
+        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] md:text-[1.6rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote)) }}</span></p>
         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
         <img src="/src/assets/InterstellarMovie.png" class="rounded-[10px]"/>
         <div class="flex items-center justify-start gap-[2.4rem] mt-[2.4rem]">
@@ -283,7 +289,7 @@ return {
         </div>
         </div>
       <div>
-        <div v-if="showComments==quote.id">
+        <div v-if="showComments==quote.id" class="max-h-[50rem] overflow-y-scroll scrollbarHide">
         <div v-for="comment in quote.comments" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
@@ -292,10 +298,11 @@ return {
          </div>
         </div>
         </div>
-        <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea @keydown.enter.prevent="commentSubmit(quote, $event)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
-        </div>
+        <Form @submit="commentSubmit(quote, $event)" class="mt-[2.4rem] gap-[2.4rem] flex items-center">
+          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+          <Field rules="required" :id="'comment'+quote.id" name="comment" as="textarea" @keydown.enter.prevent="submitComment(quote)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[89%] max-w-[89%] min-h-[5.2rem] max-h-[5.2rem] md:min-w-[81%] md:max-w-[81%] md:min-h-[4rem] md:max-h-[4rem] bg-[#24222F] px-[2.5rem] py-[1rem] md:px-[1.6rem] md:py-[0.5rem]"></Field>
+          <button type="submit" :id="'submitComment'+quote.id" class="w-0 h-0 opacity-0 absolute -top-full -left-full"></button>
+        </Form>
       </div>
     </div>
       </div>
@@ -313,6 +320,26 @@ return {
 main{
   display: grid;
   grid-template-columns: 1.2fr auto 1fr;
+}
+@media (max-width: 920px) {
+  main{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .scrollbar::-webkit-scrollbar{
+display: none;
+  }
+  .scrollbar:hover{
+    scrollbar-width: none;
+  }
+  .scrollbar::-webkit-scrollbar-thumb {
+    display: none;
+
+  }
+  textarea::placeholder, textarea {
+    font-size:1.6rem;
+  }
+  
 }
 .backdrop{
   backdrop-filter: blur(25px);
@@ -369,6 +396,17 @@ input {
 
 .scrollbar::-webkit-scrollbar-thumb {
   background: #222030;
+  border-radius: 0 0 0 0;
+        }
+.scrollbarHide::-webkit-scrollbar {
+  width: 0; 
+ display: none;
+}
+  .scrollbarHide{
+          scrollbar-width: none;
+
+        }
+.scrollbarHide::-webkit-scrollbar-thumb {
   border-radius: 0 0 0 0;
         }
 </style>

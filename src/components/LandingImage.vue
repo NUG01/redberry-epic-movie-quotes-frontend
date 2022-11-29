@@ -24,11 +24,11 @@ setup(props, context){
 <template>
   <div class="w-[100%] h-[100vh] relative backImg" :class="image">
     <div class="absolute top-0 left-0 h-[100%] w-[100%] z-10" :class="gradient">
-   <div class="h-[auto] w-[60%] custom-grid ml-[5%] gap-[1.6rem]" :class="margintop">
-       <div class="w-[5rem] h-[4.5rem] flex items-end"><div class="h-[2px] w-[100%] bg-white text-[white]"></div></div>
+   <div class="h-[auto] w-[60%] md:w-[82%] custom-grid ml-[5%] gap-[1.6rem]" :class="margintop">
+       <div class="w-[5rem] h-[4.5rem] flex items-end md:w-[1.8rem]"><div class="h-[2px] w-[100%] bg-white text-[white] md:self-start md:mt-[1.4rem]"></div></div>
        <div class="font-bold">
-        <p class="text-[5rem] text-[#ffffff]"><slot></slot></p>
-        <p class="text-[3rem] text-[#D9D9D9] mt-[1.6rem]"><slot name="movie"></slot></p>
+        <p class="text-[5rem] md:text-[2rem] text-[#ffffff]"><slot></slot></p>
+        <p class="text-[3rem] md:text-[1.6rem] text-[#D9D9D9] mt-[1.6rem]"><slot name="movie"></slot></p>
         </div>
     </div>
   </div>
