@@ -48,7 +48,7 @@ export default {
     
     
    onMounted(async()=>{
-    const res= await axios.get(`quote/${currentId}`);
+    const res= await axios.get(`quotes/${currentId}/details`);
     authUser.value=login.getUserData
     quoteData.value=res.data.quote
     likesData.value=res.data.likes
@@ -82,7 +82,7 @@ function deleteQuote(id){
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);
-      basicAxios.post('update-quote',form)
+      basicAxios.post('quotes',form)
       .then((res)=>{
         quoteUpdated.value=true
      })

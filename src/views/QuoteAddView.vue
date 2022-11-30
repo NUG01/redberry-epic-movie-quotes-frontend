@@ -41,10 +41,9 @@ export default {
 
 onMounted(async ()=>{
   authUser.value=login.getUserData
-  const res = await axios.get(`movie/${props.id}`);
+  const res = await axios.get(`movies/${props.id}/details`);
   movie.value=res.data.movie
   genres.value=res.data.genres
-  console.log(movie.value, genres.value)
   dataIsFetched.value=true
 
 })
@@ -63,7 +62,7 @@ onMounted(async ()=>{
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);
-      basicAxios.post('quotes',form)
+      basicAxios.post('quotes/create',form)
     .then((res)=>{
       router.push({ name: 'movie-description', params: { id: currentId.value } })
     })

@@ -53,7 +53,7 @@ export default {
       const form=new FormData();
       form.append('thumbnail', selectedFile.value);
       form.append('name', values.name);
-      basicAxios.post('update-profile',form)
+      basicAxios.post('user/profile',form)
     .then((res)=>{
      responseError.value=[];
      requestSuccess.value=true
@@ -70,7 +70,7 @@ export default {
       form.append('name', values.name);
       form.append('email', values.email);
       form.append('password', values.password);
-      basicAxios.post('update-profile',form)
+      basicAxios.post('user/profile',form)
     .then((res)=>{
       responseError.value=[];
       requestSuccess.value=true
@@ -152,8 +152,8 @@ return {
        </Form>
       </div>
       
-      <div v-if="!user.google_id"  class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
-        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] pb-[10%] flex flex-col items-center">
+      <div v-if="!user.google_id"  class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[55rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] lg:px-[15%] xl:px-[20%] pb-[10%] flex flex-col items-center">
           <div class="relative flex flex-col items-center justify-center inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>

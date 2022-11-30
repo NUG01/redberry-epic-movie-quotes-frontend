@@ -80,8 +80,8 @@ export default {
           },
 
         });
-
-         document.getElementById('comment'+quote.id).value=''
+         document.getElementsByName('comment').value=''
+        //  document.getElementById('comment'+quote.id).value=''
          showComments.value=quote.id
      }).catch(()=>{
       alert('Something went wrong')
