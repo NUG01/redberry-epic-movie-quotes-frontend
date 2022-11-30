@@ -96,26 +96,26 @@ return {
 <template>
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header class="z-50"></basic-header>
-  <main>
+  <main class="md:px-[3.2rem] md:w-[100vw]">
     <addmovie-form @update-movie="updateMovieList" @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
-    <div>
+    <div class="md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
     <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!moviesIsFetched"></loading-spinner>
-    <div v-else class="bg-gray h-[92.65vh] pr-[8rem] pt-[3rem]">
+    <div v-else class="bg-gray h-[92.65vh] pr-[8rem] xxl:pr-[8rem] xl:pr-[3rem] llg:pr-[3rem] lg:pr-[3rem] pt-[3rem] md:pr-[0px] md:pt-[3.5rem] md:w-[100%]">
       <div class="w-[100%] flex items-center justify-between mb-[5rem]">
-        <div class="text-[2.4rem] font-medium text-[#fff]">{{ $t('newsFeed.my_list_of') }}  ({{ $t('newsFeed.total') }} <span>{{ moviesList.length }}</span>)</div>
+        <div class="text-[2.4rem] md:text-[2.2rem] sm:text-[2rem] font-medium text-[#fff] total">{{ $t('newsFeed.my_list_of') }}<br class="hidden md:block">  <span class="md:text-[1.6rem] sm:text-[1.4rem]">({{ $t('newsFeed.total') }} <span>{{ moviesList.length }}</span>)</span></div>
         <div class="flex items-center justify-center gap-[3rem]">
-          <div class="text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem] border-b-[#6C757D] border-b border-b-solid pb-[0.9rem]"><search-icon></search-icon><input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :placeholder="$t('newsFeed.search')"/></div>
-          <basic-button @click="addMoviesModal=true" type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[4px]" width="w-[100%]">
+          <div class="md:hidden text-[2rem] text-[#CED4DA] flex items-center justify-center gap-[1.6rem] border-b-[#6C757D] border-b border-b-solid pb-[0.9rem] hide"><search-icon></search-icon><input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :placeholder="$t('newsFeed.search')"/></div>
+          <basic-button @click="addMoviesModal=true" type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] md:px-[12px] md:py-[px] rounded-[4px]" width="w-[100%]">
           <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_movie') }}</p></div></basic-button>
         </div>
       </div>
-      <div class="w-[100%] movies-grid h-[90.3%] overflow-y-scroll scrollHide pb-[1.5rem]">
+      <div class="w-[100%] md:w-[100%] movies-grid h-[90.3%] overflow-y-scroll scrollHide pb-[1.5rem]">
         <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesList" :key="movie.id">
           <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
-          <div class="flex items-center justify-start gap-[1.2rem] mt-[2px]">
+          <div class="flex items-center justify-start gap-[1.2rem] mt-[2px] md:mt-0">
             <span class="text-[2rem] font-medium text-[#fff]">{{ movie.quotes.length }}</span>
             <quote-icon></quote-icon>
           </div>
@@ -152,6 +152,71 @@ main{
 .scrollHide {
   scrollbar-width: none; 
 }
+@media (max-width: 1550px) {
+  .movies-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap:3.2rem;
+    row-gap:4.8rem;
+  }
+
+}
+@media (max-width: 1450px) {
+  .movies-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap:4rem;
+    row-gap:5rem;
+  }
+  main{
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+}
+
+@media (max-width: 1450px) {
+  .movies-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap:4rem;
+  row-gap:4rem;
+  }
+  main{
+  display: grid;
+  grid-template-columns: 1fr 2.1fr;
+}
+.total{
+  font-size: 1.8rem;
+}
+input::placeholder {
+  font-size: 1.8rem;
+}
+}
+@media (max-width: 1050px) {
+  main{
+  display: grid;
+  grid-template-columns: 1fr 1.8fr;
+}
+.movies-grid{
+    column-gap:4rem;
+  row-gap:0;
+  }
+.hide{
+  display: none;
+}
+}
+  @media (max-width: 920px) {
+    main{
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+  .movies-grid{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  
+    
+  }
 input {
  border:none;
  outline: none;

@@ -19,7 +19,8 @@ export default {
     rounded,
     text,
     width,
-    emitBase
+    emitBase,
+    
     }
   }
 }

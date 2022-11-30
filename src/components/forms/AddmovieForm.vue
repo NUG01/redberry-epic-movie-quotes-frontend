@@ -113,9 +113,9 @@ export default {
 <template>
 <div v-if="dataIsFetched" class="flex items-center justify-center">
 <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="emitClose"></div>
-    <div class="fixed w-[40%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
+    <div class="fixed md:overflow-y-scroll w-[40%] xl:w-[45%] lg:w-[60%] md:w-[100vw] md:h-[100vh] md:max-h-[100vh] top-1/2 left-1/2 md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
-      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ headerName }}</p>
+      <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem] md:text-[2rem]">{{ headerName }}</p>
       <close-icon @click="emitClose" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
     </div>
      <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
@@ -127,7 +127,7 @@ export default {
       <addmovie-input :value="name_en" rules="required|eng_alphabet" inputName="name_en" placeholder="Movie name" label="Eng" classLabel="top-1/2"></addmovie-input>
       <addmovie-input :value="name_ka" rules="required|geo_alphabet" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
       
-      <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
+      <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] md:text-[1.6rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
       <checkbox-input rules="required" v-for="(genre) in genres" :key="genre" :id="genre.id" :genreValue="genre.name"></checkbox-input>
       </div>
       
@@ -139,13 +139,19 @@ export default {
       <div class="w-[100%] h-[100%] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit">
         <div class="flex items-center gap-[1.2rem]">
           <camera-icon></camera-icon>
-          <div class="text-[2rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]"><p>{{ $t('newsFeed.drag_and_drop') }} <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span></p></div>
+          <div class="text-[2rem] md:text-[1.6rem] text-[#fff] font-normal flex items-center justify-start gap-[8px]">
+            <p class="md:flex md:items-center md:gap-[1rem]">
+              <span class="md:hidden">{{ $t('newsFeed.drag_and_drop') }}</span>
+              <span class="hidden md:block md:z-40">{{ $t('newsFeed.upload_image') }}</span> 
+          <span class="bg-[#9747ff36] rounded-[2px] p-[1rem]">{{ $t('newsFeed.choose_file') }}</span>
+          </p>
+          </div>
         </div>
-        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] max-w-[20%] rounded-[5px] absolute top-0 right-0" />
+        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] md:z-30 max-w-[20%] rounded-[5px] absolute top-0 right-0 md:max-w-[50%]" />
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
 
-      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[3.2rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.add_movie') }}</basic-button>
+      <basic-button type="submit" class="text-[#fff] text-[2rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[5px] mt-[3.2rem] md:mt-[1.6rem] mb-[1.8rem]" width="w-[100%]">{{ $t('newsFeed.add_movie') }}</basic-button>
      </Form>
     </div>
 </div>
@@ -165,4 +171,5 @@ export default {
 .scrollHide {
   scrollbar-width: none;  
 }
+
 </style>

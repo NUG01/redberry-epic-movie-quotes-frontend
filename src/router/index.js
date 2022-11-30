@@ -14,9 +14,9 @@ import MovieListView from "@/views/MovieListView.vue";
 import MovieDescriptionView from "@/views/MovieDescriptionView.vue";
 import OAuthLoginView from "@/views/OAuthLoginView.vue";
 import UpdateEmailView from "@/views/UpdateEmailView.vue";
-import QuoteDetailsView from "@/views/QuoteDetailsView.vue";
 import QuoteEditView from "@/views/QuoteEditView.vue";
 import QuoteAddView from "@/views/QuoteAddView.vue";
+import QuoteDetailsView from "@/views/QuoteDetailsView.vue";
 import { isAuthenticated, isLoggedIn } from "@/router/guards.js";
 
 const router = createRouter({

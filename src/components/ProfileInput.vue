@@ -12,6 +12,7 @@ export default {
 
 
   const rules=props.rules;
+  const disabled=props.disabled;
   const label=props.label;
   const inputName=props.name;
   const inputType=props.type;
@@ -67,7 +68,10 @@ export default {
       noState,
       validState,
       showPassword,
-      hidePassword};
+      hidePassword,
+      disabled
+      
+      };
   }
 }
 </script>
@@ -76,10 +80,10 @@ export default {
 
 <template>
   <div class="flex flex-col w-[100%] mb-[1.6rem] relative">
-    <label :for="inputName" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">{{ label }}</label>
+    <label :for="inputName" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem] md:mb-[0px]">{{ label }}</label>
     <div class="relative">
-    <Field @blur="stateChange" v-model="vModel" :rules="rules" :type="inputType" :name="inputName" :id="inputName" :placeholder="inputText"
-    class="border border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow font-medium disabled:bg-[#E9ECEF]"/>
+    <Field @blur="stateChange" v-model="vModel" :rules="rules" :class="disabled" :type="inputType" :name="inputName" :id="inputName" :placeholder="inputText"
+    class="md:bg-inherit md:text-[#fff] md:border-b md:border-b-solid md:border-b-[#ced4da80] md:border-x-0 md:border-t-0 border md:rounded-[0px] border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow font-medium disabled:bg-[#E9ECEF]"/>
     <password-hidden @mouseenter="showPassword" @mouseleave="hidePassword" v-if="inputType=='password' && (!noState && !validState)" class="absolute top-1/2 right-0 -translate-x-3/4 -translate-y-1/2"></password-hidden>
     <profileinvalid-icon v-if="noState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></profileinvalid-icon>
     <profilevalid-icon v-if="validState" class="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2"></profilevalid-icon>    
@@ -108,5 +112,16 @@ export default {
 }
  input:disabled::placeholder {
   color:  rgba(108, 117, 125, 0.3);
+}
+@media (max-width: 920px) {
+   input::placeholder {
+  font-weight: 400;
+  font-size: 1.6rem;
+  color:  #fff;
+}
+ input:disabled::placeholder {
+  color:  rgba(108, 117, 125, 0.3);
+}
+
 }
 </style>

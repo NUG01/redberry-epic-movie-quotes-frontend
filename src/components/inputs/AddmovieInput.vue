@@ -25,8 +25,8 @@ export default {
 
 <template>
 <div class="w-[100%] relative">
-  <label :for="inputName" class="text-[2rem] text-[#6C757D] absolute right-0 -translate-y-1/2 mr-[1rem]" :class="classLabel">{{ label }}</label>
-  <Field :value="value" :rules="rules" class="w-[100%] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] text-[#fff]"  
+  <label :for="inputName" class="text-[2rem] md:text-[1.6rem] text-[#6C757D] absolute right-0 -translate-y-1/2 mr-[1rem]" :class="classLabel">{{ label }}</label>
+  <Field :value="value" :rules="rules" class="w-[100%] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] md:text-[1.6rem] text-[#fff]"  
   :id="inputName"
   :name="inputName"
   :placeholder="placeholder"
@@ -46,10 +46,18 @@ export default {
   color:  #fff;
 }
  input:disabled::placeholder {
-  color:  rgb(113, 113, 113);
+   color:  rgb(113, 113, 113);
 }
 textarea {
   resize: none;
+}
+@media (max-width: 720px) {
+  input::placeholder,
+  textarea::placeholder {
+   font-size: 1.6rem;
+ }
+  
+  
 }
 
 </style>

@@ -15,7 +15,6 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
-import { useMoviesStore } from '@/stores/MoviesStore.js';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
@@ -120,7 +119,7 @@ quotes
   <div class="main w-[100vw] h-[100vh] relative main overflow-x-hidden">
   <basic-header></basic-header>
   <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
-  <main v-else>
+  <main v-else class="md:w-[100vw]">
   <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
@@ -131,17 +130,17 @@ quotes
   :id="currentId"
    ></addmovie-form>
 
-    <div>
+    <div class="md:hidden">
       <basic-navigation :user="authUser" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>
-    <div>
-      <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem]">{{ $t('newsFeed.movie_description') }}</div>
-      <div class="mt-[3rem] listGrid">
+    <div class="md:w-[100%] md:px-[3.2rem]">
+      <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem] md:hidden">{{ $t('newsFeed.movie_description') }}</div>
+      <div class="mt-[3rem] listGrid md:w-[100%]">
         
         <div class="w-[100%]">
           <div class="mb-[4rem]">
           <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>
-          <div class="mt-[4rem] flex items-center w-[55%]">
+          <div class="mt-[4rem] flex items-center w-[55%] xxl:w-[55%] xl:w-[65%] llg:w-[85%] lg:w-[110%] md:hidden">
             <div>
             <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">{{ $t('newsFeed.quotes') }} ({{ $t('newsFeed.total') }} <span>{{ quotesLength }}</span>)</p>
             </div>
@@ -152,12 +151,12 @@ quotes
             </div>
           </div>
           </div>
-            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :quotes="quotes" :id="currentId"></quote-list>
+            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :quotes="quotes" :id="currentId" class="md:hidden"></quote-list>
         </div>
         
-        <div class="h-[100%] pr-[8rem]">
-          <div class="mb-[3rem]">
-            <div class="mb-[2.4rem] flex items-center justify-between">
+        <div class="h-[100%] pr-[8rem] xxl:pr-[8rem] xl:pr-[4rem] llg:pr-[2rem] lg:pr-[1.2rem] md:pr-[1.2rem] md:mb-[5rem]">
+          <div class="mb-[3rem] md:mb-[2.4rem]">
+            <div class="mb-[2.4rem] md:mb-[1.6rem] flex items-center justify-between">
               <p class="text-[2.4rem] text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movieName.en : movieName.ka }}</p>
               <div class="flex items-center justify-center bg-[#24222F] px-[2.7rem] py-[1rem] rounded-[10px]">
                 <edit-pencil @click="addMoviesModal=true" class="mr-[2.5rem] cursor-pointer"></edit-pencil>
@@ -169,7 +168,7 @@ quotes
               <p v-for="genre in genres" :key="genre.id" class="font-semibold text-[#fff] text-[1.8rem] px-[10px] py-[2px] bg-[#6C757D] inline-block rounded-[4px]">{{ genre.name }}</p>
             </div>
           </div>
-          <div class="flex justify-center flex-col gap-[2rem] pl-[1.2rem]">
+          <div class="flex justify-center flex-col gap-[2rem] md:gap-[1.6rem] pl-[1.2rem]">
             <div class="flex items-center gap-[1rem]">
               <p class="text-[#CED4DA] text-[1.8rem] font-bold">{{ $t('newsFeed.director') }}:</p>
               <p class="text-[#fff] text-[1.8rem] font-medium">{{ $i18n.locale=='en'? movieData.director.en : movieData.director.ka }}</p>
@@ -177,8 +176,19 @@ quotes
             <p class="text-[#CED4DA] text-[1.8rem] font-normal">
              {{ $i18n.locale=='en'? movieData.description.en : movieData.description.ka }}
             </p>
+          <div class="mt-[4rem] hidden md:block flex flex-col items-center justify-center">
+            <div class="inline-block">
+            <router-link :to="{ name: 'quote-add', params: { id: currentId }}"><basic-button  type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[17px] py-[9px] rounded-[4px]" width="w-[100%]">
+          <div class="flex items-center justify-center gap-[8px]"><add-movie></add-movie><p>{{ $t('newsFeed.add_quote') }}</p></div></basic-button></router-link>
+            </div>
+            <div class="w-[100%] h-[1px] bg-[#6C757D] mt-[4rem] mb-[4rem]"></div>
+            <div>
+            <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">{{ $t('newsFeed.quotes') }} <span class="text-[1.8rem]">({{ $t('newsFeed.total') }} <span>{{ quotesLength }}</span>)</span></p>
+            </div>
+          </div>
           </div>
         </div>
+            <quote-list v-if="quotesLength>0" @quotes-quantity="updateQuantity" :quotes="quotes" :id="currentId" class="hidden md:block md:order"></quote-list>
       
       </div>
     </div>
@@ -202,6 +212,40 @@ main{
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   column-gap: 2rem;
+}
+@media (max-width: 1500px) {
+  main{
+    grid-template-columns: 1fr 2.7fr;
+  }
+  .listGrid{
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    column-gap:3.2rem; 
+    row-gap:4.8rem;
+  }
+
+}
+@media (max-width: 1200px) {
+  main{
+    grid-template-columns: 1fr 2fr;
+  }
+  .listGrid{
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    column-gap:2.4rem; 
+    row-gap:3.6rem;
+  }
+
+}
+   @media (max-width: 920px) {
+     main{
+       display: grid;
+  grid-template-columns: 1fr;
+     }
+   .listGrid{
+    display: grid;
+  grid-template-columns: 1fr;
+   }
 }
 
  .scrollbar::-webkit-scrollbar {

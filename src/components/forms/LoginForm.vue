@@ -59,7 +59,7 @@ window.location.href=import.meta.env.VITE_API_BASE_URL+'auth/google/redirect';
 
 
 <template>
-   <Form @submit="onSubmit" class="w-[36rem] mb-[3.2rem]">
+   <Form @submit="onSubmit" class="w-[36rem] sm:w-[32rem] mb-[3.2rem]">
       <basic-input rules='required|min:3' name="name" type="text" :placeholder="$t('landing.email_placeholder')" :label="$t('landing.email')"/>
       <basic-input rules='required' name="password" type="password" :placeholder="$t('landing.password_placeholder')" :label="$t('landing.password')"/>      
       <div class="flex mb-[1.6rem] mt-[1.6rem] justify-between">

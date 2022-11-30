@@ -1,6 +1,7 @@
 <script>
 import { useUserStore } from '@/stores/UserStore.js';
 import { onMounted, ref } from "vue";
+import { Form, Field } from "vee-validate";
 import { useRouter } from "vue-router";
 import BasicHeader from "@/components/BasicHeader.vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
@@ -16,8 +17,8 @@ import { useAuthStore } from "@/stores/AuthStore.js";
 
 export default {
   name:'NewsFeed',
-  emits:['likedStatus', 'addpostClose', 'updateQuotes'],
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm},
+  emits:['likedStatus', 'addpostClose', 'updateQuotes', 'headerSearch'],
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field},
   
   setup(){
 
@@ -46,22 +47,12 @@ export default {
 
     onMounted(async ()=>{
     const res= await axios.get('quotes');
-    const resMovies= await axios.get('movies');
-    const resComments= await axios.get(`comments`);
-    const resLikes= await axios.get(`likes`);
-    likesData.value=resLikes.data
-    likes.value=resLikes.data
+    likesData.value=res.data.likes
+    likes.value=res.data.likes
+    commentsData.value=res.data.comments
+    comments.value=res.data.comments
     quoteData.value=res.data
-    moviesData.value=resMovies.data
     quotesList.value=quoteData.value
-    for (let i = 0; i < resComments.data.length; i++) {
-      authors.value.push(resComments.data[i].user)
-      commentsData.value.push(resComments.data[i])
-      comments.value.push(resComments.data[i])
-    }
-    for (let i = 0; i < resMovies.data.length; i++) {
-      movieAuthors.value.push(resMovies.data[i].user)
-    }
     feedDataIsFetched.value=true
    })
 
@@ -71,36 +62,50 @@ export default {
     }
 
 
-    function commentSubmit(quote_id, event){
-    if(event.target.value==''){
-      return
-    }else{
+    function commentSubmit(quote, event){
+      console.log(event)
+    let commentValue=event.comment
       axios.post('comments',{
-        body: event.target.value,
-        quote_id: quote_id,
+        body: commentValue,
+        quote_id: quote.id,
         user_id: user.value.id
      }).then((res)=>{
-        comments.value.push({
-          body:event.target.value,
+        quoteData.value.find(x => x.id ==quote.id).comments.push({
+          body:commentValue,
           user_id:user.value.id,
-          quote_id: quote_id
+          quote_id: quote.id,
+          user:{
+            name:user.value.name,
+            thumbnail: user.value.thumbnail
+          },
+
         });
-         event.target.value='';
-         showComments.value=quote_id
+
+         document.getElementById('comment'+quote.id).value=''
+         showComments.value=quote.id
      }).catch(()=>{
       alert('Something went wrong')
      })
-    }
     
   }
 
-  function handleLikes(id){
+  function handleLikes(quote){
     axios.post('likes',{
-      quote_id: id,
+      quote_id: quote.id,
       user_id: user.value.id
     })
     .then((res)=>{
-      likes.value=res.data.attributes
+      if(res.data.message=='Unliked!'){
+        quote.likes = quote.likes.filter(function( obj ) {
+        return obj.user_id != user.value.id ;
+     });
+   }
+      if(res.data.message=='Liked!'){
+        quote.likes.push({
+          quote_id: quote.id,
+          user_id: user.value.id
+        })
+      }
     })
     .catch(()=>{
       alert('Something went wrong')
@@ -121,9 +126,10 @@ export default {
     quotesList.value=data
   }
 
-  function searchSubmit(locale, ev){
+  function searchSubmit(payload){
+    const locale=payload.locale
+    let target=payload.event.target.value
     quotesList.value=quoteData.value
-    let target=ev.target.value
     if(target==''){
       quotesList.value=quoteData.value
     }
@@ -150,6 +156,7 @@ export default {
          }
       }
   }
+
      if(locale=='ka'){
       quotesList.value=[]
       const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
@@ -174,25 +181,17 @@ export default {
   showComments.value=id
    }
 
-   function quoteAuthor(user_id){
-     return movieAuthors.value.find(x => x.id == user_id).name
+   function commentsQuantity(quote){
+   return quote.comments.length
    }
-   function commentAuthor(user_id){
-     return authors.value.find(x => x.id == user_id).name
+   function likesQuantity(quote){
+   return quote.likes.length
    }
-
-
-   function commentsQuantity(quote_id){
-   return comments.value.filter(x => x.quote_id == quote_id).length
+   function likesColor(quote){
+   return quote.likes.filter(x => x.quote_id == quote.id).find(x => x.user_id == user.value.id) ? '#F3426C': '#fff'
    }
-   function likesQuantity(quote_id){
-   return likes.value.filter(x => x.quote_id == quote_id).length
-   }
-   function likesColor(quote_id){
-   return likes.value.filter(x => x.quote_id == quote_id).find(x => x.user_id == user.value.id) ? '#F3426C': '#fff'
-   }
-   function movieName(movie_id){
-     return  moviesData.value.find(x => x.id == movie_id).name
+   function movieName(quote){
+     return  quote.movie.name
    }
    function localeChange(locale, object){
     if(locale=='ka'){
@@ -200,6 +199,10 @@ export default {
     }else{
       return object.en
     }
+   }
+
+   function submitComment(quote){
+       document.getElementById('submitComment'+quote.id).click();
    }
  
 
@@ -223,9 +226,7 @@ return {
        likes,
        likesQuantity,
        likesColor,
-       commentAuthor,
        commentsQuantity,
-       quoteAuthor,
        movieName,
        localeChange,
        addPost,
@@ -233,7 +234,8 @@ return {
        searchActivated,
        searchClicked,
        updateQuotesIntoArray,
-       searchSubmit
+       searchSubmit,
+       submitComment,
        
     
        }
@@ -246,60 +248,61 @@ return {
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
 <div class="fixed z-50">
-  <basic-header></basic-header>
+  <basic-header @header-search="searchSubmit" search="search"></basic-header>
   </div>
-  <div class="w-[100vw] h-[8rem]"></div>
+  <div class="w-[100vw] h-[8rem] md:h-[7rem]"></div>
 
   <main class="w-[100%] h-[93%]">
-    <div class="fixed">
+    <div class="fixed md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#E31221" movies="#fff" profile="border-none"></basic-navigation>
     </div>
-    <div class="w-[100%] h-[100%] min-w-[32rem]"></div>
+    <div class="w-[100%] h-[100%] min-w-[32rem] md:hidden"></div>
     
     <loading-spinner bgColor="bg-none" v-if="!feedDataIsFetched" texts="hidden" location="pt-[35rem]"></loading-spinner>
 
     <div v-else class="bg-gray min-w-[36vw]">
       <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
-      <div class="mt-[3.2rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
-        <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
-      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] pr-[2.5rem] pl-[5.6rem] py-[1rem] overflow-hidden"></textarea> 
-        <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 hover:cursor-pointer"></pencil-icon>
+      <div class="mt-[3.2rem] md:mt-[1.6rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
+        <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden md:w-[100%] md:flex md:items-center md:justify-center" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
+      <textarea disabled :placeholder="$t('newsFeed.new_quote')" class="post cursor-pointer rounded-[10px] max-h-[5.2rem] w-[100%] bg-[#24222F] md:bg-inherit md:w-[85%] pr-[2.5rem] pl-[5.6rem] md:pl-[3.6rem] py-[1rem] overflow-hidden"></textarea> 
+        <pencil-icon class="absolute top-0 left-0 translate-x-1/2 translate-y-1/2 md:translate-x-full hover:cursor-pointer"></pencil-icon>
         </div>
 
-      <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']">
+      <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']" class="md:hidden">
         <div  class="flex items-center gap-[1.6rem] pb-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']">
        <search-icon></search-icon>
-        <input @keydown.enter.prevent="searchSubmit($i18n.locale, $event)" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
+        <input @keydown.enter.prevent="searchSubmit({locale:$i18n.locale, event:$event})" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
         </div>
       </div>
       </div>
-      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
+      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] md:w-[100vw] lg:w-[61rem] llg:w-[72rem] xl:w-[87rem] xxl:w-[94rem] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
         <div class="flex items-center justify-start gap-[1.6rem]">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <p class="text-[2rem] text-[#fff]">{{ quoteAuthor(quote.user_id) }}</p>
+          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+          <p class="text-[2rem] md:text-[1.8rem] text-[#fff]">{{ quote.user.name }}</p>
         </div>
-        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote.movie_id)) }}</span></p>
+        <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] md:text-[1.6rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote)) }}</span></p>
         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
         <img src="/src/assets/InterstellarMovie.png" class="rounded-[10px]"/>
         <div class="flex items-center justify-start gap-[2.4rem] mt-[2.4rem]">
-        <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsQuantity(quote.id) }}</span><comments-icon></comments-icon></div>
-        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ likesQuantity(quote.id) }}</span><likes-icon  @liked-status="handleLikes(quote.id)" :fill="likesColor(quote.id)" class="cursor-pointer"></likes-icon></div>
+        <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsQuantity(quote) }}</span><comments-icon></comments-icon></div>
+        <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ likesQuantity(quote) }}</span><likes-icon  @liked-status="handleLikes(quote)" :fill="likesColor(quote)" class="cursor-pointer"></likes-icon></div>
         </div>
         </div>
       <div>
-        <div v-if="showComments==quote.id">
-        <div v-for="comment in comments.filter(x => x.quote_id == quote.id)" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
+        <div v-if="showComments==quote.id" class="max-h-[50rem] overflow-y-scroll scrollbarHide">
+        <div v-for="comment in quote.comments" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
-          <p class="text-[2rem] font-medium text-[#fff]">{{ commentAuthor(comment.user_id) }}</p>
+          <p class="text-[2rem] font-medium text-[#fff]">{{ comment.user.name }}</p>
           <p class="text-[2rem] font-normal text-[#fff]">{{ comment.body }}</p>
          </div>
         </div>
         </div>
-        <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-          <textarea @keydown.enter.prevent="commentSubmit(quote.id, $event)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></textarea>
-        </div>
+        <Form @submit="commentSubmit(quote, $event)" class="mt-[2.4rem] gap-[2.4rem] flex items-center">
+          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+          <Field rules="required" :id="'comment'+quote.id" name="comment" as="textarea" @keydown.enter.prevent="submitComment(quote)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[89%] max-w-[89%] min-h-[5.2rem] max-h-[5.2rem] md:min-w-[81%] md:max-w-[81%] md:min-h-[4rem] md:max-h-[4rem] bg-[#24222F] px-[2.5rem] py-[1rem] md:px-[1.6rem] md:py-[0.5rem]"></Field>
+          <button type="submit" :id="'submitComment'+quote.id" class="w-0 h-0 opacity-0 absolute -top-full -left-full"></button>
+        </Form>
       </div>
     </div>
       </div>
@@ -317,6 +320,26 @@ return {
 main{
   display: grid;
   grid-template-columns: 1.2fr auto 1fr;
+}
+@media (max-width: 920px) {
+  main{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .scrollbar::-webkit-scrollbar{
+display: none;
+  }
+  .scrollbar:hover{
+    scrollbar-width: none;
+  }
+  .scrollbar::-webkit-scrollbar-thumb {
+    display: none;
+
+  }
+  textarea::placeholder, textarea {
+    font-size:1.6rem;
+  }
+  
 }
 .backdrop{
   backdrop-filter: blur(25px);
@@ -373,6 +396,17 @@ input {
 
 .scrollbar::-webkit-scrollbar-thumb {
   background: #222030;
+  border-radius: 0 0 0 0;
+        }
+.scrollbarHide::-webkit-scrollbar {
+  width: 0; 
+ display: none;
+}
+  .scrollbarHide{
+          scrollbar-width: none;
+
+        }
+.scrollbarHide::-webkit-scrollbar-thumb {
   border-radius: 0 0 0 0;
         }
 </style>

@@ -13,16 +13,19 @@ import FormHeader from "@/components/FormHeader.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
+import SearchArrow from "@/components/icons/SearchArrow.vue";
+import { useRouter } from "vue-router";
 
 
 
 
 export default {
     name:'Profile',
-    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner},
+    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow},
   
   setup(){
 
+    const router = useRouter();
     const login = useUserStore();
     const image=ref('')
     const imageError=ref(false)
@@ -96,7 +99,9 @@ return {
   imageError, 
   responseError, 
   onSubmitGoogleProfile,
-  dataIsFetched}
+  dataIsFetched,
+  router
+  }
   }
   
 }
@@ -104,7 +109,7 @@ return {
 
 
 <template>
-<div>
+<div class="overflow-x-hidden overflow-y-scroll">
   <loading-spinner v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
   <div v-else class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
@@ -125,13 +130,14 @@ return {
     </div>
    
    
-    <div>
+    <div class="md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
     </div>
-    <div class="bg-gray">
-      <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem]">{{ $t('newsFeed.my_profile') }}</p>
-      <div v-if="user.google_id" class="bg-[#11101A] w-[90rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
-        <Form @submit="onSubmitGoogleProfile" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center" enctype="multipart/form-data">
+    <div class="bg-gray md:bg-[#24222F] md:mt-[3rem] relative">
+      <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem] md:mt-[12rem] md:hidden">{{ $t('newsFeed.my_profile') }}</p>
+        <search-arrow @click="router.push({name:'news-feed'})" class="hidden md:block absolute top-0 left-0 -translate-y-[150%] translate-x-[180%]"></search-arrow>
+      <div v-if="user.google_id" class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[55rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+        <Form @submit="onSubmitGoogleProfile" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] lg:px-[15%] xl:px-[20%] pb-[10%] flex flex-col items-center" enctype="multipart/form-data">
           <div class="relative inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
@@ -140,15 +146,14 @@ return {
            <div v-if="responseError.length>0" @click="responseError=[]" id="responseError" class="mt-[2rem] px-[6px] py-[4px] cursor-pointer border border-solid border-[#EC9524] bg-[#ec952234] text-[#fff] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><span class="flex items-center justify-between gap-[1rem]"><p>{{ responseError[0] }}</p><profileinvalid-icon/></span></div>        
           <div class="flex flex-col w-[100%]">
          <profile-input rules='required|min:8|max:15' :vModel="user.name" name="name" type="name" :label="$t('landing.name')"/>
-          <label for="googleEmail" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem]">{{ $t('landing.email') }}</label>
-          <input name="googleEmail" :value="user.email" class="border border-[#CED4DA] border-solid text-[#232323] text-[1.6rem] px-[13px] py-[7px] rounded-[4px] bg-[#CED4DA] w-[100%] focus:outline-none focus:shadow-focus-shadow disabled:bg-[#E9ECEF]" disabled/>
+         <profile-input disabled='pointer-events-none opacity-[70%] mt-[3rem]' :vModel="user.email" name="googleEmail" type="email" :label="$t('landing.email')"/>
           </div>
-          <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">{{ $t('newsFeed.save_changes') }}</basic-button>  
+          <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%] md:right-[2.4rem]">{{ $t('newsFeed.save_changes') }}</basic-button>  
        </Form>
       </div>
       
-      <div v-if="!user.google_id"  class="bg-[#11101A] w-[90rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
-        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] pb-[10%] flex flex-col items-center">
+      <div v-if="!user.google_id"  class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] pb-[10%] flex flex-col items-center">
           <div class="relative flex flex-col items-center justify-center inline-block -translate-y-[31%]">
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
@@ -160,7 +165,7 @@ return {
           <profile-input rules='email|required' :vModel="user.email" name="email" type="email" :label="$t('landing.email')"/>
           <profile-input rules='required|min:8|max:15|lower_case'  name="password" type="password" placeholder="••••••••••" :label="$t('landing.password')"/>
           </div>
-      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%]">{{ $t('newsFeed.save_changes') }}</basic-button>  
+      <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%] md:right-[2.4rem]">{{ $t('newsFeed.save_changes') }}</basic-button>  
       </Form>
       </div>
     </div>
@@ -182,6 +187,40 @@ return {
 main{
   display: grid;
   grid-template-columns: 1.2fr auto 1fr;
+}
+@media (max-width: 1500px) {
+  main{
+    display: grid;
+    grid-template-columns: 0.75fr auto;
+  }
+  
+}
+@media (max-width: 1360px) {
+  main{
+    display: grid;
+    grid-template-columns: 0.82fr auto;
+  }
+  
+}
+@media (max-width: 920px) {
+  main{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .scrollbar::-webkit-scrollbar{
+display: none;
+  }
+  .scrollbar:hover{
+    scrollbar-width: none;
+  }
+  .scrollbar::-webkit-scrollbar-thumb {
+    display: none;
+
+  }
+  textarea::placeholder, textarea {
+    font-size:1.6rem;
+  }
+  
 }
 .scrollHide::-webkit-scrollbar {
   display: none;

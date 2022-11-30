@@ -29,11 +29,7 @@ export default {
 
   
   onMounted(async ()=>{
-    const resComments= await axios.get(`comments`);
-    const resLikes= await axios.get(`likes`);
-    likesData.value = resLikes.data;
-    commentsData.value = resComments.data;
-    quotesData.value = quotes;
+    quotesData.value = props.quotes;
     dataIsFetched.value=true;
 })
   
@@ -47,22 +43,15 @@ export default {
   detailsModal.value=id
   }
 
-  function commentsQuantity(quote_id){
-    return commentsData.value.filter(x => x.quote_id == quote_id).length
-  }
-  function likesQuantity(quote_id){
-   return likesData.value.filter(x => x.quote_id == quote_id).length
-  }
-
  async function deleteQuote(id){
    await axios.delete(`quotes/${id}`)
     .catch((err)=>{
       alert('Something went wrong!')
     })
     dataIsFetched.value=false;
-    const resQuotes=await axios.get(`quotes/${currentId}`);
-    quotesData.value = resQuotes.data;
-    context.emit('quotesQuantity', resQuotes.data)
+    const resQuotes = await axios.get(`movie/${currentId}`);
+    quotesData.value = resQuotes.data.quotes;
+    context.emit('quotesQuantity', resQuotes.data.quotes)
     dataIsFetched.value=true;
   }
 
@@ -72,8 +61,6 @@ export default {
     deleteQuote,
     detailsModal,
     dataIsFetched,
-    commentsQuantity,
-    likesQuantity
   }
     }
 
@@ -87,11 +74,11 @@ export default {
 <div>
   <loading-spinner  v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
 
-  <div v-else class="flex flex-col gap-[4rem] h-[17%]">
-            <div class="px-[3.2rem] py-[2.4rem] w-[100%] bg-[#09090f] rounded-[10px]" v-for="quote in quotesData" :key="quote">
+  <div v-else class="flex flex-col gap-[4rem] h-[17%] md:w-[100%]">
+            <div class="px-[3.2rem] py-[2.4rem] md:px-0 md:py-0 md:pb-[2.7rem] w-[100%] bg-[#09090f] rounded-[10px] md:rounded-[2px]" v-for="quote in quotesData" :key="quote">
             <div class="relative">
-              <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-40"></dots-icon>
-              <div v-if="detailsModal==quote.id" :id="'quote'+quote.id" class="p-[4rem] bg-[#24222F] flex flex-col justify-center gap-[3rem] absolute top-[2rem] right-0 translate-x-[87%] rounded-[10px] z-50">
+              <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-40 md:hidden"></dots-icon>
+              <div v-if="detailsModal==quote.id" :id="'quote'+quote.id" class="p-[4rem] bg-[#24222F] flex flex-col justify-center gap-[3rem] absolute top-[2rem] md:-top-[0.3px] right-0 translate-x-[87%] md:translate-x-0 rounded-[10px] md:rounded-[2px] z-50">
                    <div class="flex items-center gap-[1.6rem]">
                     <view-quote></view-quote>
                    <router-link :to="{ name: 'quote-details', params: { id: quote.id }}"><p class="text-[1.6rem] text-[#fff] cursor-pointer">{{ $t('newsFeed.view_quote') }}</p></router-link>
@@ -105,22 +92,48 @@ export default {
                     <p @click="deleteQuote(quote.id)" class="text-[1.6rem] text-[#fff] cursor-pointer">{{ $t('newsFeed.delete') }}</p>
                    </div>
               </div>
-              <div class="flex items-center gap-[3.1rem] pb-[2.4rem] border-b border-b-[#f0f0f036] border-b-solid">
-                <img src="/src/assets/LordofRingsMovie.png" class="w-[30%] rounded-[2px]"/>
-                <p class="text-[2.4rem] text-[#CED4DA]">{{ $i18n.locale=='en'? quote.quote.en : quote.quote.ka }}</p>
+              <div class="flex items-center md:flex-col gap-[3.1rem] md:gap-[2.4rem] pb-[2.4rem] border-b border-b-[#f0f0f036] border-b-solid md:border-b-0">
+                <img src="/src/assets/LordofRingsMovie.png" class="w-[30%] rounded-[2px] md:hidden"/>
+                <div class="bg-[url('/src/assets/LordofRingsMovie.png')] bg-cover bg-no-repeat w-[100%] min-h-[15rem] height rounded-[2px] hidden md:block"></div>
+                <p class="text-[2.4rem] text-[#CED4DA] md:w-[95%] md:border-b md:border-b-[#f0f0f036] md:border-b-solid md:pb-[2.4rem] break-words">"{{ $i18n.locale=='en'? quote.quote.en : quote.quote.ka }}"</p>
                 </div>
-              <div class="flex items-center gap-[3.2rem] mt-[2.4rem]">
-                <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">{{ commentsQuantity(quote.id) }}</span>
-                  <description-comment></description-comment>
+              <div class="flex items-center gap-[3.2rem] mt-[2.4rem] md:mt-0 md:justify-start md:pl-[1rem]">
+                <div class="flex items-center gap-[1.6rem] md:gap-[1.2rem]">
+                  <span class="text-[2rem] text-[#fff]">{{ quote.comments.length }}</span>
+                  <description-comment class="md:hidden"></description-comment>
+                  <description-comment class="hidden md:block" width="24" height="23"></description-comment>
                 </div>
-                <div class="flex items-center gap-[1.6rem]">
-                  <span class="text-[2rem] text-[#fff]">{{ likesQuantity(quote.id) }}</span>
-                  <heart-icon></heart-icon>
+                <div class="flex items-center gap-[1.6rem] md:gap-[1.2rem]">
+                  <span class="text-[2rem] text-[#fff]">{{ quote.likes.length }}</span>
+                  <heart-icon class="md:hidden"></heart-icon>
+                  <heart-icon class="hidden md:block" width="24" height="22.5"></heart-icon>
                </div>
+              <dots-icon @emit-dots="quoteEditModal(quote.id)" class="cursor-pointer z-40 hidden md:block md:ml-[36%]"></dots-icon>
               </div>
             </div>
             </div>
           </div>
 </div>
 </template>
+
+<style scoped>
+.height{
+  height: 15rem;
+}
+@media (max-width: 920px) {
+  .height{
+    height: 24rem;
+  }
+}
+@media (max-width: 520px) {
+  .height{
+    height: 20rem;
+  }
+}
+@media (max-width: 450px) {
+  .height{
+    height: 16rem;
+  }
+}
+
+</style>
