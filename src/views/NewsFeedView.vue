@@ -11,6 +11,7 @@ import PencilIcon from "@/components/icons/PencilIcon.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ScrollSpinner from "@/components/ScrollSpinner.vue";
 import AddquoteForm from "@/components/forms/AddquoteForm.vue";
 import { useAuthStore } from "@/stores/AuthStore.js";
 
@@ -18,13 +19,14 @@ import { useAuthStore } from "@/stores/AuthStore.js";
 export default {
   name:'NewsFeed',
   emits:['likedStatus', 'addpostClose', 'updateQuotes', 'headerSearch'],
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field},
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field, ScrollSpinner},
   
   setup(){
 
     const login = useUserStore();
     const router = useRouter();
     const authStore = useAuthStore();
+  
 
 
     const dataIsFetched=ref(false)
@@ -33,28 +35,70 @@ export default {
     const quoteData=ref([])
     const moviesData=ref([])
     const commentsData=ref([])
-    const likesData=ref(null)
+    const likesData=ref([])
     const showComments=ref(false)
     const comments=ref([])
     const likes=ref([])
     const addPost=ref(false)
     const searchActivated=ref(false)
+    const spinner=ref(false)
     const quotesList=ref([])
     const authors=ref([])
     const movieAuthors=ref([])
+    const page=ref(1)
+    const noMorePosts=ref(false)
 
+    function paginationData(data){
+      for (let i = 0; i < data.length; i++) {
+      for (let k = 0; k < data[i].likes.length; k++) {
+       likesData.value.push(data[i].likes[k])
+       likes.value.push(data[i].likes[k])
+     }
+     }
+    for (let i = 0; i < data.length; i++) {
+      for (let k = 0; k < data[i].likes.comments; k++) {
+       commentsData.value.push(data[i].comments[k])
+       comments.value.push(data[i].comments[k])
+     }
+     }
+    for (let i = 0; i < data.length; i++) {
+       quoteData.value.push(data[i])
+       quotesList.value.push(data[i])
+     }
+    }
+
+    
+       const observeEl=new IntersectionObserver(async function(entries) {
+        const ent=entries[0]
+        if(!ent.isIntersecting) return;
+        spinner.value=true
+        page.value++
+        const res= await axios.get('quotes?page='+page.value);
+        spinner.value=false
+        paginationData(res.data.data)
+        observeEl.unobserve(ent.target)
+        if(res.data.data.length!=0) observeEl.observe(document.querySelector('.last:last-child'));
+        if(res.data.data.length==0) noMorePosts.value=true
+  
+      }, 
+      {
+        root: null,
+        threshold:1,
+        rootMargin:"0px",
+      }
+      );
 
 
     onMounted(async ()=>{
-    const res= await axios.get('quotes');
-    likesData.value=res.data.likes
-    likes.value=res.data.likes
-    commentsData.value=res.data.comments
-    comments.value=res.data.comments
-    quoteData.value=res.data
-    quotesList.value=quoteData.value
-    feedDataIsFetched.value=true
+      const res= await axios.get('quotes?page='+page.value);
+      paginationData(res.data.data)
+      feedDataIsFetched.value=true
+      if(res.data.data.length==0) noMorePosts.value=true
    })
+     setTimeout(() => {
+       observeEl.observe(document.querySelector('.last:last-child'))
+     }, "1800")
+
 
     user.value =login.getUserData;
     if(user.value!=null){
@@ -62,9 +106,11 @@ export default {
     }
 
 
-    function commentSubmit(quote, event){
-      console.log(event)
-    let commentValue=event.comment
+    function submitComment(quote, event){
+      if(event.target.value===''){
+        return;
+      }
+    let commentValue=event.target.value
       axios.post('comments',{
         body: commentValue,
         quote_id: quote.id,
@@ -80,8 +126,8 @@ export default {
           },
 
         });
-         document.getElementsByName('comment').value=''
-        //  document.getElementById('comment'+quote.id).value=''
+         document.getElementById('comment'+quote.id).value=''
+         document.getElementById('comment'+quote.id).blur()
          showComments.value=quote.id
      }).catch(()=>{
       alert('Something went wrong')
@@ -124,6 +170,7 @@ export default {
   function updateQuotesIntoArray(data){
     quoteData.value=data
     quotesList.value=data
+    noMorePosts.value=false
   }
 
   function searchSubmit(payload){
@@ -201,25 +248,18 @@ export default {
     }
    }
 
-   function submitComment(quote){
-       document.getElementById('submitComment'+quote.id).click();
-   }
- 
-
 
     
 
 return {
        user,
        dataIsFetched, 
-       commentSubmit,
        quotesList, 
        feedDataIsFetched, 
        moviesData, 
        commentsData, 
        showComments,
        handleShowComments,
-       commentSubmit,
        comments,
        handleLikes,
        likesData,
@@ -236,6 +276,8 @@ return {
        updateQuotesIntoArray,
        searchSubmit,
        submitComment,
+       spinner,
+       noMorePosts
        
     
        }
@@ -247,6 +289,7 @@ return {
 
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
+  <scroll-spinner v-if="spinner" class="fixed z-40 scale-75"></scroll-spinner>
 <div class="fixed z-50">
   <basic-header @header-search="searchSubmit" search="search"></basic-header>
   </div>
@@ -260,7 +303,7 @@ return {
     
     <loading-spinner bgColor="bg-none" v-if="!feedDataIsFetched" texts="hidden" location="pt-[35rem]"></loading-spinner>
 
-    <div v-else class="bg-gray min-w-[36vw]">
+    <div v-else class="bg-gray min-w-[36vw] pb-[7rem]">
       <div v-show="addPost"><addquote-form @update-quotes="updateQuotesIntoArray" @addpost-close="addPost=false"></addquote-form></div>
       <div class="mt-[3.2rem] md:mt-[1.6rem] ml-[0.3rem] flex items-center gap-[2.4rem]">
         <div @click="openAddPostModal" class="relative cursor-pointer overflow-hidden md:w-[100%] md:flex md:items-center md:justify-center" :class="[!searchActivated ? 'w-[75%]' : 'w-[25%]']">
@@ -275,7 +318,7 @@ return {
         </div>
       </div>
       </div>
-      <div v-for="quote in quotesList" :key="quote" class="w-[94rem] h-[auto] md:w-[100vw] lg:w-[61rem] llg:w-[72rem] xl:w-[87rem] xxl:w-[94rem] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem]">
+      <div v-for="quote in quotesList" :key="quote" :id="quote.id" class="w-[94rem] h-[auto] md:w-[100vw] lg:w-[61rem] llg:w-[72rem] xl:w-[87rem] xxl:w-[94rem] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem] last">
         <div class="flex items-center justify-start gap-[1.6rem]">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
           <p class="text-[2rem] md:text-[1.8rem] text-[#fff]">{{ quote.user.name }}</p>
@@ -298,14 +341,13 @@ return {
          </div>
         </div>
         </div>
-        <Form @submit="commentSubmit(quote, $event)" class="mt-[2.4rem] gap-[2.4rem] flex items-center">
+        <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
           <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
-          <Field rules="required" :id="'comment'+quote.id" name="comment" as="textarea" @keydown.enter.prevent="submitComment(quote)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[89%] max-w-[89%] min-h-[5.2rem] max-h-[5.2rem] md:min-w-[81%] md:max-w-[81%] md:min-h-[4rem] md:max-h-[4rem] bg-[#24222F] px-[2.5rem] py-[1rem] md:px-[1.6rem] md:py-[0.5rem]"></Field>
-          <button type="submit" :id="'submitComment'+quote.id" class="w-0 h-0 opacity-0 absolute -top-full -left-full"></button>
-        </Form>
+          <textarea :id="'comment'+quote.id" :name="'comment'+quote.id" @keydown.enter.prevent="submitComment(quote, $event)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[89%] max-w-[89%] min-h-[5.2rem] max-h-[5.2rem] md:min-w-[81%] md:max-w-[81%] md:min-h-[4rem] md:max-h-[4rem] bg-[#24222F] px-[2.5rem] py-[1rem] md:px-[1.6rem] md:py-[0.5rem]"></textarea>
+        </div>
       </div>
     </div>
-      </div>
+    <p v-if="noMorePosts" class="relative text-[#CED4DA] text-[1.6rem] font-medium translate-y-full flex items-center justify-center">No more posts to load</p>      </div>
 
   </main>
   </div>
