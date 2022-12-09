@@ -57,7 +57,7 @@ onMounted(()=>{
       }
 
      async function logoutHandle(){
-     await axios.post('logout')
+     await axios.get('logout')
      authStore.authenticated = false;
      router.push({ name: 'landing'})
     }

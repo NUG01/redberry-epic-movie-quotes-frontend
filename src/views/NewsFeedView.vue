@@ -170,7 +170,6 @@ export default {
   function updateQuotesIntoArray(data){
     quoteData.value=data
     quotesList.value=data
-    noMorePosts.value=false
   }
 
   function searchSubmit(payload){
@@ -277,7 +276,7 @@ return {
        searchSubmit,
        submitComment,
        spinner,
-       noMorePosts
+       noMorePosts,
        
     
        }
@@ -347,7 +346,8 @@ return {
         </div>
       </div>
     </div>
-    <p v-if="noMorePosts" class="relative text-[#CED4DA] text-[1.6rem] font-medium translate-y-full flex items-center justify-center">No more posts to load</p>      </div>
+    <p v-if="noMorePosts" class="relative text-[#CED4DA] text-[1.6rem] font-medium translate-y-full flex items-center justify-center">No more posts to load</p>
+  </div>
 
   </main>
   </div>

@@ -1,6 +1,6 @@
-<script>
+ <script>
 import { useUserStore } from '@/stores/UserStore.js';
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import BasicInput from "@/components/BasicInput.vue";
 import ProfileInput from "@/components/ProfileInput.vue";
@@ -18,6 +18,8 @@ import AddEmail from "@/components/icons/AddEmail.vue";
 import { useRouter } from "vue-router";
 import axios from "@/config/axios/index.js";
 import DeleteTrash from "@/components/icons/DeleteTrash.vue";
+import SuccessIcon from "@/components/icons/SuccessIcon.vue";
+
 
 
 
@@ -25,7 +27,7 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 
 export default {
     name:'Profile',
-    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail},
+    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail, SuccessIcon},
   
   setup(){
 
@@ -38,6 +40,7 @@ export default {
     const requestSuccess=ref(false)
     const dataIsFetched=ref(false)
     const newEmailModal=ref(false)
+    const profileUpdated=ref(false)
 
 
     const user=ref([])
@@ -95,14 +98,21 @@ export default {
       location.reload();
     }
 
+    watch(profileUpdated, () => {
+      setTimeout(() => {
+        profileUpdated.value=false
+     }, "7200")
+});
+
    async function newEmailHandle(values){
-    const res= await axios.post('user/newEmail', values)
+     const res= await axios.post('user/newEmail', values)
+    profileUpdated.value=true
     emails.value=res.data
     newEmailModal.value=false
     }
 
    async function deleteEmail(id){
-     const res=await axios.post('user/email/'+id)
+     const res=await axios.delete('user/email/'+id)
      emails.value=res.data
     }
 
@@ -130,7 +140,8 @@ return {
   newEmailHandle,
   emails,
   deleteEmail,
-  chooseEmail
+  chooseEmail,
+  profileUpdated
   }
   }
   
@@ -140,6 +151,12 @@ return {
 
 <template>
 <div class="overflow-x-hidden overflow-y-scroll">
+   <div v-show="profileUpdated" class="fixed z-50 right-0 top-0 -translate-x-[30%] md:right-1/2 md:translate-x-[50%] translate-y-1/2 md:w-[70%] md:px-[2rem] md:py-[1.2rem] px-[2.4rem] py-[1.5rem] bg-[#BADBCC] rounded-[4px]">
+      <div class="flex items-center justify-center gap-[1rem]">
+        <success-icon></success-icon>
+        <p class="text-[#11101A] text-[1.8rem] font-medium">{{ $t('newsFeed.email_added') }}<br>{{ $t('newsFeed.check_email') }}</p>
+      </div>
+    </div>
   <loading-spinner v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
   <div v-else class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
@@ -147,16 +164,16 @@ return {
     <div v-if="newEmailModal" @click="newEmailModal=false" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-40"></div>
     <div v-if="newEmailModal" class="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] w-[54rem] lsm:w-[100vw]">
     <div class="border-b border-b-solid border-b-[#ced4da34] w-[100%] px-[3.2rem] py-[2.4rem]">
-      <p class="font-medium text-[2.4rem] text-[#fff]">Add new Email</p>
+      <p class="font-medium text-[2.4rem] text-[#fff]">{{ $t('newsFeed.add_new_email') }}</p>
     </div>
       <Form @submit="newEmailHandle" class="px-[4rem] pb-[2.4rem] pt-[4.2rem]">
         <div class="flex flex-col items-center mb-[5.4rem] gap-[8px]">
-        <label for="new_email" class="text-[1.6rem] text-[#fff] self-start">New email</label>
-        <Field name="new_email" type="email" id="new_email" rules="email|required" placeholder="Enter new email" class="w-[100%] h-[4.2rem] rounded-[4.8px] text-[1.6rem] pl-[17px]"/>
+        <label for="new_email" class="text-[1.6rem] text-[#fff] self-start">{{ $t('newsFeed.new_email') }}</label>
+        <Field name="new_email" type="email" id="new_email" rules="email|required" :placeholder="$t('newsFeed.enter_email')" class="w-[100%] h-[4.2rem] rounded-[4.8px] text-[1.6rem] pl-[17px]"/>
         </div>
         <div class="flex items-center justify-end gap-[3rem]">
-          <p @click="newEmailModal=false" class="text-[#D9D9D9] text-[2rem] cursor-pointer">Cancel</p>
-          <button type="submit" class="bg-[#E31221] px-[17px] py-[9px] rounded-[4.8px]"><p class="text-[2rem] text-[#fff]">Add</p></button>
+          <p @click="newEmailModal=false" class="text-[#D9D9D9] text-[2rem] cursor-pointer">{{ $t("newsFeed.cancel") }}</p>
+          <button type="submit" class="bg-[#E31221] px-[17px] py-[9px] rounded-[4.8px]"><p class="text-[2rem] text-[#fff]">{{ $t("newsFeed.add") }}</p></button>
         </div>
       </Form>
     </div>
@@ -214,7 +231,7 @@ return {
           <div class="flex items-center gap-[2.4rem] lsm:gap-[1.2rem]">
           <profile-input rules='email|required' :vModel="user.email" name="email" type="email" width="w-[60%]" :label="$t('landing.email')"/>
           <div class="translate-y-[25%]">
-            <p class="text-[1.8rem] text-[#CED4DA]">Primary Email</p>
+            <p class="text-[1.8rem] text-[#CED4DA]">{{ $t('newsFeed.primary_email') }}</p>
           </div>
           </div>
           
@@ -222,7 +239,7 @@ return {
           <div v-for="email in emails" v-show="email.address!=user.email" :key="email.id" class="flex items-center lsm:flex-col lsm:items-start lsm:justify-start gap-[2.4rem] lsm:gap-0">
           <profile-input :vModel="email.address" :name="'email'+email.id" type="email" width="w-[60%] pointer-events-none" :label="$t('landing.email')"/>
           <div class="translate-y-[25%] flex items-center justify-center gap-[1.8rem] lsm:self-end">
-            <p @click="chooseEmail(email)" class="text-[1.8rem] text-[#CED4DA] cursor-pointer">Make this primary</p>
+            <p @click="chooseEmail(email)" class="text-[1.8rem] text-[#CED4DA] cursor-pointer">{{ $t('newsFeed.make_primary') }}</p>
             <div class="h-[2rem] w-[1px] bg-[#6C757D]"></div>
             <delete-trash @click="deleteEmail(email.id)" class="cursor-pointer"></delete-trash>
           </div>
@@ -230,7 +247,7 @@ return {
 
           <button @click="newEmailModal=true" type="button" class="flex items-center justify-center self-start gap-[8px] border border-[#ffffffb4] border-solid rounded-[4.8px] px-[10px] py-[6px]">
             <add-email></add-email>
-            <p class="text-[1.6rem] text-[#fff]">Add new email</p>
+            <p class="text-[1.6rem] text-[#fff]">{{ $t('newsFeed.add_new_email') }}</p>
           </button>
 
           <profile-input rules='required|min:8|max:15|lower_case'  name="password" type="password" width="w-[60%]" placeholder="••••••••••" :label="$t('landing.password')"/>

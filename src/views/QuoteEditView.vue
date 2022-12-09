@@ -60,7 +60,7 @@ onMounted(async ()=>{
     form.append('thumbnail', selectedFile.value);
     form.append('quote_en', values.quote_en);
     form.append('quote_ka', values.quote_ka);
-    basicAxios.post('quotes',form)
+    basicAxios.post('quotes/update',form)
   .then((res)=>{
     router.go(-1)
   })
