@@ -19,8 +19,8 @@ export default {
 
     onMounted(async()=>{
       const userId=router.currentRoute.value.query.user_id
-      const response=await axios.get(`user/${userId}`)
-      login.userData=response.data;
+      const res= await axios.get("user")
+      login.userData=res.data.user;
       authStore.authenticated=true;
       router.push({ name: 'news-feed' })})
 

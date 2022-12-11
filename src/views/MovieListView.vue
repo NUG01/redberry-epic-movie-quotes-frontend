@@ -38,7 +38,7 @@ export default {
       user.value=login.getUserData
       dataIsFetched.value=true
     onMounted(async () => {
-     const res = await axios.get(`movies/${user.value.id}`);
+     const res = await axios.get('movies');
      quotesData.value=res.data.quotes
      moviesData.value=res.data
      moviesList.value=res.data
@@ -53,7 +53,7 @@ export default {
 
    async function updateMovieList(){
         moviesIsFetched.value=false
-        const res = await axios.get(`movies/${user.value.id}`);
+        const res = await axios.get('movies');
         moviesList.value=res.data
         moviesList.value=(moviesList.value).reverse()
         moviesIsFetched.value=true
@@ -97,7 +97,7 @@ return {
   <div class="main w-[100vw] h-[100vh] relative overflow-hidden">
   <basic-header class="z-50"></basic-header>
   <main class="md:px-[3.2rem] md:w-[100vw]">
-    <addmovie-form @update-movie="updateMovieList" @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies/create" class="absolute" name="Add Movie"></addmovie-form>
+    <addmovie-form @update-movie="updateMovieList" @emit-close="closeAddMoviesModal" v-if="addMoviesModal" :user="user" axiosEndpoint="movies" class="absolute" name="Add Movie"></addmovie-form>
     <div class="md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#E31221" profile="border-none"></basic-navigation>
     </div>

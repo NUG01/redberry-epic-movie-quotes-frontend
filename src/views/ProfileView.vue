@@ -1,6 +1,6 @@
  <script>
 import { useUserStore } from '@/stores/UserStore.js';
-import { ref, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import BasicNavigation from "@/components/BasicNavigation.vue";
 import BasicInput from "@/components/BasicInput.vue";
 import ProfileInput from "@/components/ProfileInput.vue";
@@ -10,9 +10,13 @@ import InvalidIcon from "@/components/icons/InvalidIcon.vue";
 import basicAxios from "@/config/axios/BasicAxios.js";
 import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import FormHeader from "@/components/FormHeader.vue";
+import ProfileUpdated from "@/components/ProfileUpdated.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
+import ProfileupdatedModal from "@/components/ProfileupdatedModal.vue";
+import ProfileinputContainer from "@/components/ProfileinputContainer.vue";
+import AddemailForm from "@/components/forms/AddemailForm.vue";
 import SearchArrow from "@/components/icons/SearchArrow.vue";
 import AddEmail from "@/components/icons/AddEmail.vue";
 import { useRouter } from "vue-router";
@@ -21,13 +25,10 @@ import DeleteTrash from "@/components/icons/DeleteTrash.vue";
 import SuccessIcon from "@/components/icons/SuccessIcon.vue";
 
 
-
-
-
-
 export default {
     name:'Profile',
-    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail, SuccessIcon},
+    emits:['EmailformClose'],
+    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail, SuccessIcon, ProfileUpdated, ProfileupdatedModal, ProfileinputContainer, AddemailForm},
   
   setup(){
 
@@ -51,11 +52,8 @@ export default {
       user.value =login.getUserData;
       emails.value=login.getUserData.emails
       dataIsFetched.value=true
-      
-
-
+    
         
-      // imageDisplay.value='http://localhost:8000/assets/LaracastImage.png'
       imageDisplay.value='http://localhost:8000/'+user.value.thumbnail
     
     function handleImageChange(ev){
@@ -66,6 +64,7 @@ export default {
       const form=new FormData();
       form.append('thumbnail', selectedFile.value);
       form.append('name', values.name);
+      form.append("_method", "PATCH");
       basicAxios.post('user/profile',form)
     .then((res)=>{
      responseError.value=[];
@@ -83,6 +82,7 @@ export default {
       form.append('name', values.name);
       form.append('email', values.email);
       form.append('password', values.password);
+      form.append("_method", "PATCH");
       basicAxios.post('user/profile',form)
     .then((res)=>{
       responseError.value=[];
@@ -94,22 +94,12 @@ export default {
 
     }
 
-    function reload(){
-      location.reload();
-    }
 
     watch(profileUpdated, () => {
       setTimeout(() => {
         profileUpdated.value=false
      }, "7200")
 });
-
-   async function newEmailHandle(values){
-     const res= await axios.post('user/newEmail', values)
-    profileUpdated.value=true
-    emails.value=res.data
-    newEmailModal.value=false
-    }
 
    async function deleteEmail(id){
      const res=await axios.delete('user/email/'+id)
@@ -119,14 +109,16 @@ export default {
     function chooseEmail(email){
       user.value.email=email.address
     }
+    function updateProfile(data){
+      emails.value=data
+      profileUpdated.value=true
+    }
 
-  
 
     
 return {
   user,
   requestSuccess, 
-  reload, 
   onSubmit, 
   imageUrl,
   handleImageChange, 
@@ -137,11 +129,11 @@ return {
   dataIsFetched,
   router,
   newEmailModal,
-  newEmailHandle,
   emails,
   deleteEmail,
   chooseEmail,
-  profileUpdated
+  profileUpdated, 
+  updateProfile
   }
   }
   
@@ -151,48 +143,15 @@ return {
 
 <template>
 <div class="overflow-x-hidden overflow-y-scroll">
-   <div v-show="profileUpdated" class="fixed z-50 right-0 top-0 -translate-x-[30%] md:right-1/2 md:translate-x-[50%] translate-y-1/2 md:w-[70%] md:px-[2rem] md:py-[1.2rem] px-[2.4rem] py-[1.5rem] bg-[#BADBCC] rounded-[4px]">
-      <div class="flex items-center justify-center gap-[1rem]">
-        <success-icon></success-icon>
-        <p class="text-[#11101A] text-[1.8rem] font-medium">{{ $t('newsFeed.email_added') }}<br>{{ $t('newsFeed.check_email') }}</p>
-      </div>
-    </div>
+  <profile-updated v-if="profileUpdated"></profile-updated>
   <loading-spinner v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
   <div v-else class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
   <main>
-    <div v-if="newEmailModal" @click="newEmailModal=false" class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-40"></div>
-    <div v-if="newEmailModal" class="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] w-[54rem] lsm:w-[100vw]">
-    <div class="border-b border-b-solid border-b-[#ced4da34] w-[100%] px-[3.2rem] py-[2.4rem]">
-      <p class="font-medium text-[2.4rem] text-[#fff]">{{ $t('newsFeed.add_new_email') }}</p>
-    </div>
-      <Form @submit="newEmailHandle" class="px-[4rem] pb-[2.4rem] pt-[4.2rem]">
-        <div class="flex flex-col items-center mb-[5.4rem] gap-[8px]">
-        <label for="new_email" class="text-[1.6rem] text-[#fff] self-start">{{ $t('newsFeed.new_email') }}</label>
-        <Field name="new_email" type="email" id="new_email" rules="email|required" :placeholder="$t('newsFeed.enter_email')" class="w-[100%] h-[4.2rem] rounded-[4.8px] text-[1.6rem] pl-[17px]"/>
-        </div>
-        <div class="flex items-center justify-end gap-[3rem]">
-          <p @click="newEmailModal=false" class="text-[#D9D9D9] text-[2rem] cursor-pointer">{{ $t("newsFeed.cancel") }}</p>
-          <button type="submit" class="bg-[#E31221] px-[17px] py-[9px] rounded-[4.8px]"><p class="text-[2rem] text-[#fff]">{{ $t("newsFeed.add") }}</p></button>
-        </div>
-      </Form>
-    </div>
-    <div v-if="requestSuccess" class="absolute w-[100vw] h-[100vh] top-0 left-0">
-       <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="reload"></div>
-       <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center px-[12rem] py-[5.4rem] bg-[#222030] rounded-[10px] z-50">
-      <form-header>
-        {{ $t('newsFeed.profile_updated') }}
-        <template v-slot:secondaryText>
-         {{ $t('newsFeed.reload_page') }}<br><br><span v-if="!user.google_id">{{ $t('newsFeed.if_email_changed') }}<br>{{ $t('newsFeed.dont_forget_confirm') }}</span>
-        </template>
-      </form-header>
-      <div class="flex items-center justify-center">
-        <basic-button type="button" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px]" width="w-[100%]" @click="reload">{{ $t('newsFeed.reload_page') }}</basic-button>
-      </div>
-       </div>
-    </div>
-   
-   
+
+    <addemail-form v-if="newEmailModal" @emailform-close="newEmailModal=false" @profile-updated="updateProfile"></addemail-form>
+
+    <profileupdated-modal v-if="requestSuccess" :user="user"></profileupdated-modal> 
     <div class="md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
     </div>
@@ -202,7 +161,6 @@ return {
       <div v-if="user.google_id" class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[55rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
         <Form @submit="onSubmitGoogleProfile" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] lg:px-[15%] xl:px-[20%] pb-[10%] flex flex-col items-center" enctype="multipart/form-data">
           <div class="relative inline-block -translate-y-[31%]">
-            <!-- <img src='http://127.0.0.1:8000/assets/LaracastImage.png' class="rounded-[100%] w-[19rem] h-[19rem]"> -->
             <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
              <input type="file" @change="handleImageChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
@@ -227,14 +185,7 @@ return {
           <div class="flex flex-col w-[100%] gap-[2rem]">
 
           <profile-input rules='required|min:8|max:15|lower_case' :vModel="user.name" name="name" type="name" width="w-[60%]" :label="$t('landing.name')"/>
-          
-          <div class="flex items-center gap-[2.4rem] lsm:gap-[1.2rem]">
-          <profile-input rules='email|required' :vModel="user.email" name="email" type="email" width="w-[60%]" :label="$t('landing.email')"/>
-          <div class="translate-y-[25%]">
-            <p class="text-[1.8rem] text-[#CED4DA]">{{ $t('newsFeed.primary_email') }}</p>
-          </div>
-          </div>
-          
+          <profileinput-container><profile-input rules='email|required' :vModel="user.email" name="email" type="email" width="w-[60%]" :label="$t('landing.email')"/></profileinput-container>  
           
           <div v-for="email in emails" v-show="email.address!=user.email" :key="email.id" class="flex items-center lsm:flex-col lsm:items-start lsm:justify-start gap-[2.4rem] lsm:gap-0">
           <profile-input :vModel="email.address" :name="'email'+email.id" type="email" width="w-[60%] pointer-events-none" :label="$t('landing.email')"/>
@@ -262,9 +213,6 @@ return {
   </div>
   </div>
 </template>
-
-
-
 
 
 <style scoped>

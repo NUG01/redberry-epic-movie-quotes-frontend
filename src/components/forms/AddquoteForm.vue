@@ -65,7 +65,7 @@ export default {
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);
-      basicAxios.post('quotes/create',form)
+      basicAxios.post('quotes',form)
     .then((res)=>{
         context.emit('updateQuotes', res.data.attributes)
         context.emit('addpostClose')

@@ -48,6 +48,7 @@ export default {
       onMounted(async ()=>{
        authUser.value=login.getUserData
        const res = await axios.get(`movies/${currentId}/details`);
+       console.log(res)
        genres.value=res.data.genres
        movieData.value=res.data.movie
        quotes.value=res.data.quotes

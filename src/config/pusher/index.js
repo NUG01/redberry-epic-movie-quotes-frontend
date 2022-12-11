@@ -21,7 +21,7 @@ import { useUserStore } from '@/stores/UserStore.js';
   authorizer: (channel) => {
           return {
               authorize: (socketId, callback) => {
-                  axios.post('http://127.0.0.1:8000/api/broadcasting/auth', {
+                  axios.post(import.meta.env.PUSHER_BASE_URL, {
                       socket_id: socketId,
                       channel_name: `private-notifications.${login.getUserData.id}`
                   })

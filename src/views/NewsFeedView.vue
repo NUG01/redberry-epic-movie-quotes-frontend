@@ -11,7 +11,7 @@ import PencilIcon from "@/components/icons/PencilIcon.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import ScrollSpinner from "@/components/ScrollSpinner.vue";
+import NewsfeedSpinner from "@/components/NewsfeedSpinner.vue";
 import AddquoteForm from "@/components/forms/AddquoteForm.vue";
 import { useAuthStore } from "@/stores/AuthStore.js";
 
@@ -19,7 +19,7 @@ import { useAuthStore } from "@/stores/AuthStore.js";
 export default {
   name:'NewsFeed',
   emits:['likedStatus', 'addpostClose', 'updateQuotes', 'headerSearch'],
-  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field, ScrollSpinner},
+  components:{BasicHeader, BasicNavigation, CommentsIcon, LikesIcon, PencilIcon, SearchIcon, LoadingSpinner, AddquoteForm, Form, Field, NewsfeedSpinner},
   
   setup(){
 
@@ -168,8 +168,8 @@ export default {
   }
 
   function updateQuotesIntoArray(data){
-    quoteData.value=data
-    quotesList.value=data
+    quoteData.value.unshift(data)
+    quotesList.value.unshift(data)
   }
 
   function searchSubmit(payload){
@@ -288,7 +288,7 @@ return {
 
 <template>
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
-  <scroll-spinner v-if="spinner" class="fixed z-40 scale-75"></scroll-spinner>
+  <newsfeed-spinner v-if="spinner" class="fixed z-40 scale-75"></newsfeed-spinner>
 <div class="fixed z-50">
   <basic-header @header-search="searchSubmit" search="search"></basic-header>
   </div>
