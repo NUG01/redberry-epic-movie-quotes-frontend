@@ -43,16 +43,20 @@ export default {
   detailsModal.value=id
   }
 
- async function deleteQuote(id){
-   await axios.delete(`quotes/${id}`)
-    .catch((err)=>{
+  function deleteQuote(id){
+      axios.delete(`quotes/${id}`)
+      .then(()=>{
+        dataIsFetched.value=false;
+         axios.get(`quotes/${currentId}`)
+         .then((resQuotes)=>{
+            quotesData.value = resQuotes.data;
+            context.emit('quotesQuantity', resQuotes.data)
+           dataIsFetched.value=true;
+           })
+      })
+    .catch(()=>{
       alert('Something went wrong!')
     })
-    dataIsFetched.value=false;
-    const resQuotes = await axios.get(`movie/${currentId}`);
-    quotesData.value = resQuotes.data.quotes;
-    context.emit('quotesQuantity', resQuotes.data.quotes)
-    dataIsFetched.value=true;
   }
 
   return {

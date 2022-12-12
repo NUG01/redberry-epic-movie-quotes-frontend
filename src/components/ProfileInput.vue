@@ -1,12 +1,12 @@
 <script>
 import { Field, ErrorMessage } from 'vee-validate';
-import { computed, ref,watch} from 'vue';
+import { computed, ref} from 'vue';
 import PasswordHidden from "@/components/icons/PasswordHidden.vue";
 import ProfileinvalidIcon from "@/components/icons/ProfileinvalidIcon.vue";
 import ProfilevalidIcon from "@/components/icons/ProfilevalidIcon.vue";
 import InputSuffix from "@/components/icons/InputSuffix.vue";
 export default {
-  props: ['name','type','placeholder','label', 'rules', 'value', 'disabled', 'vModel'],
+  props: ['name','type','placeholder','label', 'rules', 'value', 'disabled', 'vModel', 'width'],
   components:{Field, ErrorMessage, PasswordHidden,ProfileinvalidIcon,ProfilevalidIcon,InputSuffix},
   setup(props,context){
 
@@ -19,11 +19,18 @@ export default {
   const inputText=props.placeholder;
   const validate=props.validate;
   const value=props.value;
-  const vModel=props.vModel;
+  // const vModel=props.vModel;
+  const width=props.width;
 
+ const vModel= computed(()=>{
+  console.log(props.vModel)
+       return props.vModel
+  })
         
   const noState=ref(false);
   const validState=ref(false);
+
+
 
   function addErrors(){
       noState.value=true;
@@ -69,7 +76,8 @@ export default {
       validState,
       showPassword,
       hidePassword,
-      disabled
+      disabled,
+      width
       
       };
   }
@@ -79,7 +87,7 @@ export default {
 
 
 <template>
-  <div class="flex flex-col w-[100%] mb-[1.6rem] relative">
+  <div class="flex flex-col mb-[1.6rem] relative" :class="width">
     <label :for="inputName" class="text-[1.6rem] text-[#ffffff] mb-[0.8rem] md:mb-[0px]">{{ label }}</label>
     <div class="relative">
     <Field @blur="stateChange" v-model="vModel" :rules="rules" :class="disabled" :type="inputType" :name="inputName" :id="inputName" :placeholder="inputText"

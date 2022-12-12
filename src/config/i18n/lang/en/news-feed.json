@@ -39,5 +39,14 @@
   "commented": "Commented to your quote..",
   "liked": "Reacted to your quote",
   "new": "New",
-  "upload_image": "Upload image"
+  "upload_image": "Upload image",
+  "make_primary": "Make this primary",
+  "primary_email": "Primary Email",
+  "add_new_email": "Add new email",
+  "new_email": "New email",
+  "enter_email": "Enter new email",
+  "add": "Add",
+  "cancel": "Cancel",
+  "email_added": "Email added successfully!",
+  "check_email": "check your email to confirm"
 }

@@ -56,9 +56,6 @@ export default {
         return;
       }
       const form=new FormData();
-      if(id){
-      form.append('id', id);
-      }
       if(login.getUserData.id){
         form.append('user_id', login.getUserData.id);
       }
@@ -70,6 +67,21 @@ export default {
       form.append('director_ka', values.director_ka);
       form.append('description_en', values.description_en);
       form.append('description_ka', values.description_ka);
+      if(id){
+      form.append('id', id);
+      form.append("_method", "PATCH");
+      basicAxios.post(axiosEndpoint,form)
+    .then((res)=>{
+      context.emit('emit-close');
+      context.emit('update-movie');
+    })
+    .catch((err)=>{
+      alert('Something went wrong!')
+    })
+    .finally(()=>{
+      return;
+    })
+      }
       basicAxios.post(axiosEndpoint,form)
     .then((res)=>{
       context.emit('emit-close');

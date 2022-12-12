@@ -13,7 +13,7 @@ export default {
     const router=useRouter();
 
     onMounted(()=>{
-      axios.post('update-email', {
+      axios.post('user/email', {
         token: router.currentRoute.value.params.id,
         email: router.currentRoute.value.query.email
       })

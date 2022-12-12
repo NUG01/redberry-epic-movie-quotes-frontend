@@ -38,7 +38,7 @@ export default {
 
 
 onMounted(async ()=>{
-  const resQuote=await axios.get(`quote/${currentId}`);
+  const resQuote=await axios.get(`quotes/${currentId}/details`);
    authUser.value=login.getUserData
   quoteData.value=resQuote.data
    dataIsFetched.value=true
@@ -60,7 +60,8 @@ onMounted(async ()=>{
     form.append('thumbnail', selectedFile.value);
     form.append('quote_en', values.quote_en);
     form.append('quote_ka', values.quote_ka);
-    basicAxios.post('update-quote',form)
+    form.append("_method", "PATCH");
+    basicAxios.post('quotes/'+currentId,form)
   .then((res)=>{
     router.go(-1)
   })

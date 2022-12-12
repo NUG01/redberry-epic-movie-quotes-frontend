@@ -44,16 +44,16 @@ export default {
    const comments=ref([])
    const userEligibilityForChange=ref(null)
    const likes=ref([])
-   const likesData=ref(null)
+   const likesData=ref([])
     
     
    onMounted(async()=>{
-    const res= await axios.get(`quote/${currentId}`);
+    const res= await axios.get(`quotes/${currentId}/details`);
     authUser.value=login.getUserData
     quoteData.value=res.data.quote
-    likesData.value=res.data.likes
+    likesData.value=res.data.quote.likes
     likes.value=likesData.value
-    commentsData.value=res.data.comments
+    commentsData.value=res.data.quote.comments
     comments.value=commentsData.value
     userEligibilityForChange.value= quoteData.value.user_id == authUser.value.id ? true : false;
     dataIsFetched.value=true
@@ -82,7 +82,7 @@ function deleteQuote(id){
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);
-      basicAxios.post('update-quote',form)
+      basicAxios.post('quotes',form)
       .then((res)=>{
         quoteUpdated.value=true
      })
@@ -131,6 +131,7 @@ function commentsHandle(){
       user_id: authUser.value.id
     })
     .then((res)=>{
+      console.log(res)
       likes.value=res.data.attributes
     })
     .catch(()=>{
@@ -144,10 +145,10 @@ function commentsHandle(){
     imageUpload(ev,selectedFile, imageDisplay);
   }
   const likesQuantity=computed(()=>{
-     return likes.value.filter(x => x.quote_id == currentId).length
+     return likes.value.length
     })
   const likeColor=computed(()=>{
-     return likes.value.filter(x => x.quote_id == currentId).find(x => x.user_id == authUser.value.id) ? '#F3426C': '#fff'
+     return likes.value.find(x => x.user_id == authUser.value.id) ? '#F3426C': '#fff'
     })
 
      function submitComment(){

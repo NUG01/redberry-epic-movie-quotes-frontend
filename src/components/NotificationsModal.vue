@@ -19,18 +19,18 @@ export default {
      const router = useRouter();
      const dataIsFetched=ref(false)
      const user=ref(null)
-     const oldValue=ref([])
      const notifications=ref([])
+     const newNotifications=ref([])
 
     onMounted(async()=>{
        user.value=login.getUserData
       const resNotifications= await axios.get(`notifications/${user.value.id}`);
       notifications.value=resNotifications.data
-        oldValue.value=resNotifications.data
-      window.Echo.channel('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
+      window.Echo.private('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
         let data=e.notification.data
               data.user=e.notification.user
               if(user.value.id!=data.user.id){
+                newNotifications.value.push(data)
                 notifications.value.unshift(data)
                 context.emit('notificationLength')
 
@@ -44,15 +44,27 @@ export default {
       return props.modalShow
     })
     function newColor(notification){
-      return oldValue.value.find(x => x.id == notification.id) ? false : true
+      return newNotifications.value.find(x => x.id == notification.id) ? true : false
     }
      function now(date, locale){
       locale=='ka'? moment.locale('ka', ka) : moment.locale('en')
       return moment(date).fromNow()
     }
 
+    function markAsRead(){
+      newNotifications.value=[]
+    }
 
-    return {modalShow, notifications, now, newColor, router, dataIsFetched}
+
+    return {
+      modalShow,
+      notifications, 
+      now, 
+      newColor, 
+      router, 
+      dataIsFetched,
+      markAsRead
+            }
   }
   
 }
@@ -66,7 +78,7 @@ export default {
         <div class="bg-[#000] px-[4rem] py-[2rem]">
           <div class="flex items-end justify-between mb-[2.4rem]">
             <p class="text-[2.4rem] text-[#fff] font-medium md:text-[2rem]">{{ $t('newsFeed.notifications') }}</p>
-            <p class="text-[1.6rem] text-[#fff] font-normal cursor-pointer md:text-[1.4rem]">{{ $t('newsFeed.mark_as_read') }}</p>
+            <p @click="markAsRead" class="text-[1.6rem] text-[#fff] font-normal cursor-pointer md:text-[1.4rem] underline decoration-[0.5px] underline-offset-2">{{ $t('newsFeed.mark_as_read') }}</p>
           </div>
 
          

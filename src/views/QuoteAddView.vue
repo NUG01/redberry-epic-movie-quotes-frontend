@@ -41,10 +41,9 @@ export default {
 
 onMounted(async ()=>{
   authUser.value=login.getUserData
-  const res = await axios.get(`movie/${props.id}`);
+  const res = await axios.get(`movies/${props.id}/details`);
   movie.value=res.data.movie
   genres.value=res.data.genres
-  console.log(movie.value, genres.value)
   dataIsFetched.value=true
 
 })

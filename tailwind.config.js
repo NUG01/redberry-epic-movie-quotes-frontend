@@ -19,6 +19,8 @@ module.exports = {
 
         md: { max: "920px" },
   
+        lsm: { max: "620px" },
+
         sm: { max: "540px" },
       },
     },

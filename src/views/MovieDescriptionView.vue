@@ -47,7 +47,8 @@ export default {
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const res = await axios.get(`movie/${currentId}`);
+       const res = await axios.get(`movies/${currentId}/details`);
+       console.log(res)
        genres.value=res.data.genres
        movieData.value=res.data.movie
        quotes.value=res.data.quotes
@@ -59,7 +60,7 @@ export default {
 
        async function updateMovie(){
         dataIsFetched.value=false
-          const res = await axios.get(`movie/${currentId}`);
+          const res = await axios.get(`movies/${currentId}/details`);
           movieData.value=res.data.movie
           genres.value=res.data.genres
           quotes.value=res.data.quotes
@@ -120,7 +121,7 @@ quotes
   <basic-header></basic-header>
   <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
   <main v-else class="md:w-[100vw]">
-  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="update-movie" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
+  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
   :director_en="movieData.director.en" 
@@ -136,7 +137,7 @@ quotes
     <div class="md:w-[100%] md:px-[3.2rem]">
       <div class="text-[2.4rem] font-medium text-[#fff] mt-[3rem] md:hidden">{{ $t('newsFeed.movie_description') }}</div>
       <div class="mt-[3rem] listGrid md:w-[100%]">
-        
+       
         <div class="w-[100%]">
           <div class="mb-[4rem]">
           <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>

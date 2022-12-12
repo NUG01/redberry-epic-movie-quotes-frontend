@@ -37,6 +37,7 @@ export default {
     const valuesFetched=ref(false);
     const sideMenuShow=ref(false);
     const searchShow=ref(false);
+    const newNotifications=ref(false);
     const notificationsLength=ref(null)
     const user=ref([])
 

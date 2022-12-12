@@ -38,7 +38,7 @@ export default {
       user.value=login.getUserData
       dataIsFetched.value=true
     onMounted(async () => {
-     const res = await axios.get(`movies/${user.value.id}`);
+     const res = await axios.get('movies');
      quotesData.value=res.data.quotes
      moviesData.value=res.data
      moviesList.value=res.data
@@ -53,7 +53,7 @@ export default {
 
    async function updateMovieList(){
         moviesIsFetched.value=false
-        const res = await axios.get(`movies/${user.value.id}`);
+        const res = await axios.get('movies');
         moviesList.value=res.data
         moviesList.value=(moviesList.value).reverse()
         moviesIsFetched.value=true
