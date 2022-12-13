@@ -1,6 +1,6 @@
 <script>
 import { Form, Field } from 'vee-validate';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
@@ -16,7 +16,7 @@ import axios from "@/config/axios/index.js";
 
 
 export default {
-  props:['name', 'user', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka'],
+  props:['name', 'user', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka', 'author'],
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
     const router=useRouter()
@@ -32,10 +32,15 @@ export default {
     const director_ka=props.director_ka
     const description_en=props.description_en
     const description_ka=props.description_ka
+    const author=props.author
     const imageDisplay=ref('')
     const selectedFile=ref('')
     const dataIsFetched=ref(false)
     const genres=ref([])
+    const movieImage=ref([])
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+    
+
 
    function emitClose(){
     context.emit('emit-close');
@@ -96,6 +101,11 @@ export default {
     function deleteGenre(el){
       el.target.closest('.checkboxWrapper').remove();
     }
+    function currentImage(image){
+      return imageUrl+image
+    }
+
+    
 
 
 
@@ -114,7 +124,9 @@ export default {
     description_en, 
     description_ka,
     user,
-    dataIsFetched
+    dataIsFetched,
+    author,
+    currentImage
     }
   }
   
@@ -132,8 +144,8 @@ export default {
     </div>
      <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-center gap-[1.6rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
-        <p class="text-[2rem] text-[#fff]">{{ user.name }}</p>
+      <div :style="'background-image:url('+currentImage(user.thumbnail)+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
+        <p class="text-[2rem] text-[#fff]">{{ author }}</p>
       </div>
       
       <addmovie-input :value="name_en" rules="required|eng_alphabet" inputName="name_en" placeholder="Movie name" label="Eng" classLabel="top-1/2"></addmovie-input>

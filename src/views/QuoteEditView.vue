@@ -35,14 +35,18 @@ export default {
    const authUser=ref({})
    const dataIsFetched=ref(false)
    const quoteData=ref([])
+   const authorImage=ref([])
+   const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+
 
 
 onMounted(async ()=>{
   const resQuote=await axios.get(`quotes/${currentId}/details`);
-   authUser.value=login.getUserData
+  authUser.value=login.getUserData
   quoteData.value=resQuote.data
-   dataIsFetched.value=true
-
+  authorImage.value=imageUrl+quoteData.value.quote.user.thumbnail
+  imageDisplay.value=imageUrl+quoteData.value.quote.thumbnail
+  dataIsFetched.value=true
 })
 
 
@@ -90,7 +94,8 @@ onMounted(async ()=>{
     quoteData,
     deleteQuote,
     authUser,
-    dataIsFetched
+    dataIsFetched,
+    authorImage
     }
   }
   
@@ -109,27 +114,27 @@ onMounted(async ()=>{
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
       <p class="text-[2.4rem] md:text-[2rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.edit_quote') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <div @click="deleteQuote" class="absolute top-1/2 md:top-1/2 md:-translate-y-[25%] left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
+      <div @click="deleteQuote" class="absolute top-[45%] md:top-1/2 md:-translate-y-[25%] left-[3.6rem] cursor-pointer flex items-center gap-[1rem]">
         <delete-trash></delete-trash>
         <p class="text-[#CED4DA] text-[1.6rem] md:hidden">{{ $t('newsFeed.delete') }}</p>
       </div>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-start gap-[1.6rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
-        <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
+      <div :style="'background-image:url('+authorImage+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
+        <p class="text-[2rem] text-[#fff]">{{ quoteData.quote.user.name }}</p>
       </div>
       
       
-      <addmovie-input :value="quoteData.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
-      <addmovie-input :value="quoteData.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.quote.en" rules="required|eng_alphabet" as="textarea" inputName="quote_en" placeholder="Frankly, my dear, I don't give a damn." label="Eng" classLabel="top-[2rem]"></addmovie-input>
+      <addmovie-input :value="quoteData.quote.quote.ka" rules="required|geo_alphabet" as="textarea" inputName="quote_ka" placeholder='ციტატა ქართულ ენაზე' label="ქარ" classLabel="top-[2rem]"></addmovie-input>
       
       <div class="w-[100%] h-[45rem] md:h-[27rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
           <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">{{ $t('newsFeed.change_photo') }}</p>
         </div>
-        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
+      <div v-if="imageDisplay" :style="'background-image:url('+imageDisplay+')'" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0 bg-cover bg-no-repeat bg-center"></div>
       <input @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
 

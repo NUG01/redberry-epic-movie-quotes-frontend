@@ -44,13 +44,15 @@ export default {
     const quotesLength=ref('')
     const genres=ref([])
     const quotes=ref([])
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
        const res = await axios.get(`movies/${currentId}/details`);
-       console.log(res)
        genres.value=res.data.genres
        movieData.value=res.data.movie
+       imageDisplay.value=imageUrl+movieData.value.thumbnail
        quotes.value=res.data.quotes
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
        quotesLength.value=res.data.quotes.length  
@@ -62,6 +64,7 @@ export default {
         dataIsFetched.value=false
           const res = await axios.get(`movies/${currentId}/details`);
           movieData.value=res.data.movie
+          imageDisplay.value=imageUrl+movieData.value.thumbnail
           genres.value=res.data.genres
           quotes.value=res.data.quotes
           quotesLength.value=res.data.quotes.length 
@@ -73,7 +76,6 @@ export default {
           quotesLength.value=data.length   
         }
      
-    // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
  
     
 
@@ -108,7 +110,8 @@ dataIsFetched,
 updateMovie,
 updateQuantity,
 genres,
-quotes
+quotes,
+imageDisplay
 }
   }
   
@@ -128,6 +131,7 @@ quotes
   :director_ka="movieData.director.ka" 
   :description_en="movieData.description.en" 
   :description_ka="movieData.description.ka" 
+  :author="movieData.user.name" 
   :id="currentId"
    ></addmovie-form>
 
@@ -140,7 +144,7 @@ quotes
        
         <div class="w-[100%]">
           <div class="mb-[4rem]">
-          <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>
+          <img :src="imageDisplay" class="w-[100%] rounded-[12px]"/>
           <div class="mt-[4rem] flex items-center w-[55%] xxl:w-[55%] xl:w-[65%] llg:w-[85%] lg:w-[110%] md:hidden">
             <div>
             <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">{{ $t('newsFeed.quotes') }} ({{ $t('newsFeed.total') }} <span>{{ quotesLength }}</span>)</p>

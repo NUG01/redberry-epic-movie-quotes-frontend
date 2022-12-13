@@ -21,12 +21,14 @@ export default {
      const user=ref(null)
      const notifications=ref([])
      const newNotifications=ref([])
+     const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
 
     onMounted(async()=>{
        user.value=login.getUserData
       const resNotifications= await axios.get(`notifications/${user.value.id}`);
       notifications.value=resNotifications.data
       window.Echo.private('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
+        console.log(e)
         let data=e.notification.data
               data.user=e.notification.user
               if(user.value.id!=data.user.id){
@@ -54,6 +56,9 @@ export default {
     function markAsRead(){
       newNotifications.value=[]
     }
+    function notificationAuthor(image){
+      return imageUrl+image
+    }
 
 
     return {
@@ -63,7 +68,8 @@ export default {
       newColor, 
       router, 
       dataIsFetched,
-      markAsRead
+      markAsRead,
+      notificationAuthor
             }
   }
   
@@ -85,7 +91,7 @@ export default {
           <div class="flex flex-col justify-center gap-[2rem]">
             <div v-for="notify in notifications" :key="notify.id" class="border border-solid border-[#6d767e80] p-[1.6rem] flex items-center gap-[1.6rem] rounded-[4px]">
               <div class="md:flex md:items-center md:justify-center md:flex-col md:w-[6rem]">
-                <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] min-w-[6rem] min-h-[6rem] max-w-[6rem] max-h-[6rem]" :class="[newColor(notify) ? 'border-[2px] border-solid border-[#198754]' : '']">
+              <div :style="'background-image:url('+(notificationAuthor(notify.user.thumbnail))+')'" class="rounded-[100%] min-w-[6rem] min-h-[6rem] max-w-[6rem] max-h-[6rem] bg-cover bg-no-repeat bg-center" :class="[newColor(notify) ? 'border-[2px] border-solid border-[#198754]' : '']"></div>
                 <div class="text-[#198754] text-[1.6rem] hidden md:block" v-if="newColor(notify)">{{ $t('newsFeed.new') }}</div>
               </div>
               <div class="flex flex-col items-start gap-[1rem] md:gap-[3px] w-[100%]">

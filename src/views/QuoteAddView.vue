@@ -35,14 +35,19 @@ export default {
    const moviesData=ref([])
    const movie=ref([])
    const genres=ref([])
+   const movieImage=ref([])
+   const userImage=ref([])
    const dataIsFetched=ref(false)
+   const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
 
   currentId.value=props.id
 
 onMounted(async ()=>{
   authUser.value=login.getUserData
+  userImage.value=imageUrl+authUser.value.thumbnail
   const res = await axios.get(`movies/${props.id}/details`);
   movie.value=res.data.movie
+  movieImage.value=imageUrl+movie.value.thumbnail
   genres.value=res.data.genres
   dataIsFetched.value=true
 
@@ -81,7 +86,9 @@ onMounted(async ()=>{
     authUser,
     movie,
     dataIsFetched,
-    genres
+    genres,
+    movieImage,
+    userImage
     }
   }
   
@@ -102,11 +109,11 @@ onMounted(async ()=>{
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="self-start mb-[0.5rem]">
       <div class="flex items-center self-start justify-start gap-[1.6rem] mb-[3rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
+      <div :style="'background-image:url('+userImage+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
         <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
       </div>
        <div class="flex items-center gap-[3rem] md:gap-[1.2rem]">
-          <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[12px] w-[30%] inline-block"/>
+          <img :src="movieImage" class="rounded-[12px] w-[30%] inline-block"/>
           <div class="flex flex-col justify-center gap-[2.4rem] md:gap-0">
             <p class="text-[2.4rem] md:text-[1.6rem] md:order-1 text-[#DDCCAA] font-medium">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
               <div class="flex items-center gap-[8px] md:gap-[5px] md:order-3">

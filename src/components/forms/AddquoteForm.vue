@@ -41,10 +41,12 @@ export default {
    const movieChoosen=ref(false)
    const movieName=ref('')
    const movieId=ref(null)
+   const userImage=ref([])
 
    onMounted(async ()=>{
   authUser.value=login.getUserData
-  const resMovies = await axios.get(`movies/${authUser.value.id}`);
+  userImage.value=import.meta.env.VITE_API_BASE_URL_IMAGE+authUser.value.thumbnail
+  const resMovies = await axios.get('movies');
   moviesData.value=resMovies.data
   dataIsFetched.value=true
 
@@ -108,7 +110,8 @@ export default {
       moviesData,
       chooseMovie,
       movieChoosen,
-      movieName
+      movieName,
+      userImage
     }
   }
   
@@ -127,7 +130,7 @@ export default {
    <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="self-start mb-[1rem]">
       <div class="flex items-center self-start justify-start gap-[1.6rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
+      <div :style="'background-image:url('+userImage+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
         <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
       </div>
       </div>

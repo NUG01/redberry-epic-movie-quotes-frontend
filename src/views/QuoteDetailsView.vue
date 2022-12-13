@@ -45,12 +45,18 @@ export default {
    const userEligibilityForChange=ref(null)
    const likes=ref([])
    const likesData=ref([])
+   const userImage=ref([])
+   const authorImage=ref([])
+   const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
     
     
    onMounted(async()=>{
     const res= await axios.get(`quotes/${currentId}/details`);
     authUser.value=login.getUserData
+    userImage.value=imageUrl+authUser.value.thumbnail
     quoteData.value=res.data.quote
+    authorImage.value=imageUrl+quoteData.value.user.thumbnail
+    imageDisplay.value=imageUrl+quoteData.value.thumbnail
     likesData.value=res.data.quote.likes
     likes.value=likesData.value
     commentsData.value=res.data.quote.comments
@@ -82,7 +88,8 @@ function deleteQuote(id){
       form.append('thumbnail', selectedFile.value);
       form.append('quote_en', values.quote_en);
       form.append('quote_ka', values.quote_ka);
-      basicAxios.post('quotes',form)
+      form.append("_method", "PATCH");
+      basicAxios.post('quotes/'+props.id,form)
       .then((res)=>{
         quoteUpdated.value=true
      })
@@ -144,12 +151,16 @@ function commentsHandle(){
   function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay);
   }
+  function commentAuthorImage(image){
+    return imageUrl+image
+  }
   const likesQuantity=computed(()=>{
      return likes.value.length
     })
   const likeColor=computed(()=>{
      return likes.value.find(x => x.user_id == authUser.value.id) ? '#F3426C': '#fff'
     })
+
 
      function submitComment(){
        document.getElementById('submitComment').click();
@@ -178,7 +189,10 @@ function commentsHandle(){
       likes,
       likesQuantity,
       likeColor,
-      submitComment
+      submitComment,
+      commentAuthorImage,
+      userImage,
+      authorImage
       
     }
   }
@@ -197,14 +211,14 @@ function commentsHandle(){
         <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
       <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem]">{{ $t('newsFeed.view_quote_exact') }}</p>
       <close-icon  @click="router.go(-1)" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
-      <button v-show="userEligibilityForChange"  @click="deleteQuote(currentId)" class="absolute top-1/2 left-[3.6rem] md:top-1/2 md:-translate-y-[25%] flex items-center gap-[1rem] cursor-pointer">
+      <button v-show="userEligibilityForChange"  @click="deleteQuote(currentId)" class="absolute top-[45%] left-[3.6rem] md:top-1/2 md:-translate-y-[25%] flex items-center gap-[1rem] cursor-pointer">
         <delete-trash></delete-trash>
         <p class="text-[#CED4DA] text-[1.6rem] md:hidden">{{ $t('newsFeed.delete') }}</p>
       </button>
     </div>
        <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-start gap-[1.6rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
+      <div :style="'background-image:url('+authorImage+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
         <p class="text-[2rem] text-[#fff]">{{ authUser.name }}</p>
       </div>
       
@@ -214,10 +228,9 @@ function commentsHandle(){
       <div class="w-[100%] h-[45rem] md:h-[27rem] relative py-[2.7rem] px-[1.8rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit relative">
         <div v-if="userEligibilityForChange" class="bg-[#181623cc] flex flex-col items-center justify-center gap-[1.2rem] px-[2rem] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-[10px]">
           <camera-icon class="mt-[1.6rem]"></camera-icon>
-          <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal">{{ $t('newsFeed.change_photo') }}</p>
+          <p class="mb-[1rem] text-[1.6rem] text-[#fff] font-normal md:text-[1.4rem]">{{ $t('newsFeed.change_photo') }}</p>
         </div>
-        <img v-if="!imageDisplay" src="/src/assets/TenenbaumsMovie.png" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
-        <img v-if="imageDisplay" :src="imageDisplay" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0" />
+      <div v-if="imageDisplay" :style="'background-image:url('+imageDisplay+')'" class="h-[100%] w-[100%] rounded-[5px] absolute top-0 right-0 bg-cover bg-no-repeat bg-center"></div>
       <input v-if="userEligibilityForChange" @change="handleImageChange" type="file" class="z-50 w-[100%] h-[100%] cursor-pointer absolute top-0 left-0 opacity-0" />
       </div>
       <div class="w-[100%] border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
@@ -228,17 +241,17 @@ function commentsHandle(){
       </div>
         <div v-if="showComments" class="self-start w-[100%] max-h-[50rem] overflow-y-scroll scrollbarHide">
         <div class="flex gap-[2.4rem] pt-[1rem]" v-for="comment in comments" :key="comment">
-         <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
+      <div :style="'background-image:url('+commentAuthorImage(comment.user.thumbnail)+')'" class="rounded-[100%] w-[5.2rem] h-[5.2rem] bg-cover bg-no-repeat bg-center"></div>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%] flex flex-col">
           <p class="text-[2rem] font-medium text-[#fff]">{{ comment.user.name }}</p>
           <div><p class="text-[2rem] font-normal text-[#fff] wordwrap">{{ comment.body }}</p></div>
          </div>
         </div>
       </div>
-     <Form @submit="commentSubmit" v-if="showComments" class="w-[100%] md:w-[84%] mt-[1rem] md:self-start">
+     <Form @submit="commentSubmit" v-if="showComments" class="w-[100%] mt-[1rem] md:self-start">
         <div class="gap-[2.4rem] flex items-center">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
-              <Field rules="required" id="comment" name="comment" as="textarea" @keydown.enter.prevent="submitComment()" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[91.5%] max-w-[91.5%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></Field>
+      <div :style="'background-image:url('+userImage+')'" class="rounded-[100%] w-[5.2rem] h-[5.2rem] bg-cover bg-no-repeat bg-center"></div>
+              <Field rules="required" id="comment" name="comment" as="textarea" @keydown.enter.prevent="submitComment()" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[100%] max-w-[100%] xxl:min-w-[100%] xxl:max-w-[100%] xl:min-w-[83%] xl:max-w-[83%] llg:min-w-[80%] llg:max-w-[80%] lg:min-w-[80%] lg:max-w-[80%] md:min-w-[90%] md:max-w-[90%] lsm:min-w-[81%] lsm:max-w-[81%] sm:min-w-[70%] sm:max-w-[70%] min-h-[5.2rem] max-h-[5.2rem] bg-[#24222F] px-[2.5rem] py-[1rem]"></Field>
           <button type="submit" id="submitComment" class="w-0 h-0 opacity-0 absolute -top-full -left-full"></button>
         </div>
         </Form>

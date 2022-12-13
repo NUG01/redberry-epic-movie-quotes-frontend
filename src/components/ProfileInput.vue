@@ -19,11 +19,9 @@ export default {
   const inputText=props.placeholder;
   const validate=props.validate;
   const value=props.value;
-  // const vModel=props.vModel;
   const width=props.width;
 
  const vModel= computed(()=>{
-  console.log(props.vModel)
        return props.vModel
   })
         
