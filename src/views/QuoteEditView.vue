@@ -41,7 +41,7 @@ export default {
 
 
 onMounted(async ()=>{
-  const resQuote=await axios.get(`quotes/${currentId}/details`);
+  const resQuote=await axios.get(`quotes/${currentId}/show`);
   authUser.value=login.getUserData
   quoteData.value=resQuote.data
   authorImage.value=imageUrl+quoteData.value.quote.user.thumbnail

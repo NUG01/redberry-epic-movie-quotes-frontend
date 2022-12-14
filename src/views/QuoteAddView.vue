@@ -45,7 +45,7 @@ export default {
 onMounted(async ()=>{
   authUser.value=login.getUserData
   userImage.value=imageUrl+authUser.value.thumbnail
-  const res = await axios.get(`movies/${props.id}/details`);
+  const res = await axios.get(`movies/${props.id}`);
   movie.value=res.data.movie
   movieImage.value=imageUrl+movie.value.thumbnail
   genres.value=res.data.genres
