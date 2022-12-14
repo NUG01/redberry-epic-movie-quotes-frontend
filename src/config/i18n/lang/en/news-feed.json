@@ -50,5 +50,6 @@
   "email_added": "Email added successfully!",
   "check_email": "check your email to confirm",
   "check_email_change": "Please check email to verify new address,",
-  "if_changed_email": "if you changed it"
+  "if_changed_email": "if you changed it",
+  "genre_required": "Choose at least one genre!"
 }

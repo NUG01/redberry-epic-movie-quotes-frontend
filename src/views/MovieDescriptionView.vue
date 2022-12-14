@@ -1,6 +1,6 @@
 <script>
 import { useUserStore } from '@/stores/UserStore.js';
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import QuoteList from "@/components/QuoteList.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
@@ -16,6 +16,7 @@ import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ProfileUpdated from "@/components/ProfileUpdated.vue";
 
 
 
@@ -23,8 +24,8 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
   name:'MovieDescription',
   props:['id'],
-  emits:['emitDots', 'updateMovie', 'quotesQuantity'],
-  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
+  emits:['emitDots', 'updateMovie', 'quotesQuantity', 'requiredMessage'],
+  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm, ProfileUpdated },
   
   setup(props){
 
@@ -35,6 +36,7 @@ export default {
 
 
     const addMoviesModal=ref(false);
+    const imageRequired=ref(false);
     const imageDisplay=ref('');
     const movieData=ref([])
     const moviesData=ref([])
@@ -45,6 +47,7 @@ export default {
     const genres=ref([])
     const quotes=ref([])
     const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+
 
 
       onMounted(async ()=>{
@@ -76,7 +79,11 @@ export default {
           quotesLength.value=data.length   
         }
      
- 
+  watch(imageRequired, () => {
+      setTimeout(() => {
+        imageRequired.value=false
+     }, "7200")
+});
     
 
       function handleCloseEmit(){
@@ -111,7 +118,8 @@ updateMovie,
 updateQuantity,
 genres,
 quotes,
-imageDisplay
+imageDisplay,
+imageRequired
 }
   }
   
@@ -124,7 +132,10 @@ imageDisplay
   <basic-header></basic-header>
   <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
   <main v-else class="md:w-[100vw]">
-  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
+    <profile-updated v-if="imageRequired" class="z-50" color="bg-[#ec942293] text-[#fff]">
+    {{ $t('newsFeed.genre_required') }}
+  </profile-updated>
+  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" @required-message="imageRequired=true" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute z-40" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
   :director_en="movieData.director.en" 
@@ -132,6 +143,7 @@ imageDisplay
   :description_en="movieData.description.en" 
   :description_ka="movieData.description.ka" 
   :author="movieData.user.name" 
+  :image="movieData.thumbnail"
   :id="currentId"
    ></addmovie-form>
 

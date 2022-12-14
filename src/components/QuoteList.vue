@@ -87,7 +87,7 @@ export default {
   <div v-else class="flex flex-col gap-[4rem] h-[17%] md:w-[100%]">
             <div class="px-[3.2rem] py-[2.4rem] md:px-0 md:py-0 md:pb-[2.7rem] w-[100%] bg-[#09090f] rounded-[10px] md:rounded-[2px]" v-for="quote in quotesData" :key="quote">
             <div class="relative">
-              <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-40 md:hidden"></dots-icon>
+              <dots-icon @emit-dots="quoteEditModal(quote.id)" class="absolute top-0 right-0 cursor-pointer z-30 md:hidden"></dots-icon>
               <div v-if="detailsModal==quote.id" :id="'quote'+quote.id" class="p-[4rem] bg-[#24222F] flex flex-col justify-center gap-[3rem] absolute top-[2rem] md:-top-[0.3px] right-0 translate-x-[87%] md:translate-x-0 rounded-[10px] md:rounded-[2px] z-50">
                    <div class="flex items-center gap-[1.6rem]">
                     <view-quote></view-quote>

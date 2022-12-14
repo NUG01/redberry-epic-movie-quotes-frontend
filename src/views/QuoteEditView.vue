@@ -56,9 +56,6 @@ onMounted(async ()=>{
 
 
   function onSubmit(values){
-    if(!imageDisplay.value){
-    return;
-    }
     const form=new FormData();
     form.append('quote_id', currentId);
     form.append('thumbnail', selectedFile.value);
