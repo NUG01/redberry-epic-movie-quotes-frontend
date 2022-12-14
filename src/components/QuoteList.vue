@@ -103,8 +103,8 @@ export default {
                    </div>
               </div>
               <div class="flex items-center md:flex-col gap-[3.1rem] md:gap-[2.4rem] pb-[2.4rem] border-b border-b-[#f0f0f036] border-b-solid md:border-b-0">
-                <img :src="quoteImage(quote.thumbnail)" class="w-[30%] rounded-[2px] md:hidden"/>
-                <div :style="'background-image:url('+(quoteImage(quote.thumbnail))+')'" class="bg-cover bg-no-repeat w-[100%] min-h-[15rem] height rounded-[2px] hidden md:block"></div>
+                <div :style="'background-image:url('+(quoteImage(quote.thumbnail))+')'" class="bg-cover bg-no-repeat bg-center w-[30%] h-[12rem] rounded-[2px] md:hidden"></div>
+                <div :style="'background-image:url('+(quoteImage(quote.thumbnail))+')'" class="bg-cover bg-no-repeat bg-center w-[100%] min-h-[15rem] height rounded-[2px] hidden md:block"></div>
                 <p class="text-[2.4rem] text-[#CED4DA] md:w-[95%] md:border-b md:border-b-[#f0f0f036] md:border-b-solid md:pb-[2.4rem] break-words">"{{ $i18n.locale=='en'? quote.quote.en : quote.quote.ka }}"</p>
                 </div>
               <div class="flex items-center gap-[3.2rem] mt-[2.4rem] md:mt-0 md:justify-start md:pl-[1rem]">
