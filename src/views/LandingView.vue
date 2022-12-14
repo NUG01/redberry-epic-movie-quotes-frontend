@@ -1,96 +1,113 @@
 <script>
-import BaseButton from "@/components/BaseButton.vue";
+import BasicButton from "@/components/BasicButton.vue";
 import LandingImage from "@/components/LandingImage.vue";
+import LandingFooter from "@/components/LandingFooter.vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
-import RegisterForm from "@/components/forms/RegisterForm.vue";
+
 
 import { ref } from "vue";
 export default{
   name:"Landing",
-  components:{BaseButton,LandingImage,DropdownArrow,RegisterForm},
-  emits:["emit-base"],
-  setup(){
+  components:{BasicButton, LandingImage, DropdownArrow, LandingFooter},
+     setup(){
 
-    const registerShow=ref(false);
+      const langActive=ref(false);
+      const intersection=ref(false);
 
-    function registration(){
-      registerShow.value=true;
-    }
-    function registrationHide(){
-      registerShow.value=false;
-    }
-  
-    return{
-      showModal:registerShow,
-      registration,
-      registrationHide
+      function langDropDown(){
+        langActive.value=!langActive.value;
+        setTimeout(function(){
+          langActive.value=false
+        }, 2700);
+
       }
-  }
 
+
+        const observeEl=new IntersectionObserver(function(entries) {
+        const ent=entries[0]
+        if(ent.isIntersecting==false){
+          intersection.value=false
+         }else{
+          intersection.value=true
+        }
+      }, {
+        root: null,
+        threshold:1,
+        rootMargin:'-75px'
+      });
+
+      setTimeout(() => {
+        observeEl.observe(document.getElementById('getStartedButton'));
+      }, "720")
+     
+
+
+
+     
+
+      return {
+        langDropDown,
+        active: langActive,
+        intersection
+        }
+     }
 }
-
-
 
 </script>
 
-<template>
+<template >
 <section class="w-[100vw] bg-[#08080D] relative">
-  <div v-if="showModal" class="flex items-center justify-center">
-    <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click.stop="registrationHide"></div>
-    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center px-[12rem] py-[5.4rem] bg-[#222030] rounded-[10px] z-50">
-      <div class="flex flex-col text-center gap-[1.2rem] mb-[2.4rem]">
-        <p class="text-[3.2rem] text-[#ffffff] font-medium">Create an account</p>
-        <p class="text-[1.6rem] text-[#6C757D]">Start your journey!</p>
-      </div>
-     <register-form></register-form>
-      <div class="flex items-center justify-center">
-      <p class="text-[#6C757D] text-[1.6rem]">Already have an account? <span class="text-[#0D6EFD]">Log in</span></p>
-      </div>
-    </div>
-  </div>
-<div class="gradient-two absolute top-0 left-0 h-[100%] w-[100%] z-10">
-  <header class="absolute top-0 left-0 w-[100%] h-[auto] py-[3rem] px-[7rem] flex items-center justify-between">
-    <div class="uppercase font-medium text-[1.6rem] text-[#DDCCAA]">movie quotes</div>
-    <div class="flex gap-[1.6rem]">
-      <div class="flex items-center justify-center gap-[1rem] mr-[2.4rem]">
-        <p class="text-[1.6rem] text-[white]">Eng</p>
+  <router-view></router-view>
+<div class="absolute top-0 left-0 h-[100%] w-[100%] gradient-two z-10"></div>
+<div class="fixed top-0 left-0 h-[100%] w-[100%] z-30">
+  <header class="absolute z-50 top-0 left-0 w-[100%] h-[auto] py-[3rem] px-[5rem] md:px-[3.6rem] md:py-[2.4rem] flex items-center justify-between z-50">
+    <div class="uppercase font-medium text-[1.6rem] sm:text-[1.4rem] text-[#DDCCAA]">movie quotes</div>
+    <div class="flex gap-[1.6rem] md:gap-0">
+      <div class="mr-[2.4rem] relative flex items-center justify-center">
+        <div @click="langDropDown" class="flex items-center justify-center gap-[1rem] cursor-pointer">
+        <p class="text-[1.6rem] sm:text-[1.4rem] text-[white]">{{ $i18n.locale=='en'? 'Eng' : 'Ka' }}</p>
       <dropdown-arrow></dropdown-arrow>
+        </div>
+      <div class="absolute top-full left-0 bg-none border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
+          <div @click="$i18n.locale='en'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Eng</p></div>
+          <div @click="$i18n.locale='ka'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Ka</p></div>
       </div>
-      <base-button @emit-base="registration" text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">Sign Up</base-button>
-      <button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px]">Log in</button>
-      
+      </div>
+      <router-link :to="{name:'registration'}" class="md:hidden"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">{{ $t('landing.signup') }}</basic-button></router-link>
+      <router-link :to="{name:'login'}"><button type="button" class="text-[white] text-[1.6rem] bg-none border border-solid border-[white] px-[25.5px] py-[7px] rounded-[4px] hover:bg-[#cdc9c2] hover:text-[#222030] font-medium active:bg-[#b6b1a8] disabled:bg-[#e6e2da] focus:bg-[#a5a199] focus:text-[#222030]">{{ $t('landing.login') }}</button></router-link>
     </div>
   </header>
 </div>
+ 
 <div class="w-[100%] h-[80vh] gradient-one flex items-center justify-center">
-  <div class="flex flex-col gap-[3rem] items-center text-[6rem] font-bold text-[#DDCCAA] text-center">
-    <p>Find any quote in<br>millions of movie lines</p>
-    <base-button @emit-base="registration" type="button" paddings="px-[16px] py-[9px]" rounded="rounded-[4.8px]" text="text-[2rem]">Get started</base-button>  
+  <div class="flex flex-col gap-[3rem] items-center text-[6rem] md:text-[3rem] font-bold text-[#DDCCAA] text-center">
+    <p>{{ $t('landing.find_any_quote') }}<br>{{ $t('landing.millions_movie_lines') }}</p>
+    <basic-button type="button" rounded="rounded-[4.8px]" text="text-[2rem]" id="getStartedButton" :class="[!intersection ? 'z-20' : '']"><router-link to="/landing/register" class="px-[16px] py-[9px] md:px-[14px] md:py-[7px] block focus:shadow-base-shadow rounded-[4.8px] text-[2rem] border border-solid transition-all disabled:opacity-[0.65] bg-[#E31221] border-[#E31221] hover:bg-[#CC0E10] hover:border-[#CC0E10] active:bg-[#B80D0F] active:border-[#B80D0F]disabled:bg-[#EC4C57]focus:bg-[#B80D0F]focus:border-[#B80D0F]">{{ $t('landing.get_started') }}</router-link></basic-button>
   </div>
 </div>
   
-  <landing-image margintop="mt-[18%]" image="/src/assets/image1.png" gradient="gradient-two">
-    &#8220;You have to leave something<br>behind to go forward&#8221;
+  <landing-image margintop="mt-[18%] md:mt-[48%]" image="bg-[url(/src/assets/InterstellarMovie.png)]" :imageSource="true" gradient="gradient-two">
+    &#8220;{{ $t('landing.interstellar_quote_one') }}<br class="sm:hidden"> {{ $t('landing.interstellar_quote_two') }}&#8221;
     <template v-slot:movie>
-        Interstellar, 2014
+        {{ $t('landing.interstellar') }}, 2014
+    </template>
+  </landing-image>
+
+    <landing-image margintop="mt-[18%] md:mt-[54%]" image="bg-[url(/src/assets/TenenbaumsMovie.png)] bg-fixed" gradient="gradient-three">
+    &#8220;{{ $t('landing.tenenbaums_quote_one') }}<br class="sm:hidden"> {{ $t('landing.tenenbaums_quote_two') }}<br> {{ $t('landing.tenenbaums_quote_three') }}&#8221;
+    <template v-slot:movie>
+        {{ $t('landing.tenenbaums') }}, 2001
     </template>
   </landing-image>
   
-  <landing-image margintop="mt-[21%]" image="/src/assets/image3.png" gradient="gradient-three">
-    &#8220;I think we're just gonna have<br>to be secretly in love with each other<br>and leave it that&#8221;
+    <landing-image margintop="mt-[18%] md:mt-[60%]" image="bg-[url(/src/assets/LordofRingsMovie.png)] bg-fixed" gradient="gradient-four">
+    &#8220;{{ $t('landing.lord_of_rings_quote_one') }}<br class="sm:hidden"> {{ $t('landing.lord_of_rings_quote_two') }}<br>{{ $t('landing.lord_of_rings_quote_three') }}&#8221;
     <template v-slot:movie>
-        The Royal Tenenbaums, 2001
+        {{ $t('landing.lord_of_rings') }}, 2003
     </template>
   </landing-image>
   
-  <landing-image margintop="mt-[27%]" image="/src/assets/image2.png" gradient="gradient-four">
-    &#8220;For behold! the storm comes,<br>and now all friends should gather together,<br>lest each singly be destroyed&#8221;
-    <template v-slot:movie>
-        The Lord of the Rings, 2003
-    </template>
-  </landing-image>
-<div class="w-[100%] h-[4.5rem] absolute bottom-0 left-0"><div class="gradient-five relative top-0 left-0 h-[100%] w-[100%] z-10 flex items-center">
-  <p class="font-medium text-[1.2rem] text-[#DDCCAA] uppercase ml-[7rem]">&#169;  2022 movie quotes. all rights reserved.</p></div></div>
+  <landing-footer></landing-footer>
 </section>
 </template>
 
@@ -104,5 +121,11 @@ section{
 }
 .gradient-two{
   background: linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 55.21%, rgba(0, 0, 0, 0) 100%);
+}
+.lang{
+  color:#cdc9c2;
+  color:#23232b;
+  height: auto !important;
+  display: block !important;
 }
 </style>
