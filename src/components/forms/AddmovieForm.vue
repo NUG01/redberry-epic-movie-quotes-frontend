@@ -1,6 +1,6 @@
 <script>
 import { Form, Field } from 'vee-validate';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import BasicButton from "@/components/BasicButton.vue";
 import AddmovieInput from "@/components/inputs/AddmovieInput.vue";
@@ -16,7 +16,7 @@ import axios from "@/config/axios/index.js";
 
 
 export default {
-  props:['name', 'user', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka'],
+  props:['name', 'user', 'image', 'axiosEndpoint', 'name_en', 'name_ka', 'director_en','id', 'director_ka', 'description_en', 'description_ka', 'author'],
   components:{Form, BasicButton, AddmovieInput, CloseIcon,CameraIcon, Field, CloseCheckbox,CheckboxInput },
   setup(props, context){
     const router=useRouter()
@@ -32,11 +32,18 @@ export default {
     const director_ka=props.director_ka
     const description_en=props.description_en
     const description_ka=props.description_ka
+    const author=props.author
     const imageDisplay=ref('')
     const selectedFile=ref('')
     const dataIsFetched=ref(false)
     const genres=ref([])
+    const movieImage=ref([])
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+    
 
+   if(props.image){
+    imageDisplay.value=imageUrl+props.image
+   }
    function emitClose(){
     context.emit('emit-close');
 
@@ -52,10 +59,16 @@ export default {
     imageUpload(ev,selectedFile, imageDisplay);
   }
     function onSubmit(values){
-      if(!imageDisplay.value){
-        return;
-      }
       const form=new FormData();
+      if(!values.genre){
+      context.emit('requiredMessage')
+      return
+      }
+      if(!id){
+        if(!selectedFile.value){
+        return
+        }
+      }
       if(login.getUserData.id){
         form.append('user_id', login.getUserData.id);
       }
@@ -96,6 +109,11 @@ export default {
     function deleteGenre(el){
       el.target.closest('.checkboxWrapper').remove();
     }
+    function currentImage(image){
+      return imageUrl+image
+    }
+
+    
 
 
 
@@ -114,7 +132,10 @@ export default {
     description_en, 
     description_ka,
     user,
-    dataIsFetched
+    dataIsFetched,
+    author,
+    currentImage,
+    id
     }
   }
   
@@ -124,23 +145,23 @@ export default {
 
 <template>
 <div v-if="dataIsFetched" class="flex items-center justify-center">
-<div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-50" @click="emitClose"></div>
-    <div class="fixed md:overflow-y-scroll w-[40%] xl:w-[45%] lg:w-[60%] md:w-[100vw] md:h-[100vh] md:max-h-[100vh] top-1/2 left-1/2 md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-50">
+<div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-40" @click="emitClose"></div>
+    <div class="fixed md:overflow-y-scroll w-[40%] xl:w-[45%] lg:w-[60%] md:w-[100vw] md:h-[100vh] md:max-h-[100vh] top-1/2 left-1/2 md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-40">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
       <p class="text-[2.4rem] font-medium text-[#fff] pt-[3rem] pb-[2.4rem] md:text-[2rem]">{{ headerName }}</p>
       <close-icon @click="emitClose" class="absolute top-1/2 right-[3.6rem] cursor-pointer"/>
     </div>
      <Form @submit="onSubmit" class="w-[100%] p-[3rem] flex flex-col items-center justify-center gap-[2rem]" enctype="multipart/form-data">
       <div class="flex items-center self-start justify-center gap-[1.6rem]">
-        <img src="/src/assets/TenenbaumsMovie.png" class="rounded-[100%] w-[6rem] h-[6rem]"/>
-        <p class="text-[2rem] text-[#fff]">{{ user.name }}</p>
+      <div :style="'background-image:url('+currentImage(user.thumbnail)+')'" class="rounded-[100%] w-[6rem] h-[6rem] bg-cover bg-no-repeat bg-center"></div>
+        <p class="text-[2rem] text-[#fff]">{{ author }}</p>
       </div>
       
       <addmovie-input :value="name_en" rules="required|eng_alphabet" inputName="name_en" placeholder="Movie name" label="Eng" classLabel="top-1/2"></addmovie-input>
       <addmovie-input :value="name_ka" rules="required|geo_alphabet" inputName="name_ka" placeholder="ფილმის სახელი" label="ქარ" classLabel="top-1/2"></addmovie-input>
       
       <div class="w-[100%] min-h-[5rem] border-[#6C757D] border border-solid rounded-[5px] bg-inherit px-[17px] py-[9px] text-[2rem] md:text-[1.6rem] flex items-center gap-[1rem] overflow-y-scroll scrollHide">
-      <checkbox-input rules="required" v-for="(genre) in genres" :key="genre" :id="genre.id" :genreValue="genre.name"></checkbox-input>
+      <checkbox-input :rules="[id ? '' : 'required']" v-for="(genre) in genres" :key="genre" :id="genre.id" :genreValue="genre.name"></checkbox-input>
       </div>
       
       <addmovie-input :value="director_en" rules="required|eng_alphabet" inputName="director_en" placeholder="Director" label="Eng" classLabel="top-1/2"></addmovie-input>

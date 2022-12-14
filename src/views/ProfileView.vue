@@ -14,7 +14,6 @@ import ProfileUpdated from "@/components/ProfileUpdated.vue";
 import { imageUpload } from "@/helpers/ImageUpload/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
-import ProfileupdatedModal from "@/components/ProfileupdatedModal.vue";
 import ProfileinputContainer from "@/components/ProfileinputContainer.vue";
 import AddemailForm from "@/components/forms/AddemailForm.vue";
 import SearchArrow from "@/components/icons/SearchArrow.vue";
@@ -28,7 +27,7 @@ import SuccessIcon from "@/components/icons/SuccessIcon.vue";
 export default {
     name:'Profile',
     emits:['EmailformClose'],
-    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail, SuccessIcon, ProfileUpdated, ProfileupdatedModal, ProfileinputContainer, AddemailForm},
+    components:{BasicHeader, BasicNavigation,BasicInput,Form,Field, InvalidIcon, ErrorMessage,DeleteTrash, ProfileInput, ProfileinvalidIcon,FormHeader, BasicButton, LoadingSpinner, SearchArrow, AddEmail, SuccessIcon, ProfileUpdated, ProfileinputContainer, AddemailForm},
   
   setup(){
 
@@ -38,23 +37,26 @@ export default {
     const imageError=ref(false)
     const responseError=ref([])
     const emails=ref(null)
-    const requestSuccess=ref(false)
     const dataIsFetched=ref(false)
     const newEmailModal=ref(false)
     const profileUpdated=ref(false)
+    const updatedProfile=ref(false)
+    const emailUpdated=ref(false)
 
 
     const user=ref([])
     const imageUrl=ref('')
     const imageDisplay=ref('')
     const selectedFile=ref('')
+    const imageBackUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
 
       user.value =login.getUserData;
       emails.value=login.getUserData.emails
       dataIsFetched.value=true
+      updatedProfile.value=true
     
         
-      imageDisplay.value='http://localhost:8000/'+user.value.thumbnail
+    imageDisplay.value=imageBackUrl+user.value.thumbnail
     
     function handleImageChange(ev){
     imageUpload(ev,selectedFile, imageDisplay, imageUrl);
@@ -68,13 +70,19 @@ export default {
       basicAxios.post('user/profile',form)
     .then((res)=>{
      responseError.value=[];
-     requestSuccess.value=true
     })
     .catch((err)=>{
       responseError.value.push(err.response.data.message)
     })
+    updateProfileData()
     }
-
+  async function updateProfileData(){
+     updatedProfile.value=false    
+     const response=await axios.get("user")
+     login.userData=response.data.user;
+     user.value=login.userData
+     updatedProfile.value=true   
+      }
   
     function onSubmit(values){
       const form=new FormData();
@@ -86,15 +94,20 @@ export default {
       basicAxios.post('user/profile',form)
     .then((res)=>{
       responseError.value=[];
-      requestSuccess.value=true
+      if(values.email!=user.value.email)emailUpdated.value=true
     })
     .catch((err)=>{
       responseError.value.push(err.response.data.message)
     })
-
+     updateProfileData();
     }
 
 
+    watch(emailUpdated, () => {
+      setTimeout(() => {
+        emailUpdated.value=false
+     }, "7200")
+});
     watch(profileUpdated, () => {
       setTimeout(() => {
         profileUpdated.value=false
@@ -118,7 +131,6 @@ export default {
     
 return {
   user,
-  requestSuccess, 
   onSubmit, 
   imageUrl,
   handleImageChange, 
@@ -133,7 +145,9 @@ return {
   deleteEmail,
   chooseEmail,
   profileUpdated, 
-  updateProfile
+  updateProfile,
+  updatedProfile,
+  emailUpdated
   }
   }
   
@@ -143,7 +157,12 @@ return {
 
 <template>
 <div class="overflow-x-hidden overflow-y-scroll">
-  <profile-updated v-if="profileUpdated"></profile-updated>
+  <profile-updated v-if="profileUpdated">
+    {{ $t('newsFeed.email_added') }}<br>{{ $t('newsFeed.check_email') }}
+  </profile-updated>
+  <profile-updated v-if="emailUpdated">
+    {{ $t('newsFeed.check_email_change') }}
+  </profile-updated>
   <loading-spinner v-if="!dataIsFetched" texts="hidden" bgColor="bg-none" location="mt-[20rem]"></loading-spinner>
   <div v-else class="main w-[100vw] bg-[#181623] min-h-[100vh]">
   <basic-header></basic-header>
@@ -151,17 +170,17 @@ return {
 
     <addemail-form v-if="newEmailModal" @emailform-close="newEmailModal=false" @profile-updated="updateProfile"></addemail-form>
 
-    <profileupdated-modal v-if="requestSuccess" :user="user"></profileupdated-modal> 
     <div class="md:hidden">
       <basic-navigation :user="user" :dataIsFetched="dataIsFetched" feed="#fff" movies="#fff" profile="border-[2px] border-solid border-[#E31221]"></basic-navigation>
     </div>
     <div class="bg-gray md:bg-[#24222F] md:mt-[3rem] relative">
       <p class="font-medium text-[2.4rem] text-[#fff] mt-[3rem] md:mt-[12rem] md:hidden">{{ $t('newsFeed.my_profile') }}</p>
         <search-arrow @click="router.push({name:'news-feed'})" class="hidden md:block absolute top-0 left-0 -translate-y-[150%] translate-x-[180%]"></search-arrow>
-      <div v-if="user.google_id" class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[55rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+      <div v-if="user.google_id" :class="[updatedProfile ? 'bg-[#11101A]' :'']" class="md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[55rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+              <loading-spinner v-if="!updatedProfile" texts="hidden" bgColor="inherit" location="mt-[20rem]"></loading-spinner>
         <Form @submit="onSubmitGoogleProfile" class="w-[100%] mb-[12rem] px-[24%] md:px-[3rem] lg:px-[15%] xl:px-[20%] pb-[10%] flex flex-col items-center" enctype="multipart/form-data">
           <div class="relative inline-block -translate-y-[31%]">
-            <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
+            <div v-if="imageDisplay" :style="'background-image:url('+imageDisplay+')'" class="rounded-[100%] w-[19rem] h-[19rem] bg-cover bg-no-repeat bg-center"></div>
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
              <input type="file" @change="handleImageChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
           </div>
@@ -174,10 +193,12 @@ return {
        </Form>
       </div>
       
-      <div v-if="!user.google_id"  class="bg-[#11101A] md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[60rem] llg:w-[70rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
-        <Form id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[9%] md:px-[3rem] lg:px-[7%] xl:px-[8%] pb-[10%] flex flex-col items-center">
+      <div v-if="!user.google_id" :class="[updatedProfile ? 'bg-[#11101A]' :'']" class="md:bg-inherit w-[90rem] md:w-[100vw] lg:w-[60rem] llg:w-[70rem] xl:w-[70rem] h-[auto] mt-[12rem] rounded-[12px] backblur relative">
+        <loading-spinner v-if="!updatedProfile" texts="hidden" bgColor="inherit" location="mt-[20rem]"></loading-spinner>
+        <Form v-else id="form" @submit="onSubmit" enctype="multipart/form-data" class="w-[100%] mb-[12rem] px-[9%] md:px-[3rem] lg:px-[7%] xl:px-[8%] pb-[10%] flex flex-col items-center">
           <div class="relative flex flex-col items-center justify-center inline-block -translate-y-[31%]">
-            <img v-if="imageDisplay" :src='imageDisplay' class="rounded-[100%] w-[19rem] h-[19rem]">
+            <div v-if="imageDisplay" :style="'background-image:url('+imageDisplay+')'" class="rounded-[100%] w-[19rem] h-[19rem] bg-cover bg-no-repeat bg-center"></div>
+
             <p class="text-[2rem] text-[#fff] text-center mt-[8px]">{{ $t('newsFeed.upload_photo') }}</p>
             <input type="file" @change="handleImageChange" class="w-[100%] h-[100%] absolute top-0 left-0 opacity-0" />
           </div>

@@ -13,8 +13,6 @@ import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 
-
-
 export default {
   name:'MovieList',
   emits:['emitClose', 'updateMovie'],
@@ -30,6 +28,8 @@ export default {
     const moviesData=ref([])
     const quotesData=ref([])
     const moviesList=ref([])
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+
 
 
     const addMoviesModal=ref(false);
@@ -44,11 +44,13 @@ export default {
      moviesList.value=res.data
      moviesList.value=(moviesList.value).reverse()
      moviesIsFetched.value=true
-      // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
     });
 
     function closeAddMoviesModal(){
       addMoviesModal.value=false
+    }
+    function movieImage(image){
+    return imageUrl+image
     }
 
    async function updateMovieList(){
@@ -86,6 +88,7 @@ return {
   searchSubmit,
   updateMovieList,
   quotesData,
+  movieImage
 }
   }
   
@@ -113,7 +116,7 @@ return {
       </div>
       <div class="w-[100%] md:w-[100%] movies-grid h-[90.3%] overflow-y-scroll scrollHide pb-[1.5rem]">
         <div class="flex flex-col gap-[1.6rem]" v-for="movie in moviesList" :key="movie.id">
-          <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><img src="/src/assets/TenenbaumsMovie.png" class="w-[100%] rounded-[12px]" /></router-link>
+          <router-link :to="{ name: 'movie-description', params: { id: movie.id }}"><div :style="'background-image:url('+(movieImage(movie.thumbnail))+')'" class="w-[100%] height rounded-[12px] bg-cover bg-no-repeat bg-center"></div></router-link>
           <p class="text-[2.4rem] font-medium text-[#fff]">{{ $i18n.locale=='en'? movie.name.en : movie.name.ka }}</p>
           <div class="flex items-center justify-start gap-[1.2rem] mt-[2px] md:mt-0">
             <span class="text-[2rem] font-medium text-[#fff]">{{ movie.quotes.length }}</span>
@@ -174,7 +177,7 @@ main{
 }
 }
 
-@media (max-width: 1450px) {
+@media (max-width: 1250px) {
   .movies-grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -199,7 +202,7 @@ input::placeholder {
 }
 .movies-grid{
     column-gap:4rem;
-  row-gap:0;
+  row-gap:3rem;
   }
 .hide{
   display: none;
@@ -230,4 +233,43 @@ input::placeholder {
     color: #CED4DA;
     font-size: 2rem;
 }
+.height{
+  height: 33rem;
+}
+@media (max-width: 1450px) {
+  .height{
+    height: 39rem;
+  }
+}
+@media (max-width: 1250px) {
+  .height{
+    height: 33rem;
+  }
+}
+@media (max-width: 1050px) {
+  .height{
+    height: 27rem;
+  }
+}
+@media (max-width: 920px) {
+  .height{
+    height: 63rem;
+  }
+}
+@media (max-width: 720px) {
+  .height{
+    height: 50rem;
+  }
+}
+@media (max-width: 520px) {
+  .height{
+    height: 43rem;
+  }
+}
+@media (max-width: 450px) {
+  .height{
+    height: 27rem;
+  }
+}
+
 </style>

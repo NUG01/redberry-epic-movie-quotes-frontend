@@ -18,6 +18,7 @@ export default {
 
 
     const user=props.user;
+    const image=import.meta.env.VITE_API_BASE_URL_IMAGE+props.user.thumbnail;
     const feedColor=props.feed;
     const moviesColor=props.movies;
     const profileColor=props.profile;
@@ -56,7 +57,8 @@ function logoutEmit(){
     medium,
     closeSideMenu,
     logout,
-    logoutEmit
+    logoutEmit,
+    image
     }
   }
   
@@ -67,7 +69,7 @@ function logoutEmit(){
 <template>
 <div class="flex flex-col items-start justify-center gap-[4.5rem] pl-[7rem] mt-[3rem]" :class="medium">
   <div @click="closeSideMenu" class="flex items-center gap-[1.3rem]">
-    <img src="/src/assets/InterstellarMovie.png" :class="profileColor" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%]"/>
+  <div :class="profileColor" :style="'background-image:url('+image+')'" class="rounded-[100%] w-[6rem] h-[6rem] -translate-x-[25%] bg-cover bg-no-repeat bg-center"></div>
     <div class="flex flex-col ietms-center justify-center">
       <p class="text-[2.4rem] text-[#fff]">{{ user.name }}</p>
       <p @click="profilePage" class="text-[1.6rem] text-[#CED4DA] hover:cursor-pointer">{{ $t('newsFeed.edit_profile') }}</p>

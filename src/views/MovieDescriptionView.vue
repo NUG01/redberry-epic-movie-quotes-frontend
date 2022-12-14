@@ -1,6 +1,6 @@
 <script>
 import { useUserStore } from '@/stores/UserStore.js';
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import QuoteList from "@/components/QuoteList.vue";
 import BasicHeader from "@/components/BasicHeader.vue";
@@ -16,6 +16,7 @@ import DescriptionComment from "@/components/icons/DescriptionComment.vue";
 import AddmovieForm from "@/components/forms/AddmovieForm.vue";
 import axios from "@/config/axios/index.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ProfileUpdated from "@/components/ProfileUpdated.vue";
 
 
 
@@ -23,8 +24,8 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 export default {
   name:'MovieDescription',
   props:['id'],
-  emits:['emitDots', 'updateMovie', 'quotesQuantity'],
-  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm },
+  emits:['emitDots', 'updateMovie', 'quotesQuantity', 'requiredMessage'],
+  components:{BasicHeader, QuoteList, BasicNavigation, BasicButton, AddMovie, HeartIcon, LoadingSpinner, DescriptionComment, DotsIcon, DeleteTrash, EditPencil, ViewQuote, AddmovieForm, ProfileUpdated },
   
   setup(props){
 
@@ -35,6 +36,7 @@ export default {
 
 
     const addMoviesModal=ref(false);
+    const imageRequired=ref(false);
     const imageDisplay=ref('');
     const movieData=ref([])
     const moviesData=ref([])
@@ -44,13 +46,16 @@ export default {
     const quotesLength=ref('')
     const genres=ref([])
     const quotes=ref([])
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
+
+
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
        const res = await axios.get(`movies/${currentId}/details`);
-       console.log(res)
        genres.value=res.data.genres
        movieData.value=res.data.movie
+       imageDisplay.value=imageUrl+movieData.value.thumbnail
        quotes.value=res.data.quotes
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
        quotesLength.value=res.data.quotes.length  
@@ -62,6 +67,7 @@ export default {
         dataIsFetched.value=false
           const res = await axios.get(`movies/${currentId}/details`);
           movieData.value=res.data.movie
+          imageDisplay.value=imageUrl+movieData.value.thumbnail
           genres.value=res.data.genres
           quotes.value=res.data.quotes
           quotesLength.value=res.data.quotes.length 
@@ -73,8 +79,11 @@ export default {
           quotesLength.value=data.length   
         }
      
-    // imageDisplay.value='http://localhost:8000/public/images/'+user.value.thumbnail
- 
+  watch(imageRequired, () => {
+      setTimeout(() => {
+        imageRequired.value=false
+     }, "7200")
+});
     
 
       function handleCloseEmit(){
@@ -108,7 +117,9 @@ dataIsFetched,
 updateMovie,
 updateQuantity,
 genres,
-quotes
+quotes,
+imageDisplay,
+imageRequired
 }
   }
   
@@ -121,13 +132,18 @@ quotes
   <basic-header></basic-header>
   <loading-spinner texts="hidden" bgColor="bg-none" location="mt-[20rem]" v-if="!dataIsFetched"></loading-spinner>
   <main v-else class="md:w-[100vw]">
-  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute z-50" :name="$t('newsFeed.edit_movie')" 
+    <profile-updated v-if="imageRequired" class="z-50" color="bg-[#ec942293] text-[#fff]">
+    {{ $t('newsFeed.genre_required') }}
+  </profile-updated>
+  <addmovie-form @update-movie="updateMovie" :user="authUser" @emit-close="handleCloseEmit" @required-message="imageRequired=true" v-if="addMoviesModal" axiosEndpoint="movies" class="absolute z-40" :name="$t('newsFeed.edit_movie')" 
   :name_en="movieData.name.en" 
   :name_ka="movieData.name.ka" 
   :director_en="movieData.director.en" 
   :director_ka="movieData.director.ka" 
   :description_en="movieData.description.en" 
   :description_ka="movieData.description.ka" 
+  :author="movieData.user.name" 
+  :image="movieData.thumbnail"
   :id="currentId"
    ></addmovie-form>
 
@@ -140,7 +156,7 @@ quotes
        
         <div class="w-[100%]">
           <div class="mb-[4rem]">
-          <img src="/src/assets/LordofRingsMovie.png" class="w-[100%] rounded-[12px]"/>
+          <img :src="imageDisplay" class="w-[100%] rounded-[12px]"/>
           <div class="mt-[4rem] flex items-center w-[55%] xxl:w-[55%] xl:w-[65%] llg:w-[85%] lg:w-[110%] md:hidden">
             <div>
             <p class="font-normal text-[2.4rem] text-[#fff] mr-[1.6rem]">{{ $t('newsFeed.quotes') }} ({{ $t('newsFeed.total') }} <span>{{ quotesLength }}</span>)</p>

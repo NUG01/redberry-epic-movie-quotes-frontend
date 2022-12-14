@@ -45,8 +45,10 @@ export default {
     const quotesList=ref([])
     const authors=ref([])
     const movieAuthors=ref([])
+    const userImage=ref([])
     const page=ref(1)
     const noMorePosts=ref(false)
+    const imageUrl=import.meta.env.VITE_API_BASE_URL_IMAGE
 
     function paginationData(data){
       for (let i = 0; i < data.length; i++) {
@@ -56,10 +58,13 @@ export default {
      }
      }
     for (let i = 0; i < data.length; i++) {
-      for (let k = 0; k < data[i].likes.comments; k++) {
+      for (let k = 0; k < data[i].comments.length; k++) {
        commentsData.value.push(data[i].comments[k])
        comments.value.push(data[i].comments[k])
      }
+     }
+    for (let i = 0; i < data.length; i++) {
+        moviesData.value.push(data[i].movie)
      }
     for (let i = 0; i < data.length; i++) {
        quoteData.value.push(data[i])
@@ -102,6 +107,7 @@ export default {
 
     user.value =login.getUserData;
     if(user.value!=null){
+      userImage.value=imageUrl+user.value.thumbnail
      dataIsFetched.value=true
     }
 
@@ -174,7 +180,12 @@ export default {
 
   function searchSubmit(payload){
     const locale=payload.locale
-    let target=payload.event.target.value
+    let target;
+    if(payload.event!=null){
+     target=payload.event.target.value
+    } else{
+       target=document.querySelector('.search').value
+    }
     quotesList.value=quoteData.value
     if(target==''){
       quotesList.value=quoteData.value
@@ -192,28 +203,12 @@ export default {
       let movie=(target).substring((target).indexOf("@")+1)
       if(locale=='en'){
         quotesList.value=[]
-      const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
-      for (let i = 0; i < filteredMovies.length; i++) {
-          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
-              let quote=filteredMovies[i].quotes[k]
-              if(quote){
-                quotesList.value.push(quote)
-              }
-         }
-      }
+       quotesList.value=quoteData.value.filter(x => (x.movie.name.en).includes(movie))
   }
 
      if(locale=='ka'){
       quotesList.value=[]
-      const filteredMovies=moviesData.value.filter(x => (x.name.en).includes(movie))
-      for (let i = 0; i < filteredMovies.length; i++) {
-          for (let k = 0; k < filteredMovies[i].quotes.length; k++) {
-              let quote=filteredMovies[i].quotes[k]
-              if(quote){
-                quotesList.value.push(quote)
-              }
-         }
-      }
+      quotesList.value=quoteData.value.filter(x => (x.movie.name.ka).includes(movie))
       }
     }
   }
@@ -227,6 +222,9 @@ export default {
   showComments.value=id
    }
 
+   function currentImage(image){
+   return imageUrl+image
+   }
    function commentsQuantity(quote){
    return quote.comments.length
    }
@@ -246,9 +244,15 @@ export default {
       return object.en
     }
    }
+  function simulateKeydown(payload){
+    let data={
+      locale:payload.locale,
+      event:null,
+    }
+    searchSubmit(data)    
+  }
 
 
-    
 
 return {
        user,
@@ -276,7 +280,10 @@ return {
        searchSubmit,
        submitComment,
        spinner,
-       noMorePosts,
+       noMorePosts, 
+       currentImage,
+       userImage,
+       simulateKeydown
        
     
        }
@@ -312,19 +319,19 @@ return {
 
       <div @click="searchClicked($i18n.locale, $event)" :class="[searchActivated ? 'w-[75%] border-b-[#6C757D] border-b border-b-solid' : 'w-[25%] cursor-pointer']" class="md:hidden">
         <div  class="flex items-center gap-[1.6rem] pb-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']">
-       <search-icon></search-icon>
-        <input @keydown.enter.prevent="searchSubmit({locale:$i18n.locale, event:$event})" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem]" :class="[searchActivated ? '' : 'cursor-pointer']"/>
+       <search-icon @click="simulateKeydown({locale:$i18n.locale, event:$event})"></search-icon>
+        <input @keydown.enter.prevent="searchSubmit({locale:$i18n.locale, event:$event})" :disabled="!searchActivated" type="text" :placeholder="!searchActivated ? $t('newsFeed.search_by') : 'Enter @ to search movies, Enter # to search quotes '" class="w-[100%] pr-[1rem] search" :class="[searchActivated ? '' : 'cursor-pointer']"/>
         </div>
       </div>
       </div>
       <div v-for="quote in quotesList" :key="quote" :id="quote.id" class="w-[94rem] h-[auto] md:w-[100vw] lg:w-[61rem] llg:w-[72rem] xl:w-[87rem] xxl:w-[94rem] bg-[#11101A] p-[2.4rem] rounded-[12px] backdrop mt-[2.2rem] last">
         <div class="flex items-center justify-start gap-[1.6rem]">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+      <div :style="'background-image:url('+currentImage(quote.user.thumbnail)+')'" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4.6rem] md:h-[4.6rem] bg-cover bg-no-repeat bg-center"></div>
           <p class="text-[2rem] md:text-[1.8rem] text-[#fff]">{{ quote.user.name }}</p>
         </div>
         <p class="mt-[1.6rem] mb-[2.8rem] text-[2rem] md:text-[1.6rem] text-[#fff] font-normal">“{{ localeChange($i18n.locale, quote.quote) }}” - <span class="text-[#DDCCAA]">{{ localeChange($i18n.locale, movieName(quote)) }}</span></p>
         <div class="border-b border-solid border-[#f0f0f04d] pb-[2.5rem]">
-        <img src="/src/assets/InterstellarMovie.png" class="rounded-[10px]"/>
+        <div :style="'background-image:url('+(currentImage(quote.thumbnail))+')'" class="w-[100%] height rounded-[10px] bg-cover bg-no-repeat bg-center"></div>
         <div class="flex items-center justify-start gap-[2.4rem] mt-[2.4rem]">
         <div @click="handleShowComments(quote.id)" class="flex items-center justify-center cursor-pointer gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ commentsQuantity(quote) }}</span><comments-icon></comments-icon></div>
         <div class="flex items-center justify-center gap-[1.2rem]"><span class="text-[#fff] text-[2rem]">{{ likesQuantity(quote) }}</span><likes-icon  @liked-status="handleLikes(quote)" :fill="likesColor(quote)" class="cursor-pointer"></likes-icon></div>
@@ -333,7 +340,7 @@ return {
       <div>
         <div v-if="showComments==quote.id" class="max-h-[50rem] overflow-y-scroll scrollbarHide">
         <div v-for="comment in quote.comments" :key="comment" class="flex gap-[2.4rem] pt-[2.4rem]">
-         <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem]"/>
+      <div :style="'background-image:url('+currentImage(comment.user.thumbnail)+')'" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4.6rem] md:h-[4.6rem] bg-cover bg-no-repeat bg-center"></div>
          <div class="border-b border-solid border-[#f0f0f04d] pb-[2.4rem] pr-[1.2rem] w-[100%]">
           <p class="text-[2rem] font-medium text-[#fff]">{{ comment.user.name }}</p>
           <p class="text-[2rem] font-normal text-[#fff]">{{ comment.body }}</p>
@@ -341,7 +348,7 @@ return {
         </div>
         </div>
         <div class="mt-[2.4rem] gap-[2.4rem] flex items-center">
-          <img src="/src/assets/InterstellarMovie.png" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4rem] md:h-[4rem]"/>
+      <div :style="'background-image:url('+userImage+')'" class="rounded-[100%] w-[5.2rem] h-[5.2rem] md:w-[4.6rem] md:h-[4.6rem] bg-cover bg-no-repeat bg-center"></div>
           <textarea :id="'comment'+quote.id" :name="'comment'+quote.id" @keydown.enter.prevent="submitComment(quote, $event)" :placeholder="$t('newsFeed.write_comment')" class="rounded-[10px] min-w-[89%] max-w-[89%] min-h-[5.2rem] max-h-[5.2rem] md:min-w-[81%] md:max-w-[81%] md:min-h-[4rem] md:max-h-[4rem] bg-[#24222F] px-[2.5rem] py-[1rem] md:px-[1.6rem] md:py-[0.5rem]"></textarea>
         </div>
       </div>
@@ -396,6 +403,7 @@ textarea::placeholder {
     font-weight: 400;
     color: #CED4DA;
     font-size: 2rem;
+    white-space: nowrap;
 }
 input::placeholder {
     font-weight: 400;
@@ -451,4 +459,38 @@ input {
 .scrollbarHide::-webkit-scrollbar-thumb {
   border-radius: 0 0 0 0;
         }
+
+.height{
+  height: 50rem;
+}
+@media (max-width: 1250px) {
+  .height{
+    height: 42rem;
+  }
+}
+@media (max-width: 1050px) {
+  .height{
+    height: 39rem;
+  }
+}
+@media (max-width: 920px) {
+  .height{
+    height: 60rem;
+  }
+}
+@media (max-width: 720px) {
+  .height{
+    height: 45rem;
+  }
+}
+@media (max-width: 520px) {
+  .height{
+    height: 36rem;
+  }
+}
+@media (max-width: 450px) {
+  .height{
+    height: 30rem;
+  }
+}
 </style>
