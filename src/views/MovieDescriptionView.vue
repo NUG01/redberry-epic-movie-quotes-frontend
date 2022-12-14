@@ -52,11 +52,12 @@ export default {
 
       onMounted(async ()=>{
        authUser.value=login.getUserData
-       const res = await axios.get(`movies/${currentId}/details`);
+       const res = await axios.get(`movies/${currentId}`);
        genres.value=res.data.genres
        movieData.value=res.data.movie
        imageDisplay.value=imageUrl+movieData.value.thumbnail
        quotes.value=res.data.quotes
+       console.log(res.data)
        movieName.value=JSON.parse(JSON.stringify(movieData.value.name))
        quotesLength.value=res.data.quotes.length  
        dataIsFetched.value=true
@@ -65,7 +66,7 @@ export default {
 
        async function updateMovie(){
         dataIsFetched.value=false
-          const res = await axios.get(`movies/${currentId}/details`);
+          const res = await axios.get(`movies/${currentId}`);
           movieData.value=res.data.movie
           imageDisplay.value=imageUrl+movieData.value.thumbnail
           genres.value=res.data.genres
