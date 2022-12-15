@@ -186,7 +186,7 @@ return {
           </div>
            <div v-if="responseError.length>0" @click="responseError=[]" id="responseError" class="mt-[2rem] px-[6px] py-[4px] cursor-pointer border border-solid border-[#EC9524] bg-[#ec952234] text-[#fff] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><span class="flex items-center justify-between gap-[1rem]"><p>{{ responseError[0] }}</p><profileinvalid-icon/></span></div>        
           <div class="flex flex-col w-[100%]">
-         <profile-input rules='required|min:8|max:15' :vModel="user.name" name="name" type="name" width="w-[100%]" :label="$t('landing.name')"/>
+         <profile-input rules='required|min:8|max:15|lower_case_name' :vModel="user.name" name="name" type="name" width="w-[100%]" :label="$t('landing.name')"/>
          <profile-input disabled='pointer-events-none opacity-[70%] mt-[3rem]' :vModel="user.email" name="googleEmail" type="email" width="w-[100%]" :label="$t('landing.email')"/>
           </div>
           <basic-button type="submit" class="text-[white] text-[1.6rem] border border-solid bg-[#E31221] border-[#E31221] px-[25.5px] py-[7px] rounded-[4px] absolute bottom-0 right-0 translate-y-[180%] md:right-[2.4rem]">{{ $t('newsFeed.save_changes') }}</basic-button>  
@@ -205,7 +205,7 @@ return {
            <div v-if="responseError.length>0" @click="responseError=[]" id="responseError" class="mt-[2rem] px-[6px] py-[4px] cursor-pointer border border-solid border-[#EC9524] bg-[#ec952234] text-[#fff] text-[1.6rem] px-[7px] py-[4px] rounded-[4px]"><span class="flex items-center justify-between gap-[1rem]"><p>{{ responseError[0] }}</p><profileinvalid-icon/></span></div>        
           <div class="flex flex-col w-[100%] gap-[2rem]">
 
-          <profile-input rules='required|min:8|max:15|lower_case' :vModel="user.name" name="name" type="name" width="w-[60%]" :label="$t('landing.name')"/>
+          <profile-input rules='required|min:8|max:15|lower_case_name' :vModel="user.name" name="name" type="name" width="w-[60%]" :label="$t('landing.name')"/>
           <profileinput-container><profile-input rules='email|required' :vModel="user.email" name="email" type="email" width="w-[60%]" :label="$t('landing.email')"/></profileinput-container>  
           
           <div v-for="email in emails" v-show="email.address!=user.email" :key="email.id" class="flex items-center lsm:flex-col lsm:items-start lsm:justify-start gap-[2.4rem] lsm:gap-0">
