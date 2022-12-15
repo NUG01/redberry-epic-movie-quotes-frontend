@@ -13,7 +13,7 @@ configure({
           required: 'The name field is required',
           min: 'The name field must be at least 0:{length} characters',
           max: 'The name field may not be greater than 0:{length} characters',
-          lower_case: 'The name field must consist of lower case characters',
+          lower_case_name: 'The name field must consist of lower case characters and numbers',
         },
         password: {
           required: 'The password field is required',
@@ -30,7 +30,7 @@ configure({
           required: 'The password field is required',
           min: 'The password field must be at least 0:{length} characters',
           max: 'The password field may not be greater than 0:{length} characters',
-          lower_case: 'The password field must consist of lower case characters',
+          lower_case: 'The password field must consist of lower case characters and numbers',
         },
       }
     },
@@ -42,7 +42,7 @@ configure({
           required: 'სახელის ველის შევსება აუცილებელია',
           min: 'სახელი უნდა შეიცავდეს მინიმუმ 0:{length} სიმბოლოს',
           max: 'სახელი არ უნდა შეიცავდეს 0:{length} სიმბოლოზე მეტს',
-          lower_case: 'სახელი უნდა შეიცავდეს მხოლოდ დაბალი რეგისტრის სიმბოლოებს',
+          lower_case: 'სახელი უნდა შეიცავდეს მხოლოდ დაბალი რეგისტრის სიმბოლოებს და რიცხვებს',
         },
         password: {
           required: 'პაროლის ველის შევსება აუცილებელია',
@@ -59,7 +59,7 @@ configure({
           required: 'პაროლის ველის შევსება აუცილებელია',
           min: 'პაროლი უნდა შეიცავდეს მინიმუმ 0:{length} სიმბოლოს',
           max: 'პაროლი არ უნდა შეიცავდეს 0:{length} სიმბოლოზე მეტს',
-          lower_case: 'პაროლი უნდა შეიცავდეს მხოლოდ დაბალი რეგისტრის სიმბოლოებს',
+          lower_case_name: 'პაროლი უნდა იყოს დაბალი რეგისტრის და რიცხვებს',
         },
       }
     },
