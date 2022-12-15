@@ -57,7 +57,7 @@ export default {
        movieData.value=res.data.movie
        imageDisplay.value=imageUrl+movieData.value.thumbnail
        quotes.value=res.data.movie.quotes
-       movieName.value=movieData.value.name
+       movieName.value=res.data.movie.name
        quotesLength.value=res.data.movie.quotes.length  
        dataIsFetched.value=true
      
@@ -71,7 +71,7 @@ export default {
           genres.value=res.data.movie.genres
           quotes.value=res.data.movie.quotes
           quotesLength.value=res.data.movie.quotes.length 
-          movieName.value=movieData.value.name
+          movieName.value=res.data.movie.name
           dataIsFetched.value=true
         }
 
