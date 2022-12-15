@@ -45,12 +45,10 @@ export default{
      
 
   watch(locale, () => {
-    console.log(locale.value)
   setLocale(locale.value)
 });
   
- function changeLocale(lang)
-{
+ function changeLocale(lang){
    locale.value=lang
 }
 
