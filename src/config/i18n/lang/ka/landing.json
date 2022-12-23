@@ -36,5 +36,20 @@
   "lord_of_rings": "ბეჭდების მბრძანებელი",
   "lord_of_rings_quote_one": "შენ თვალებში ვხედავ იგივე",
   "lord_of_rings_quote_two": "შიშს რომელიც დაიპყრობს",
-  "lord_of_rings_quote_three": "ჩემს გულს...."
+  "lord_of_rings_quote_three": "ჩემს გულს....",
+
+  "forgot_password_?": "დაგავიწყდა პაროლი?",
+  "enter_email": "შეიყვანე ელ.ფოსტა და გამოგეგზავნება მეილი",
+  "please_check_email": "შეამოწმე ელ.ფოსტა და მიყევი ინსტრუქციებს ექაუნთის გასააქტიურებლად",
+  "confirm_later": "ახლა არა, მოგვიანებით დავადასტურებ",
+  "create_password": "ახალი პაროლის შექმნა",
+  "different_new_password": "ახალი პაროლი უნდა იყოს განსხვავებული",
+  "previous_password": "ძველი პაროლებისგან",
+  "success": "წარმატება!",
+  "email_changed": "ელ.ფოსტა შეიცვალა წარმატებით",
+  "go_to_feed": "მთავარ გვერდზე გადასვლა",
+  "back_login": "უკან დაბრუნება",
+  "send_instructions": "ინსტრუქციების გაგზავნა",
+  "reset_password": "პაროლის განახლება",
+  "enter_email_placeholder": "შეიყვანე ელ.ფოსტა"
 }
