@@ -18,6 +18,8 @@ module.exports = {
         lg: { min: "921px" },
 
         md: { max: "920px" },
+
+        mob: { max: "780px" },
   
         lsm: { max: "620px" },
 

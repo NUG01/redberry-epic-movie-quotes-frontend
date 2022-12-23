@@ -80,7 +80,11 @@ npm run lint
 ### Deployment
 <br/>
 
+<<<<<<< HEAD
 !["nginx / php fpm"](./public/assets/readme/php-fpm-nginx-logo.png)
+=======
+<img src="./src/assets/readme/ngnix-fpm.png" style="position: relative; width: 100%" />
+>>>>>>> 102ce83118ffe68ae9e458b7a4f4bcd2a3bf94f8
 
 <br />
 

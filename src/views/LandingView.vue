@@ -3,9 +3,11 @@ import BasicButton from "@/components/BasicButton.vue";
 import LandingImage from "@/components/LandingImage.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import DropdownArrow from "@/components/icons/DropdownArrow.vue";
+import { setLocale } from "@vee-validate/i18n";
+import i18n from "@/config/i18n/index.js";
+import { ref, watch } from "vue";
 
 
-import { ref } from "vue";
 export default{
   name:"Landing",
   components:{BasicButton, LandingImage, DropdownArrow, LandingFooter},
@@ -13,6 +15,7 @@ export default{
 
       const langActive=ref(false);
       const intersection=ref(false);
+      const locale=ref(i18n.global.locale)
 
       function langDropDown(){
         langActive.value=!langActive.value;
@@ -41,14 +44,20 @@ export default{
       }, "720")
      
 
-
+  watch(locale, () => {
+  setLocale(locale.value)
+});
+  
+ function changeLocale(lang){
+   locale.value=lang
+}
 
      
 
       return {
         langDropDown,
         active: langActive,
-        intersection
+        intersection,changeLocale
         }
      }
 }
@@ -68,9 +77,9 @@ export default{
         <p class="text-[1.6rem] sm:text-[1.4rem] text-[white]">{{ $i18n.locale=='en'? 'Eng' : 'Ka' }}</p>
       <dropdown-arrow></dropdown-arrow>
         </div>
-      <div class="absolute top-full left-0 bg-none border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
-          <div @click="$i18n.locale='en'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Eng</p></div>
-          <div @click="$i18n.locale='ka'" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Ka</p></div>
+      <div @click="active=false" class="absolute top-full left-0 bg-none border border-solid border-[white] w-[100%] rounded-[3px] h-[0px] hidden" :class="{lang : active}">
+          <div @click="$i18n.locale='en'" @mouseenter="changeLocale('en')" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Eng</p></div>
+          <div @click="$i18n.locale='ka'" @mouseenter="changeLocale('ka')" class="block flex items-center justify-center text-[#ffffff] hover:bg-[#cdc9c2] hover:text-[#23232b] hover:font-[600] cursor-pointer"><p class="text-[1.4rem] sm:text-[1.3rem] px-[5px] py-[4px]">Ka</p></div>
       </div>
       </div>
       <router-link :to="{name:'registration'}" class="md:hidden"><basic-button text="text-[1.6rem]" class="text-[1.6rem] text-[#ffffff]" type="button" paddings="px-[25.5px] py-[7px]" rounded="rounded-[4px]">{{ $t('landing.signup') }}</basic-button></router-link>
