@@ -15,6 +15,8 @@ import { useAuthStore } from "@/stores/AuthStore.js";
 import SearchIcon from "@/components/icons/HeaderSearch.vue";
 import SearchArrow from "@/components/icons/SearchArrow.vue";
 import BellIcon from "@/components/icons/BellIcon.vue";
+import SmallsearchIcon from "@/components/icons/SearchIcon.vue";
+
 
 
 
@@ -23,7 +25,7 @@ import BellIcon from "@/components/icons/BellIcon.vue";
 export default {
   emits:['closeMenu', 'logoutMenu', 'notificationLength'],
   props:['search'],
-  components:{LanguageDropdown,BasicButton,NotificationsModal, NotificationIcon, NotificationComment, NotificationLike, HeaderMenu, BasicNavigation, SearchIcon, BellIcon, SearchArrow},
+  components:{LanguageDropdown,BasicButton,NotificationsModal, NotificationIcon, NotificationComment, NotificationLike, HeaderMenu, BasicNavigation, SearchIcon, BellIcon, SearchArrow, SmallsearchIcon},
   setup(props, context){
 
     const login=useUserStore();
@@ -66,10 +68,11 @@ onMounted(()=>{
     function sideMenuOpen(){
       sideMenuShow.value=true
     }
-    function searchSubmit(locale, event){
+    function searchSubmit(data){
       const payload={
-        locale:locale,
-        event:event
+        locale:data.locale,
+        event:data.event, 
+        value:document.querySelector('.search').value,
       }
         context.emit('headerSearch', payload)
         searchShow.value=false
@@ -88,6 +91,7 @@ onMounted(()=>{
         search,
         searchSubmit,
         searchShow,
+        
         
         
         
@@ -113,8 +117,9 @@ onMounted(()=>{
         <div v-show="searchShow" class="absolute top-0 left-0 bg-[#11101A] w-[100vw] h-[80vh] z-50 hidden md:block">
           <div class="w-[100%] border-b border-b-[#ffffff4e] border-b-solid flex items-center gap-[2.4rem] py-[1.8rem] px-[3.2rem]">
             <search-arrow @click="searchShow=false"></search-arrow>
-          <input @keydown.enter.prevent="searchSubmit($i18n.locale,$event)" type="text" :placeholder="$t('newsFeed.search')" class="w-[100%] pr-[1rem] bg-inherit"/>
-          </div>
+          <input @keydown.enter.prevent="searchSubmit({locale:$i18n.locale, event:$event})" type="text" :placeholder="$t('newsFeed.search')" class="w-[100%] pr-[1rem] bg-inherit search"/>
+          <smallsearch-icon class="scale-[1.3]" @click="searchSubmit({locale:$i18n.locale, event:$event})"></smallsearch-icon>
+         </div>
           <div class="flex flex-col justify-center gap-[2rem] mt-[2.4rem] pl-[7rem]">
             <p class="text-[#CED4DA] text-[1.6rem]">Enter <span class="text-[#fff]">@</span> to search movies</p>
             <p class="text-[#CED4DA] text-[1.6rem]">Enter <span class="text-[#fff]">#</span> to search quotes </p>

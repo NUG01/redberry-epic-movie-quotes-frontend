@@ -64,7 +64,7 @@ export default {
         })
 
        async function updateMovie(){
-        dataIsFetched.value=false
+         dataIsFetched.value=false
           const res = await axios.get(`movies/${currentId}`);
           movieData.value=res.data.movie
           imageDisplay.value=imageUrl+movieData.value.thumbnail

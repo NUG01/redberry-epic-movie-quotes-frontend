@@ -181,11 +181,15 @@ export default {
   function searchSubmit(payload){
     const locale=payload.locale
     let target;
-    if(payload.event!=null){
-     target=payload.event.target.value
-    } else{
-       target=document.querySelector('.search').value
-    }
+    if(payload.status=='mobile'){
+        target=payload.value
+    }else{
+      if(payload.event!=null){
+       target=payload.event.target.value
+      } else{
+         target=document.querySelector('.search').value
+      }
+   }
     quotesList.value=quoteData.value
     if(target==''){
       quotesList.value=quoteData.value
@@ -251,6 +255,15 @@ export default {
     }
     searchSubmit(data)    
   }
+  function mobileSearch(payload){
+    let data={
+      locale:payload.locale,
+      event:payload.event,
+      value:payload.value,
+      status:'mobile'
+    }
+    searchSubmit(data)    
+  }
 
 
 
@@ -283,7 +296,8 @@ return {
        noMorePosts, 
        currentImage,
        userImage,
-       simulateKeydown
+       simulateKeydown,
+       mobileSearch
        
     
        }
@@ -297,7 +311,7 @@ return {
 <div class="main w-[100vw] h-[100vh] bg-[#181623] overflow-x-hidden overflow-y-scroll scrollbar">
   <newsfeed-spinner v-if="spinner" class="fixed z-40 scale-75"></newsfeed-spinner>
 <div class="fixed z-50">
-  <basic-header @header-search="searchSubmit" search="search"></basic-header>
+  <basic-header @header-search="mobileSearch" search="search"></basic-header>
   </div>
   <div class="w-[100vw] h-[8rem] md:h-[7rem]"></div>
 

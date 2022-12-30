@@ -48,4 +48,25 @@ html{
   overflow-x: hidden;
   width: 100vw;
 }
+::-webkit-scrollbar {
+  width: 1.2rem;
+  background: none;
+  border-radius: 0 0 0 0;
+        }
+
+::-webkit-scrollbar-thumb {
+  background: #28272d;
+  border-radius: 0 0 0 0;
+        }
+
+::-webkit-scrollbar-track {
+  background: #b9b3a2;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2d2c2f;
+  cursor: auto;
+}
+
 </style>

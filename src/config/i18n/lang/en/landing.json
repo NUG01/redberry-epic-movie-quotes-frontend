@@ -36,5 +36,20 @@
   "lord_of_rings": "The Lord of the Rings",
   "lord_of_rings_quote_one": "I see in your eyes the same",
   "lord_of_rings_quote_two": "fear that would take the",
-  "lord_of_rings_quote_three": "heart of me...."
+  "lord_of_rings_quote_three": "heart of me....",
+
+  "forgot_password_?": "Forgot password?",
+  "enter_email": "Enter the email and we’ll send an email with",
+  "please_check_email": "Please check your email and follow the instructions to activate your account",
+  "confirm_later": "Skip, I’ll confirm later",
+  "create_password": "Create new password",
+  "different_new_password": "Your new password must be different from",
+  "previous_password": "previous used passwords",
+  "success": "Success!",
+  "email_changed": "Your Email changed successfully",
+  "go_to_feed": "Go to my news feed",
+  "back_login": "Back to log in",
+  "send_instructions": "Send instructions",
+  "reset_password": "Reset password",
+  "enter_email_placeholder": "Enter your email"
 }

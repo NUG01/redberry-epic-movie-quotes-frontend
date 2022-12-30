@@ -144,7 +144,7 @@ export default {
 
 
 <template>
-<div v-if="dataIsFetched" class="flex items-center justify-center">
+<div v-if="dataIsFetched" class="flex items-center justify-center z-50">
 <div class="fixed top-0 left-0 w-[100vw] h-[100vh] backdrop-blur-[3px] bg-[rgba(0,0,0,0.54)] z-40" @click="emitClose"></div>
     <div class="fixed md:overflow-y-scroll w-[40%] xl:w-[45%] lg:w-[60%] md:w-[100vw] md:h-[100vh] md:max-h-[100vh] top-1/2 left-1/2 md:top-0 md:left-0 md:translate-x-0 md:translate-y-0 -translate-x-1/2 -translate-y-1/2 bg-[#11101A] rounded-[10px] z-40">
     <div class="flex items-center justify-center border-b border-b-solid border-b-[#f0f0f036] relative backdrop">
