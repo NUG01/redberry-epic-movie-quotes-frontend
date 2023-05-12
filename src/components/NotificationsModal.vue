@@ -27,7 +27,7 @@ export default {
        user.value=login.getUserData
       const resNotifications= await axios.get(`notifications/${user.value.id}`);
       notifications.value=resNotifications.data.filter(x => x.user.id != user.value.id)
-      window.Echo.private('notifications.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
+      window.Echo.private('notatificions.'+user.value.id).listen('NotificationStatusUpdated', (e) => {
         let data=e.notification.data
               data.user=e.notification.user
               if(user.value.id!=e.notification.user.id){

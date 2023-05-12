@@ -1,4 +1,3 @@
-
 <script>
 import BasicInput from "@/components/BasicInput.vue";
 import BasicButton from "@/components/BasicButton.vue";
