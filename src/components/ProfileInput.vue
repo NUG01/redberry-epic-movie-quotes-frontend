@@ -14,7 +14,7 @@ export default {
     "rules",
     "value",
     "disabled",
-    "vModel",
+    "propModel",
     "width",
   ],
   components: {
@@ -37,7 +37,7 @@ export default {
     const width = props.width;
 
     const vModel = computed(() => {
-      return props.vModel;
+      return props.propModel;
     });
 
     const noState = ref(false);
